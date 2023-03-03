@@ -9,7 +9,8 @@ const config = {
       name: 'Cherry-K',
     },
     port: 27017,
-    db: 'mongodb+srv://kyawzawlwin6394:XZ90J74EVci26GAd@cluster0.85ozwwv.mongodb.net/?retryWrites=true&w=majority',
+    db: 'mongodb://dbuser:se0prykWCd8YYIx9@ac-ws1mvow-shard-00-00.85ozwwv.mongodb.net:27017,ac-ws1mvow-shard-00-01.85ozwwv.mongodb.net:27017,ac-ws1mvow-shard-00-02.85ozwwv.mongodb.net:27017/?ssl=true&replicaSet=atlas-r1hi5a-shard-0&authSource=admin&retryWrites=true&w=majority',
+
   },
 
   production: {
@@ -18,10 +19,8 @@ const config = {
       name: 'Cherry-K',
     },
     port: 27017,
-    db: 'mongodb+srv://kyawzawlwin6394:XZ90J74EVci26GAd@cluster0.85ozwwv.mongodb.net/?retryWrites=true&w=majority',
+    db: 'mongodb://dbuser:se0prykWCd8YYIx9@ac-ws1mvow-shard-00-00.85ozwwv.mongodb.net:27017,ac-ws1mvow-shard-00-01.85ozwwv.mongodb.net:27017,ac-ws1mvow-shard-00-02.85ozwwv.mongodb.net:27017/?ssl=true&replicaSet=atlas-r1hi5a-shard-0&authSource=admin&retryWrites=true&w=majority',
   },
 };
 
 module.exports = config[env];
-
-//db: 'mongodb://54.251.85.187/issue-tracking',
