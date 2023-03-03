@@ -5,7 +5,7 @@ const express = require('express'),
   config = require('./config/db'),
   app = express(),
   server = require('http').Server(app),
-  port = process.env.PORT || 9000;
+  port = 9000;
 app.use(cors({ origin: '*'}));
 
 // mongoose instance connection url connection
