@@ -1,5 +1,4 @@
 const cors = require('cors');
-const path = require('path');
 const express = require('express'),
   bodyParser = require('body-parser'),
   mongoose = require('mongoose'),
@@ -7,12 +6,7 @@ const express = require('express'),
   app = express(),
   server = require('http').Server(app),
   port = process.env.PORT || 9000;
-let corsOptions = {
-  origin: '*',
-};
-
-
-app.use(cors(corsOptions));
+app.use(cors({ origin: '*'}));
 
 // mongoose instance connection url connection
 if (mongoose.connection.readyState != 1) {
