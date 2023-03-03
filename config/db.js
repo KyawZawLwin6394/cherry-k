@@ -9,7 +9,7 @@ const config = {
       name: 'Cherry-K',
     },
     port: 27017,
-    db: 'mongodb+srv://kyawzawlwinwork6394:xyBbuhqdam1wTRHe@cluster0.48jl3a7.mongodb.net/?retryWrites=true&w=majority&ssl=true',
+    db: 'mongodb+srv://kyawzawlwin6394:XZ90J74EVci26GAd@cluster0.85ozwwv.mongodb.net/?retryWrites=true&w=majority',
   },
 
   production: {
@@ -18,7 +18,7 @@ const config = {
       name: 'Cherry-K',
     },
     port: 27017,
-    db: 'mongodb+srv://kyawzawlwinwork6394:xyBbuhqdam1wTRHe@cluster0.48jl3a7.mongodb.net/?retryWrites=true&w=majority&ssl=true',
+    db: 'mongodb+srv://kyawzawlwin6394:XZ90J74EVci26GAd@cluster0.85ozwwv.mongodb.net/?retryWrites=true&w=majority',
   },
 };
 

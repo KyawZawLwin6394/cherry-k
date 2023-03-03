@@ -1,7 +1,6 @@
 'use strict';
 const Patient = require('../models/Patient');
 var mongoose = require('mongoose');
-const Util = require('../lib/userUtil');
 
 exports.listAllPatients = async (req, res) => {
   try {
@@ -10,14 +9,7 @@ exports.listAllPatients = async (req, res) => {
     count = await Patient.find(query).count();
     res.status(200).send({
       success: true,
-      count: count,
-      _metadata: {
-        current_page: skip / limit + 1,
-        per_page: limit,
-        page_count: page,
-        total_count: count,
-      },
-      list: result,
+      data: result,
     });
   } catch (error) {
     res.status(500).send(await respond(false, error));
@@ -33,9 +25,7 @@ exports.getPatient = async (req, res) => {
 
 exports.createPatient = async (req, res, next) => {
   try {
-    let hashedPassword = await Util.bcryptHash(req.body.password);
-    let body = { ...req.body, password: hashedPassword };
-    const newPatient = new Patient(body);
+    const newPatient = new Patient(req.body);
     const result = await newPatient.save();
     res.status(200).send({
       message: 'Patient create success',
@@ -43,8 +33,7 @@ exports.createPatient = async (req, res, next) => {
       data: result
     });
   } catch (error) {
-    if (error.code === 11000) return res.status(500).send({"error":true, message:"This email is already registered!"})
-    return res.status(500).send({"error":true, message:error.code})
+    return res.status(500).send({"error":true, message:error.message})
   }
 };
 

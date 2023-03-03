@@ -15,7 +15,7 @@ let PatientSchema = new Schema({
     required: true,
   },
   phone: {
-    type:Number,
+    type:String,
     required:true
   },
   dateOfBirth: {
