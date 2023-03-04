@@ -2,7 +2,7 @@
 
 ## Installation
 
-Use the package manager [NPM] to install dependicies for Cherry-K Clinic API
+Use the package manager [NPM] to install dependencies for Cherry-K Clinic API
 
 ```nodejs
 npm install 
