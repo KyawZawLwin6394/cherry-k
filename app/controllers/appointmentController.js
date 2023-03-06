@@ -6,7 +6,7 @@ var ObjectID = require("mongodb").ObjectID; //to check if the value is objectid 
 
 exports.listAllAppointments = async (req, res) => {
   try {
-    let result = await Appointment.find({}).populate('patientName', 'name').populate('doctor','name');
+    let result = await Appointment.find({}).populate('patientName', 'name').populate('doctor', 'name');
     let count = await Appointment.find({}).count();
     res.status(200).send({
       success: true,
@@ -14,12 +14,12 @@ exports.listAllAppointments = async (req, res) => {
       data: result
     });
   } catch (error) {
-    return res.status(500).send({ error:true, message:'No Record Found!'});
+    return res.status(500).send({ error: true, message: 'No Record Found!' });
   }
 };
 
 exports.getAppointment = async (req, res) => {
-  const result = await Appointment.find({ _id: req.params.id }).populate('patientName', 'name').populate('doctor','name');
+  const result = await Appointment.find({ _id: req.params.id }).populate('patientName', 'name').populate('doctor', 'name');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -27,22 +27,22 @@ exports.getAppointment = async (req, res) => {
 
 exports.createAppointment = async (req, res, next) => {
   try {
-    if (req.body.patientStatus === 'New') {
-      const newPatient=new Patient({
+    if (req.body.patientStatus === 'New') { //If the patientStatus is new We'll save patient info first
+      const newPatient = new Patient({
         name: req.body.patientName,
-        phone:req.body.phone,
-        patientStatus:req.body.patientStatus
+        phone: req.body.phone,
+        patientStatus: req.body.patientStatus
       })
-      console.log('here',newPatient)
       const patientResult = await newPatient.save();
-      console.log(patientResult,'patientResult')
-      req.body = { ...req.body, patientName:patientResult._id}
+      req.body = { ...req.body, patientName: patientResult._id }
     }
-    console.log(req.body)
+    // After that we can create appointments with related patient id 
+    // PatientName needs to be an ObjectID if the PatientStatus is 'Old'
     if (ObjectID.isValid(req.body.patientName) === false) return res.status(500).send({
-      error:true,
-      message:'Patient Name is not an ObjectID!'
+      error: true,
+      message: 'Patient Name is not an ObjectID!'
     })
+
     const newAppointment = new Appointment(req.body);
     const result = await newAppointment.save();
     res.status(200).send({
@@ -80,7 +80,7 @@ exports.deleteAppointment = async (req, res, next) => {
     return res.status(500).send({ "error": true, "message": error.message })
 
   }
-};
+}
 
 exports.activateAppointment = async (req, res, next) => {
   try {
