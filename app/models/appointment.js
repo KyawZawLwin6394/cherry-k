@@ -30,9 +30,9 @@ let AppointmentSchema = new Schema({
     type:String,
     required:true
   },
-  date: {
+  originalDate: {
     type: Date,
-    required:true,
+    required:true, //storing the originalDate so that we can use it later whenever we need
   },
   createdAt: {
     type: Date,
@@ -40,6 +40,14 @@ let AppointmentSchema = new Schema({
   },
   updatedAt: {
     type: Date
+  },
+  date:{
+    type: String,
+    required:true,
+  },
+  time:{
+    type:String,
+    required:true
   },
   isDeleted: {
     type:Boolean,
