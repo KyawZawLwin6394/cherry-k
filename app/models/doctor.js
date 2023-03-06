@@ -6,33 +6,26 @@ const Schema = mongoose.Schema;
 const validator = require('validator');
 
 
-let PatientSchema = new Schema({
+let DoctorSchema = new Schema({
   name: {
     type: String,
     required: true
   },
-  age: {
-    type: Number,
+  speciality: {
+    type: String,
+    required: true,
   },
-  phone: {
+  treatmentUnitMain: {
     type:String,
     required:true
   },
-  dateOfBirth: {
-    type: Date,
+  schedule: {
+    type: Array,
+    required:true,
   },
-  email: {
-    type: String,
-  },
-  gender: {
-    type: String,
-    enum: ['Male', 'Female'],
-  },
-  address: {
-    type: String,
-  },
-  occupation: {
-    type: String,
+  commission: {
+    type: Number,
+    required:true,
   },
   createdAt: {
     type: Date,
@@ -45,12 +38,7 @@ let PatientSchema = new Schema({
     type:Boolean,
     required:true,
     default:false
-  },
-  patientStatus: {
-    type:String,
-    enum:['New','Old'],
-    requried:true,
   }
 });
 
-module.exports = mongoose.model('Patients', PatientSchema);
+module.exports = mongoose.model('Doctors', DoctorSchema);

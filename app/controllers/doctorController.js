@@ -1,10 +1,10 @@
 'use strict';
-const Patient = require('../models/patient');
+const Doctor = require('../models/doctor');
 
-exports.listAllPatients = async (req, res) => {
+exports.listAllDoctors = async (req, res) => {
   try {
-    let result = await Patient.find({});
-    let count = await Patient.find({}).count();
+    let result = await Doctor.find({});
+    let count = await Doctor.find({}).count();
     res.status(200).send({
       success: true,
       count: count,
@@ -15,19 +15,19 @@ exports.listAllPatients = async (req, res) => {
   }
 };
 
-exports.getPatient = async (req, res) => {
-  const result = await Patient.find({ _id: req.params.id });
+exports.getDoctor = async (req, res) => {
+  const result = await Doctor.find({ _id: req.params.id });
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
-exports.createPatient = async (req, res, next) => {
+exports.createDoctor = async (req, res, next) => {
   try {
-    const newPatient = new Patient(req.body);
-    const result = await newPatient.save();
+    const newDoctor = new Doctor(req.body);
+    const result = await newDoctor.save();
     res.status(200).send({
-      message: 'Patient create success',
+      message: 'Doctor create success',
       success: true,
       data: result
     });
@@ -36,9 +36,9 @@ exports.createPatient = async (req, res, next) => {
   }
 };
 
-exports.updatePatient = async (req, res, next) => {
+exports.updateDoctor = async (req, res, next) => {
   try {
-    const result = await Patient.findOneAndUpdate(
+    const result = await Doctor.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
       { new: true },
@@ -49,9 +49,9 @@ exports.updatePatient = async (req, res, next) => {
   }
 };
 
-exports.deletePatient = async (req, res, next) => {
+exports.deleteDoctor = async (req, res, next) => {
   try {
-    const result = await Patient.findOneAndUpdate(
+    const result = await Doctor.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: true },
       { new: true },
@@ -63,9 +63,9 @@ exports.deletePatient = async (req, res, next) => {
   }
 };
 
-exports.activatePatient = async (req, res, next) => {
+exports.activateDoctor = async (req, res, next) => {
   try {
-    const result = await Patient.findOneAndUpdate(
+    const result = await Doctor.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: false },
       { new: true },
