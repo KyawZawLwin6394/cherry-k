@@ -54,3 +54,5 @@ let PatientSchema = new Schema({
 });
 
 module.exports = mongoose.model('Patients', PatientSchema);
+
+//Author: Kyaw Zaw Lwin

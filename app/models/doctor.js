@@ -42,3 +42,5 @@ let DoctorSchema = new Schema({
 });
 
 module.exports = mongoose.model('Doctors', DoctorSchema);
+
+//Author: Kyaw Zaw Lwin

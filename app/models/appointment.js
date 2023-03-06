@@ -49,3 +49,5 @@ let AppointmentSchema = new Schema({
 });
 
 module.exports = mongoose.model('Appointments', AppointmentSchema);
+
+//Author: Kyaw Zaw Lwin
