@@ -46,6 +46,10 @@ exports.getPatient = async (req, res) => {
 
 exports.createPatient = async (req, res, next) => {
   try {
+    let data = req.body;
+    let files = req.files
+    console.log(data,'data')
+    console.log(files,'files')
     const newPatient = new Patient(req.body);
     const result = await newPatient.save();
     res.status(200).send({
