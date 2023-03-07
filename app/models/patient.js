@@ -52,7 +52,8 @@ let PatientSchema = new Schema({
     requried:true,
   },
 });
+const patient = mongoose.model('Patients',PatientSchema)
+module.exports = patient;
 
-module.exports = mongoose.model('Patients', PatientSchema);
 
 //Author: Kyaw Zaw Lwin

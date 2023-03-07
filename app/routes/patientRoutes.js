@@ -19,4 +19,7 @@ module.exports = (app) => {
 
     app.route('/api/patients-filter')
         .get(catchError(patient.filterPatients))
+
+    app.route('/api/patients-search')
+        .post(catchError(patient.searchPatients))
 };

@@ -130,10 +130,15 @@ exports.activateAppointment = async (req, res, next) => {
 
 exports.filterAppointments = async (req, res, next) => {
   try {
-    let query={}
-    const{status} = req.query
-    if (status) query.patientStatus=status
-    const patientResult = await Patient.find(query,{_id:1})
+    let query = {}
+    const { today } = req.query
+    var start = new Date();
+    start.setHours(0, 0, 0, 0); // set start date
+    var end = new Date();
+    end.setHours(23, 59, 59, 999) //set end date to be 24 hours
+    if (today) query.createdAt = {$gte:start, $lte:end}
+    if (Object.keys(query).length === 0) return res.status(404).send({error:true, message: 'Please Specify A Query To Use This Function'})
+    const result = await Patient.find(query)
     if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
     res.status(200).send({ success: true, data: result })
   } catch (err) {
