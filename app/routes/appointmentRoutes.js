@@ -14,6 +14,9 @@ module.exports = (app) => {
         .delete(catchError(appointment.deleteAppointment)) 
         .post(catchError(appointment.activateAppointment))
 
+    app.route('/api/appointments-filter')
+        .get(catchError(appointment.filterAppointments))
+
     app.route('/api/appointments').get(catchError(appointment.listAllAppointments))
 
 };

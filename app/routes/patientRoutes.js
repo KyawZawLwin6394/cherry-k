@@ -17,4 +17,6 @@ module.exports = (app) => {
 
     app.route('/api/patients').get(catchError(patient.listAllPatients))
 
+    app.route('/api/patients-filter')
+        .get(catchError(patient.filterPatients))
 };

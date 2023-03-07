@@ -19,21 +19,44 @@ function formatDateAndTime(dateString) { // format mongodb ISO 8601 date format 
 }
 
 exports.listAllAppointments = async (req, res) => {
+  let { keyword, role, limit, skip } = req.query;
+  let count = 0;
+  let page = 0;
   try {
-    let result = await Appointment.find({}).populate('patientName', 'name').populate('doctor', 'name');
-    let count = await Appointment.find({}).count();
+    limit = +limit <= 100 ? +limit : 10; //limit
+    skip = +skip || 0;
+    let query = {},
+      regexKeyword;
+    role ? (query['role'] = role.toUpperCase()) : '';
+    keyword && /\w/.test(keyword)
+      ? (regexKeyword = new RegExp(keyword, 'i'))
+      : '';
+    regexKeyword ? (query['name'] = regexKeyword) : '';
+    let result = await Appointment.find(query).limit(limit).skip(skip).populate('patientName', 'name').populate('doctor', 'name').populate('patientStatus', 'patientStatus');
+    console.log(result)
+    count = await Appointment.find(query).count();
+    const division = count / limit;
+    page = Math.ceil(division);
+
     res.status(200).send({
       success: true,
       count: count,
-      data: result
+      _metadata: {
+        current_page: skip / limit + 1,
+        per_page: limit,
+        page_count: page,
+        total_count: count,
+      },
+      list: result,
     });
-  } catch (error) {
-    return res.status(500).send({ error: true, message: 'No Record Found!' });
+  } catch (e) {
+    console.log(e)
+    //return res.status(500).send({ error: true, message: e.message });
   }
 };
 
 exports.getAppointment = async (req, res) => {
-  const result = await Appointment.find({ _id: req.params.id }).populate('patientName', 'name').populate('doctor', 'name');
+  const result = await Appointment.find({ _id: req.params.id }).populate('patientName', 'name').populate('doctor', 'name').populate('patientStatus', 'patientStatus');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   /*const dateAndTime = formatDateAndTime(result[0].date)
@@ -45,25 +68,14 @@ exports.getAppointment = async (req, res) => {
 
 exports.createAppointment = async (req, res, next) => {
   try {
-    if (req.body.patientStatus === 'New') { //If the patientStatus is new We'll save patient info first
-      const newPatient = new Patient({
-        name: req.body.patientName,
-        phone: req.body.phone,
-        patientStatus: req.body.patientStatus
-      })
-      const patientResult = await newPatient.save();
-      req.body = { ...req.body, patientName: patientResult._id } //updating patientName into patientID so that we can ref it later
-    }
-    // After that we can create appointments with related patient id 
-    // PatientName needs to be an ObjectID if the PatientStatus is 'Old'
     if (ObjectID.isValid(req.body.patientName) === false) return res.status(500).send({
       error: true,
-      message: 'Patient Name is not an ObjectID!'
+      message: 'Appointment Name is not an ObjectID!'
     })
 
     const dateAndTime = formatDateAndTime(req.body.originalDate)
     const newBody = { ...req.body, date: dateAndTime[0], time: dateAndTime[1] }
-    console.log(newBody,'newBody')
+    console.log(newBody, 'newBody')
     const newAppointment = new Appointment(newBody);
     const result = await newAppointment.save();
     res.status(200).send({
@@ -115,3 +127,16 @@ exports.activateAppointment = async (req, res, next) => {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
+
+exports.filterAppointments = async (req, res, next) => {
+  try {
+    let query={}
+    const{status} = req.query
+    if (status) query.patientStatus=status
+    const patientResult = await Patient.find(query,{_id:1})
+    if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
+    res.status(200).send({ success: true, data: result })
+  } catch (err) {
+    return res.status(500).send({ error: true, message: err.message })
+  }
+}

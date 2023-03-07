@@ -50,7 +50,7 @@ let PatientSchema = new Schema({
     type:String,
     enum:['New','Old'],
     requried:true,
-  }
+  },
 });
 
 module.exports = mongoose.model('Patients', PatientSchema);

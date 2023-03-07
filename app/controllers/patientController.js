@@ -6,7 +6,7 @@ exports.listAllPatients = async (req, res) => {
   let count = 0;
   let page = 0;
   try {
-    limit = +limit <= 100 ? +limit : 20;
+    limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
     let query = {},
       regexKeyword;
@@ -15,8 +15,8 @@ exports.listAllPatients = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-
-    let result = await Patient.find(query)
+    console.log(limit)
+    let result = await Patient.find(query).limit(limit).skip(skip);
     count = await Patient.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -97,3 +97,18 @@ exports.listAllPatients = async (req, res) => {
       return res.status(500).send({ "error": true, "message": error.message })
     }
   };
+
+  exports.filterPatients = async (req, res, next) => {
+    try {
+      let query={}
+      let {gender,startDate,endDate,status} = req.query
+      if (gender) query.gender= gender
+      if (status) query.patientStatus = status
+      if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate }
+      const result = await Patient.find(query)
+      if (result.length===0) return res.status(404).send({error:true, message:"No Record Found!"})
+      res.status(200).send({success:true, data:result})
+    } catch (err) {
+      return res.status(500).send({error:true, message:err.message})
+    }
+  }

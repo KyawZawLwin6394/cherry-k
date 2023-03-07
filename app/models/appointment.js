@@ -8,8 +8,8 @@ const validator = require('validator');
 
 let AppointmentSchema = new Schema({
   patientStatus: {
-    type: String,
-    enum:['New', 'Old'],
+    type: mongoose.Schema.Types.ObjectId,
+    ref:'Patients',
     required: true
   },
   patientName: {
@@ -56,7 +56,7 @@ let AppointmentSchema = new Schema({
   },
   token: {
     type:String
-  }
+  },
 });
 
 module.exports = mongoose.model('Appointments', AppointmentSchema);
