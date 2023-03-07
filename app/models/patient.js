@@ -51,6 +51,9 @@ let PatientSchema = new Schema({
     enum:['New','Old'],
     requried:true,
   },
+  patientID: {
+    type:String,
+  }
 });
 const patient = mongoose.model('Patients',PatientSchema)
 module.exports = patient;
