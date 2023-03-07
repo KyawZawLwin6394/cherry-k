@@ -53,6 +53,9 @@ let AppointmentSchema = new Schema({
     type:Boolean,
     required:true,
     default:false
+  },
+  token: {
+    type:String
   }
 });
 
