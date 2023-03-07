@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const validator = require('validator');
 
 
-let CategorySchema = new Schema({
+let BrandSchema = new Schema({
   code: {
     type: String,
     required: true
@@ -15,9 +15,19 @@ let CategorySchema = new Schema({
     type: String,
     required: true,
   },
+  category: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Categories',
+    required:true,
+  },
+  subCategory: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'SubCategories',
+    required:true,
+  },
   description: {
     type:String,
-    required:true
+    required:true,
   },
   createdAt: {
     type: Date,
@@ -33,6 +43,6 @@ let CategorySchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('Categories', CategorySchema);
+module.exports = mongoose.model('Brands', BrandSchema);
 
 //Author: Kyaw Zaw Lwin

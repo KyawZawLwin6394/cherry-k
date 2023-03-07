@@ -1,11 +1,10 @@
 'use strict';
-const SubCategory = require('../models/subCategory');
+const Brand = require('../models/brand');
 
-exports.listAllSubCategories = async (req, res) => {
+exports.listAllBrands = async (req, res) => {
   try {
-    let result = await SubCategory.find({}).populate('relatedCategory','name');
-    let count = await SubCategory.find({}).count();
-    console.log(result)
+    let result = await Brand.find({}).populate('category','name').populate('subCategory','name');
+    let count = await Brand.find({}).count();
     res.status(200).send({
       success: true,
       count: count,
@@ -16,19 +15,19 @@ exports.listAllSubCategories = async (req, res) => {
   }
 };
 
-exports.getSubCategory = async (req, res) => {
-  const result = await SubCategory.find({ _id: req.params.id }).populate('relatedCategory','name');
+exports.getBrand = async (req, res) => {
+  const result = await Brand.find({ _id: req.params.id }).populate('category').populate('subCategory');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
-exports.createSubCategory = async (req, res, next) => {
+exports.createBrand = async (req, res, next) => {
   try {
-    const newSubCategory = new SubCategory(req.body);
-    const result = await newSubCategory.save();
+    const newBrand = new Brand(req.body);
+    const result = await newBrand.save();
     res.status(200).send({
-      message: 'SubCategory create success',
+      message: 'Brand create success',
       success: true,
       data: result
     });
@@ -37,9 +36,9 @@ exports.createSubCategory = async (req, res, next) => {
   }
 };
 
-exports.updateSubCategory = async (req, res, next) => {
+exports.updateBrand = async (req, res, next) => {
   try {
-    const result = await SubCategory.findOneAndUpdate(
+    const result = await Brand.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
       { new: true },
@@ -50,9 +49,9 @@ exports.updateSubCategory = async (req, res, next) => {
   }
 };
 
-exports.deleteSubCategory = async (req, res, next) => {
+exports.deleteBrand = async (req, res, next) => {
   try {
-    const result = await SubCategory.findOneAndUpdate(
+    const result = await Brand.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: true },
       { new: true },
@@ -64,9 +63,9 @@ exports.deleteSubCategory = async (req, res, next) => {
   }
 };
 
-exports.activateSubCategory = async (req, res, next) => {
+exports.activateBrand = async (req, res, next) => {
   try {
-    const result = await SubCategory.findOneAndUpdate(
+    const result = await Brand.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: false },
       { new: true },

@@ -16,6 +16,7 @@ if (mongoose.connection.readyState != 1) {
   });
 
   const db = mongoose.connection;
+  
   db.on('error', (err) => {
     console.log(err)  });
 
