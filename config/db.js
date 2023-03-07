@@ -8,8 +8,8 @@ const config = {
     app: {
       name: 'Cherry-K',
     },
-    db: 'mongodb://127.0.0.1:3221', 
-    //db: 'mongodb+srv://dbuser:P7qBNveg8bVO1d2z@cluster0.85ozwwv.mongodb.net/cherry-k?retryWrites=true&w=majority', 
+    //db: 'mongodb://127.0.0.1:3221', 
+    db: 'mongodb+srv://dbuser:P7qBNveg8bVO1d2z@cluster0.85ozwwv.mongodb.net/cherry-k?retryWrites=true&w=majority', 
     
   },
 
@@ -18,8 +18,8 @@ const config = {
     app: {
       name: 'Cherry-K',
     },
-    db: 'mongodb://127.0.0.1:3221', 
-    //db: 'mongodb+srv://dbuser:P7qBNveg8bVO1d2z@cluster0.85ozwwv.mongodb.net/cherry-k?retryWrites=true&w=majority', 
+    //db: 'mongodb://127.0.0.1:3221', 
+    db: 'mongodb+srv://dbuser:P7qBNveg8bVO1d2z@cluster0.85ozwwv.mongodb.net/cherry-k?retryWrites=true&w=majority', 
   },
 };
 
