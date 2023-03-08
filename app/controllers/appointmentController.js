@@ -50,8 +50,7 @@ exports.listAllAppointments = async (req, res) => {
       list: result,
     });
   } catch (e) {
-    console.log(e)
-    //return res.status(500).send({ error: true, message: e.message });
+    return res.status(500).send({ error: true, message: e.message });
   }
 };
 
@@ -59,10 +58,6 @@ exports.getAppointment = async (req, res) => {
   const result = await Appointment.find({ _id: req.params.id }).populate('patientName', 'name').populate('doctor', 'name').populate('patientStatus', 'patientStatus');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
-  /*const dateAndTime = formatDateAndTime(result[0].date)
-  const { date, ...rest } = result[0].toObject() //deleting date from result[0] and putting it back into rest
-  //adding toObject so that it dosen't spread everything from mongodb result
-  const newResult = { ...rest, date: dateAndTime[0], time: dateAndTime[1] } //adding date and time to the body of res */
   return res.status(200).send({ success: true, data: result });
 };
 

@@ -77,8 +77,7 @@ exports.createPatient = async (req, res, next) => {
       data: result
     });
   } catch (error) {
-    console.log(error)
-    //return res.status(500).send({ "error": true, message: error.message })
+    return res.status(500).send({ "error": true, message: error.message })
   }
 };
 
