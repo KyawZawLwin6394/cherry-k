@@ -1,6 +1,5 @@
 'use strict';
 const Patient = require('../models/patient');
-const Attachment = require('../models/attachment');
 
 exports.listAllPatients = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
