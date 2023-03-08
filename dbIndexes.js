@@ -20,4 +20,15 @@ client.connect(function(err) {
 
     client.close();
   });
+
+  db.collection('appointments').createIndex({
+    doctor:'text',
+    phone:'text'
+  },function(err, result) {
+    if (err) {
+      console.log(err)
+    } else {
+      console.log("Appointment Indexes Created Successfully!")
+    }
+  })
 });

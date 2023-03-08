@@ -1,5 +1,6 @@
 'use strict';
 const Patient = require('../models/patient');
+const Attachment = require('../models/attachment');
 
 exports.listAllPatients = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -16,7 +17,7 @@ exports.listAllPatients = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     console.log(limit)
-    let result = await Patient.find(query).limit(limit).skip(skip);
+    let result = await Patient.find(query).limit(limit).skip(skip).populate('img');
     count = await Patient.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -38,19 +39,29 @@ exports.listAllPatients = async (req, res) => {
 };
 
 exports.getPatient = async (req, res) => {
-  const result = await Patient.find({ _id: req.params.id });
+  const result = await Patient.find({ _id: req.params.id }).populate('img');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.createPatient = async (req, res, next) => {
+  let data = req.body;
+  let files = req.files;
   try {
-    let data = req.body;
-    let files = req.files
-    console.log(data,'data')
-    console.log(files,'files')
-    const newPatient = new Patient(req.body);
+
+    if (files.img !== undefined) {
+      let imgPath = files.img[0].path.split('cherry-k')[1];
+      const attachData = {
+        fileName: files.img[0].originalname,
+        imgUrl: imgPath,
+      };
+      const newAttachment = new Attachment(attachData);
+      const attachResult = await newAttachment.save();
+      data = { ...data, img: attachResult._id.toString()};
+    } //prepare img and save it into attachment schema
+
+    const newPatient = new Patient(data);
     const result = await newPatient.save();
     res.status(200).send({
       message: 'Patient create success',
@@ -63,12 +74,25 @@ exports.createPatient = async (req, res, next) => {
 };
 
 exports.updatePatient = async (req, res, next) => {
+  let data = req.body;
+  let files = req.files;
   try {
+    if (files.img !== undefined) {
+      let imgPath = files.img[0].path.split('cherry-k')[1];
+      const attachData = {
+        fileName: files.img[0].originalname,
+        imgUrl: imgPath,
+      };
+      const newAttachment = new Attachment(attachData);
+      const attachResult = await newAttachment.save();
+      data = { ...data, img: attachResult._id.toString()};
+    } //prepare img and save it into attachment schema
+
     const result = await Patient.findOneAndUpdate(
       { _id: req.body.id },
-      req.body,
+      {$set: data},
       { new: true },
-    );
+    ).populate('img');
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })

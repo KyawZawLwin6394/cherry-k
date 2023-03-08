@@ -23,6 +23,15 @@ let PatientSchema = new Schema({
   },
   email: {
     type: String,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    validate: {
+      isAsync: true,
+      validator: validator.isEmail,
+      message: 'Invalid Email Address.',
+    },
+    required: [true, 'User email required'],
   },
   gender: {
     type: String,
@@ -53,7 +62,14 @@ let PatientSchema = new Schema({
   },
   patientID: {
     type:String,
-  }
+  },
+  seq: {
+    type:Number
+  },
+  img:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Attachments',
+  },
 });
 const patient = mongoose.model('Patients',PatientSchema)
 module.exports = patient;

@@ -17,7 +17,7 @@ function getRandomText() {
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         if (file.fieldname === "img") {
-            cb(null, './uploads/em/img');
+            cb(null, './uploads/cherry-k/img');
         }
     },
     filename: function (req, file, cb) {

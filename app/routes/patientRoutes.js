@@ -2,11 +2,12 @@
 
 const patient = require("../controllers/patientController");
 const { catchError } = require("../lib/errorHandler");
+const upload = require('../lib/fieldUploader').upload;
 
 module.exports = (app) => {
 
     app.route('/api/patient')
-        .post(catchError(patient.createPatient))
+        .post(upload,catchError(patient.createPatient))
         .put(catchError(patient.updatePatient))
         
     

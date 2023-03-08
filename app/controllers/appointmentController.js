@@ -148,9 +148,10 @@ exports.filterAppointments = async (req, res, next) => {
   }
 }
 
-exports.searchPatients = async (req, res, next) => {
+exports.searchAppointment = async (req, res, next) => {
   try {
-    const result = await Patient.find({ $text: { $search: req.body.search } })
+    console.log(req.body.search)
+    const result = await Appointment.find({ $text: { $search: req.body.search } })
     if (result.length===0) return res.status(404).send({error:true, message:'No Record Found!'})
     return res.status(200).send({ success: true, data: result })
   } catch (err) {

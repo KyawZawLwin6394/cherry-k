@@ -18,5 +18,6 @@ module.exports = (app) => {
         .get(catchError(appointment.filterAppointments))
 
     app.route('/api/appointments').get(catchError(appointment.listAllAppointments))
-
+    app.route('/api/appointment-search')
+        .post(catchError(appointment.searchAppointment))
 };
