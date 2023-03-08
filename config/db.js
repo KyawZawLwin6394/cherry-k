@@ -10,7 +10,8 @@ const config = {
     },
     //db: 'mongodb://127.0.0.1:3221', 
     db: 'mongodb+srv://dbuser:P7qBNveg8bVO1d2z@cluster0.85ozwwv.mongodb.net/cherry-k?retryWrites=true&w=majority', 
-    uploadsURI:['./uploads/cherry-k/img']
+    uploadsURI:['./uploads/cherry-k/img'],
+    dbName:'cherry-k'
   },
 
   production: {
@@ -20,7 +21,8 @@ const config = {
     },
     //db: 'mongodb://127.0.0.1:3221', 
     db: 'mongodb+srv://dbuser:P7qBNveg8bVO1d2z@cluster0.85ozwwv.mongodb.net/cherry-k?retryWrites=true&w=majority',
-    uploadsURI:['./uploads/cherry-k/img']
+    uploadsURI:['./uploads/cherry-k/img'],
+    dbName:'cherry-k'
   },
 };
 

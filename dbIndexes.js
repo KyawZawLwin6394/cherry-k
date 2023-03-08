@@ -8,7 +8,7 @@ const client = new MongoClient(config.db);
 client.connect(function(err) {
   console.log("Connected successfully to server");
 
-  const db = client.db('cherry-k');
+  const db = client.db(config.dbName);
 
   // Create indexes
   db.collection('patients').createIndex({ name: 'text', phone: 'text', email: 'text' }, function(err, result) {
