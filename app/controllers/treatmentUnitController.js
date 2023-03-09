@@ -1,7 +1,7 @@
 'use strict';
-const TreatmentList = require('../models/treatmentList');
+const TreatmentUnit = require('../models/treatmentUnit')
 
-exports.listAllTreatmentLists = async (req, res) => {
+exports.listAllTreatmentUnits = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
   let count = 0;
   let page = 0;
@@ -15,9 +15,8 @@ exports.listAllTreatmentLists = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await TreatmentList.find(query).limit(limit).skip(skip);
-    console.log(result)
-    count = await TreatmentList.find(query).count();
+    let result = await TreatmentUnit.find(query).limit(limit).skip(skip).populate('procedureMedicine');
+    count = await TreatmentUnit.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
 
@@ -38,19 +37,19 @@ exports.listAllTreatmentLists = async (req, res) => {
   }
 };
 
-exports.getTreatmentList = async (req, res) => {
-  const result = await TreatmentList.find({ _id: req.params.id });
+exports.getTreatmentUnit = async (req, res) => {
+  const result = await TreatmentUnit.find({ _id: req.params.id }).populate('procedureMedicine');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
-exports.createTreatmentList = async (req, res, next) => {
+exports.createTreatmentUnit = async (req, res, next) => {
   try {
-    const newTreatmentList = new TreatmentList(req.body);
-    const result = await newTreatmentList.save();
+    const newTreatmentUnit = new TreatmentUnit(req.body);
+    const result = await newTreatmentUnit.save();
     res.status(200).send({
-      message: 'TreatmentList create success',
+      message: 'TreatmentUnit create success',
       success: true,
       data: result
     });
@@ -59,22 +58,22 @@ exports.createTreatmentList = async (req, res, next) => {
   }
 };
 
-exports.updateTreatmentList = async (req, res, next) => {
+exports.updateTreatmentUnit = async (req, res, next) => {
   try {
-    const result = await TreatmentList.findOneAndUpdate(
+    const result = await TreatmentUnit.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
       { new: true },
-    );
+    ).populate('procedureMedicine') ;
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
 
-exports.deleteTreatmentList = async (req, res, next) => {
+exports.deleteTreatmentUnit = async (req, res, next) => {
   try {
-    const result = await TreatmentList.findOneAndUpdate(
+    const result = await TreatmentUnit.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: true },
       { new: true },
@@ -86,9 +85,9 @@ exports.deleteTreatmentList = async (req, res, next) => {
   }
 }
 
-exports.activateTreatmentList = async (req, res, next) => {
+exports.activateTreatmentUnit = async (req, res, next) => {
   try {
-    const result = await TreatmentList.findOneAndUpdate(
+    const result = await TreatmentUnit.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: false },
       { new: true },
