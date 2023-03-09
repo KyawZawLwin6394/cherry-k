@@ -75,3 +75,29 @@ exports.activateBrand = async (req, res, next) => {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
+
+exports.filterBrands = async (req, res, next) => {
+  try {
+    let query = {}
+    const { name,code } = req.query
+    if (name) query.name = name
+    if (code) query.code = code
+    if (Object.keys(query).length === 0) return res.status(404).send({error:true, message: 'Please Specify A Query To Use This Function'})
+    const result = await Brand.find(query)
+    if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
+    res.status(200).send({ success: true, data: result })
+  } catch (err) {
+    return res.status(500).send({ error: true, message: err.message })
+  }
+}
+
+exports.searchBrands = async (req, res, next) => {
+  try {
+    console.log(req.body.search)
+    const result = await Brand.find({ $text: { $search: req.query.search } })
+    if (result.length===0) return res.status(404).send({error:true, message:'No Record Found!'})
+    return res.status(200).send({ success: true, data: result })
+  } catch (err) {
+    return res.status(500).send({ error: true, message: err.message })
+  }
+}

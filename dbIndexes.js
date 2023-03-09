@@ -31,4 +31,22 @@ client.connect(function(err) {
       console.log("Appointment Indexes Created Successfully!")
     }
   })
+
+  db.collection('brands').createIndex({
+    code:'text',
+    name:'text'
+  },function(err, result) {
+    if (err) {
+      console.log(err)
+    } else {
+      console.log('Brand Indexes Created Successfully!')
+    }
+  })
+
+  db.collection('treatmentlists').createIndex({
+    code:'text',
+    name:'text'
+  },function(err, result) {
+    if (err) {console.log(err)} else {console.log('Treatment List Indexes Created Successfully!')}
+  })
 });

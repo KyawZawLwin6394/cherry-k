@@ -16,4 +16,9 @@ module.exports = (app) => {
 
     app.route('/api/treatment-lists').get(catchError(treatmentList.listAllTreatmentLists))
 
+    app.route('/api/treatment-lists-filter')
+        .get(catchError(treatmentList.filterTreatmentLists))
+
+    app.route('/api/treatment-lists-search')
+        .post(catchError(treatmentList.searchTreatmentLists))
 };
