@@ -35,10 +35,13 @@ let procedureItemSchema = new Schema({
     type:String,
   },
   fromUnit: {
-    type:String,
+    type:Number,
   },
   toUnit: {
-    type:String
+    type:Number
+  },
+  totalUnit: {
+    type:Number
   },
   updatedAt: {
     type: Date

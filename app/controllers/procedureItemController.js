@@ -46,6 +46,9 @@ exports.getProcedureItem = async (req, res) => {
 
 exports.createProcedureItem = async (req, res, next) => {
   try {
+    const {toUnit,currentQuantity} = req.body;
+    req.body = {...req.body, totalUnit:toUnit*currentQuantity} //calculating total unit 
+    console.log(req.body)
     const newProcedureItem = new ProcedureItem(req.body);
     const result = await newProcedureItem.save();
     res.status(200).send({
