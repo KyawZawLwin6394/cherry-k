@@ -1,0 +1,19 @@
+"use strict";
+
+const treatmentList = require("../controllers/treatmentListController");
+const { catchError } = require("../lib/errorHandler");
+
+module.exports = (app) => {
+
+    app.route('/api/treatment-list')
+        .post(catchError(treatmentList.createTreatmentList))
+        .put(catchError(treatmentList.updateTreatmentList))
+        
+    app.route('/api/treatment-list/:id')
+        .get(catchError(treatmentList.getTreatmentList))
+        .delete(catchError(treatmentList.deleteTreatmentList)) 
+        .post(catchError(treatmentList.activateTreatmentList))
+
+    app.route('/api/treatment-lists').get(catchError(treatmentList.listAllTreatmentLists))
+
+};

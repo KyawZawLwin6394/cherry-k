@@ -11,8 +11,10 @@ npm install
 ## Database Requirements
 ```
 # Create a database called 'cherry-k' after "Mongodb Setup". You may change this db name in the db.js file if it dosen't suit your taste.
-#you might need to run dbIndexes.js to ensure that all the required indexes are created on the database if you're using a new database.
+#First of all, run dbIndexes.js to ensure that all the required indexes are created on the database if you're using a new database.
+#You can also use mongosh (Mongodb CMD) to manually create or drop indexes if dbIndexes.js throws an error.
 #Search Functions may not work if you didn't run this script(MongoDB needs indexes to perform full text search).
+#You may refer to MongoDB Developer Center if you're struggling with Mongodb setup or anything mongodb related. Their documentation is quite spectacular.
 
 node ./dbIndexes.js
 
