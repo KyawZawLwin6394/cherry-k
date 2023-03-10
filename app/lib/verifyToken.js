@@ -23,10 +23,12 @@ function verifyToken(req, res, next) {
 
 function decodedCredentials(decoded) {
   let credentials = decoded.credentials.split(`.${CONFIG.jwtKey}.`);
-  return {
-    userId: credentials[0],
+  const returnThisCredential = {
+    id: credentials[0],
     email: credentials[1]
-  };
+  }
+  console.log(returnThisCredential)
+  return returnThisCredential;
 }
 
 module.exports = verifyToken;
