@@ -19,7 +19,7 @@ module.exports = (app) => {
   app.route('/api/users').get(verifyToken, catchError(user.listAllUsers));
 
   app.route('/api/users/doctor').post( verifyToken, catchError(user.createDoctor))
-  app.route('/api/users/admin').post( verifyToken ,catchError(user.createAdmin))
+  //app.route('/api/users/admin').post( verifyToken ,catchError(user.createAdmin))
   app.route('/api/me').get(
     verifyToken,
     (req, res, next) => {
