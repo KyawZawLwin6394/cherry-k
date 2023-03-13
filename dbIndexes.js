@@ -49,4 +49,5 @@ client.connect(function(err) {
   },function(err, result) {
     if (err) {console.log(err)} else {console.log('Treatment List Indexes Created Successfully!')}
   })
+  
 });
