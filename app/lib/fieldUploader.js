@@ -7,33 +7,39 @@ const uri = config.uploadsURI;
 function getRandomText() {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    
+
     for (var i = 0; i < 3; i++)
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
     return text;
-    }
+}
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         if (file.fieldname === "img") {
             cb(null, './uploads/cherry-k/img');
+        } else if (file.fieldname === "history") {
+            cb(null, './uploads/cherry-k/history');
         }
+
     },
     filename: function (req, file, cb) {
         let name = file.originalname.split(".")[0];
         let ext = file.originalname.split(".")[1];
         const randomText = getRandomText();
-         if (file.fieldname === "img") {
+        if (file.fieldname === "img") {
             cb(null, name + randomText + Date.now() + "." + ext)
-        } 
-        
+        } else if (file.fieldname === "history") {
+            cb(null, "TH-" + name + randomText + Date.now() + "." + ext)
+        }
+
+
     },
 });
 
 exports.upload = multer({
     fileFilter: function (req, file, cb) {
-        for ( let i=0; i<uri.length; i++) {
+        for (let i = 0; i < uri.length; i++) {
             if (!fs.existsSync(uri[i])) {
                 fs.mkdirSync(uri[i], { recursive: true });
             }
@@ -59,8 +65,13 @@ exports.upload = multer({
 }).fields(
     [
         {
-            name:'img',
-            maxCount:1
+            name: 'img',
+            maxCount: 1
+        },
+        {
+            name:'history',
+            maxCount:3
         }
+
     ]
 );

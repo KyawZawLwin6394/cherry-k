@@ -27,7 +27,6 @@ function decodedCredentials(decoded) {
     id: credentials[0],
     email: credentials[1]
   }
-  console.log(returnThisCredential)
   return returnThisCredential;
 }
 
