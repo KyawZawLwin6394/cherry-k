@@ -8,7 +8,7 @@ exports.listAllTreatmentSelections = async (req, res) => {
     try {
         limit = +limit <= 100 ? +limit : 10; //limit
         skip = +skip || 0;
-        let query = {},
+        let query = {isDeleted:false},
             regexKeyword;
         role ? (query['role'] = role.toUpperCase()) : '';
         keyword && /\w/.test(keyword)
@@ -36,7 +36,7 @@ exports.listAllTreatmentSelections = async (req, res) => {
 };
 
 exports.getTreatmentSelection = async (req, res) => {
-    const result = await TreatmentSelection.find({ _id: req.params.id });
+    const result = await TreatmentSelection.find({ _id: req.params.id,isDeleted:false });
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });

@@ -9,7 +9,7 @@ exports.listAllTreatmentHistorys = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = {},
+    let query = {isDeleted:false},
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -39,7 +39,7 @@ exports.listAllTreatmentHistorys = async (req, res) => {
 };
 
 exports.getTreatmentHistory = async (req, res) => {
-  const result = await TreatmentHistory.find({ _id: req.params.id }).populate('attachments').populate('relatedAppointment');
+  const result = await TreatmentHistory.find({ _id: req.params.id,isDeleted:false }).populate('attachments').populate('relatedAppointment');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });

@@ -67,7 +67,7 @@ exports.listAllUsers = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10;
     skip = +skip || 0;
-    let query = {},
+    let query = {isDeleted:false},
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)

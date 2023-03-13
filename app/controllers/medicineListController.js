@@ -8,7 +8,7 @@ exports.listAllMedicineLists = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = {},
+    let query = {isDeleted:false},
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -39,7 +39,7 @@ exports.listAllMedicineLists = async (req, res) => {
 };
 
 exports.getMedicineList = async (req, res) => {
-  const result = await MedicineList.find({ _id: req.params.id }).populate('relatedBrand');
+  const result = await MedicineList.find({ _id: req.params.id,isDeleted:false }).populate('relatedBrand');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });

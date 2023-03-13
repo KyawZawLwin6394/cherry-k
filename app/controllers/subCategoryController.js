@@ -3,8 +3,8 @@ const SubCategory = require('../models/subCategory');
 
 exports.listAllSubCategories = async (req, res) => {
   try {
-    let result = await SubCategory.find({}).populate('relatedCategory','name');
-    let count = await SubCategory.find({}).count();
+    let result = await SubCategory.find({isDeleted:false}).populate('relatedCategory','name');
+    let count = await SubCategory.find({isDeleted:false}).count();
     console.log(result)
     res.status(200).send({
       success: true,
@@ -17,7 +17,7 @@ exports.listAllSubCategories = async (req, res) => {
 };
 
 exports.getSubCategory = async (req, res) => {
-  const result = await SubCategory.find({ _id: req.params.id }).populate('relatedCategory','name');
+  const result = await SubCategory.find({ _id: req.params.id,isDeleted:false }).populate('relatedCategory','name');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });

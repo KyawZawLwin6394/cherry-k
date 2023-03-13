@@ -3,8 +3,8 @@ const Doctor = require('../models/doctor');
 
 exports.listAllDoctors = async (req, res) => {
   try {
-    let result = await Doctor.find({});
-    let count = await Doctor.find({}).count();
+    let result = await Doctor.find({isDeleted:false});
+    let count = await Doctor.find({isDeleted:false}).count();
     res.status(200).send({
       success: true,
       count: count,
@@ -16,7 +16,7 @@ exports.listAllDoctors = async (req, res) => {
 };
 
 exports.getDoctor = async (req, res) => {
-  const result = await Doctor.find({ _id: req.params.id });
+  const result = await Doctor.find({ _id: req.params.id,isDeleted:false });
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });

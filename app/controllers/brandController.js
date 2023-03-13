@@ -3,8 +3,8 @@ const Brand = require('../models/brand');
 
 exports.listAllBrands = async (req, res) => {
   try {
-    let result = await Brand.find({}).populate('category','name').populate('subCategory','name');
-    let count = await Brand.find({}).count();
+    let result = await Brand.find({isDeleted:false}).populate('category','name').populate('subCategory','name');
+    let count = await Brand.find({isDeleted:false}).count();
     res.status(200).send({
       success: true,
       count: count,
@@ -16,7 +16,7 @@ exports.listAllBrands = async (req, res) => {
 };
 
 exports.getBrand = async (req, res) => {
-  const result = await Brand.find({ _id: req.params.id }).populate('category').populate('subCategory');
+  const result = await Brand.find({ _id: req.params.id,isDeleted:false }).populate('category').populate('subCategory');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });

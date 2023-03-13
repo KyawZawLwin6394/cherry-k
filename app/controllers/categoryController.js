@@ -3,8 +3,8 @@ const Category = require('../models/category');
 
 exports.listAllCategories = async (req, res) => {
   try {
-    let result = await Category.find({});
-    let count = await Category.find({}).count();
+    let result = await Category.find({isDeleted:false});
+    let count = await Category.find({isDeleted:false}).count();
     res.status(200).send({
       success: true,
       count: count,
@@ -16,7 +16,7 @@ exports.listAllCategories = async (req, res) => {
 };
 
 exports.getCategory = async (req, res) => {
-  const result = await Category.find({ _id: req.params.id });
+  const result = await Category.find({ _id: req.params.id,isDeleted:false });
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });

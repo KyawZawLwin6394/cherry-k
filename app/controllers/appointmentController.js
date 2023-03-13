@@ -25,7 +25,7 @@ exports.listAllAppointments = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = {},
+    let query = {isDeleted:false},
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -55,7 +55,7 @@ exports.listAllAppointments = async (req, res) => {
 };
 
 exports.getAppointment = async (req, res) => {
-  const result = await Appointment.find({ _id: req.params.id }).populate('patientName', 'name').populate('doctor', 'name').populate('patientStatus', 'patientStatus');
+  const result = await Appointment.find({ _id: req.params.id,isDeleted:false }).populate('patientName', 'name').populate('doctor', 'name').populate('patientStatus', 'patientStatus');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
