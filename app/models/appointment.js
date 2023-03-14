@@ -7,32 +7,33 @@ const validator = require('validator');
 
 
 let AppointmentSchema = new Schema({
-  patientStatus: {
-    type: mongoose.Schema.Types.ObjectId,
+  relatedPatient: {
+    type:mongoose.Schema.Types.ObjectId,
     ref:'Patients',
-    required: true
-  },
-  patientName: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref:'Patients',
-    required: true,
+    required:true
   },
   phone: {
-    type:String,
-    required:true
+    type:String
   },
-  doctor: {
+  relatedDoctor: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'Doctors',
-    required:true,
+    required: function() {
+      return !this.relatedTherapist; // therapist is required if field2 is not provided
+    }
+  },
+  relatedTherapist: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Doctors',
+    required: function() {
+      return !this.relatedDoctor; // doctor is required if field2 is not provided
+    }
   },
   description: {
-    type:String,
-    required:true
+    type:String
   },
   originalDate: {
-    type: Date,
-    required:true, //storing the originalDate so that we can use it later whenever we need
+    type: Date
   },
   createdAt: {
     type: Date,
@@ -43,11 +44,9 @@ let AppointmentSchema = new Schema({
   },
   date:{
     type: String,
-    required:true,
   },
   time:{
     type:String,
-    required:true
   },
   isDeleted: {
     type:Boolean,

@@ -1,5 +1,6 @@
 'use strict';
 const Treatment = require('../models/treatment');
+const Appointment = require('../models/appointment');
 
 exports.listAllTreatments = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -8,7 +9,7 @@ exports.listAllTreatments = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -38,7 +39,7 @@ exports.listAllTreatments = async (req, res) => {
 };
 
 exports.getTreatment = async (req, res) => {
-  const result = await Treatment.find({ _id: req.params.id,isDeleted:false })
+  const result = await Treatment.find({ _id: req.params.id, isDeleted: false })
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -46,13 +47,25 @@ exports.getTreatment = async (req, res) => {
 
 exports.createTreatment = async (req, res, next) => {
   try {
+    const appointmentConfig = {
+      relatedPatient: req.body.relatedPatient,
+      relatedDoctor: req.body.relatedDoctor,
+      relatedTherapist: req.body.relatedTherapist
+    }
+    let appointments = []
+    for (let i = 0; i < req.body.treatmentTimes; i++) {
+      appointments.push(appointmentConfig)
+    }
+    const appointmentResult = await Appointment.insertMany(appointments)
+    console.log(appointmentResult)
     const newBody = req.body;
     const newTreatment = new Treatment(newBody);
     const result = await newTreatment.save();
     res.status(200).send({
       message: 'Treatment create success',
       success: true,
-      data: result
+      data: result,
+      appointmentAutoGenerate: appointmentResult
     });
   } catch (error) {
     return res.status(500).send({ "error": true, message: error.message })

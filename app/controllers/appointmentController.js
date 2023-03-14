@@ -63,11 +63,6 @@ exports.getAppointment = async (req, res) => {
 
 exports.createAppointment = async (req, res, next) => {
   try {
-    if (ObjectID.isValid(req.body.patientName) === false) return res.status(500).send({
-      error: true,
-      message: 'Appointment Name is not an ObjectID!'
-    })
-
     const dateAndTime = formatDateAndTime(req.body.originalDate)
     const newBody = { ...req.body, date: dateAndTime[0], time: dateAndTime[1] }
     console.log(newBody, 'newBody')

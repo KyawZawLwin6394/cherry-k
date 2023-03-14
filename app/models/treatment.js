@@ -17,18 +17,18 @@ let TreatmentSchema = new Schema({
     type:Number,
     required:true
   },
-  doctor: {
+  relatedDoctor: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'Doctors',
     required: function() {
-        return !this.therapist; // therapist is required if field2 is not provided
+        return !this.relatedTherapist; // therapist is required if field2 is not provided
       }
   },
-  therapist: {
+  relatedTherapist: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'Therapists',
     required: function() {
-        return !this.doctor; // doctor is required if field2 is not provided
+        return !this.relatedDoctor; // doctor is required if field2 is not provided
       }
   },
   procedureMedicine: [{
@@ -74,6 +74,11 @@ let TreatmentSchema = new Schema({
     type:Boolean, 
     required:true,
     default:false
+  },
+  relatedPatient: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Patients',
+    required:true
   }
 });
 
