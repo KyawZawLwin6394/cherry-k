@@ -54,7 +54,7 @@ exports.createTreatment = async (req, res, next) => {
     }
     let appointments = []
     for (let i = 0; i < req.body.treatmentTimes; i++) {
-      appointments.push(appointmentConfig)
+      appointments.push(appointmentConfig) //perparing for insertMany
     }
     const appointmentResult = await Appointment.insertMany(appointments)
     console.log(appointmentResult)
