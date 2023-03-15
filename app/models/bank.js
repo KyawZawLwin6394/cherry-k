@@ -38,6 +38,16 @@ let BankSchema = new Schema({
     type:Boolean,
     required:true,
     default:false
+  },
+  relatedCurrency: {
+    type:mongoose.Schema.Types.ObjectId,
+    required:true,
+    ref:'Currencies'
+  },
+  relatedAccounting:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'AccountingLists',
+    required:true
   }
 });
 
