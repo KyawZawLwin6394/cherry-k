@@ -55,6 +55,11 @@ let VoucherSchema = new Schema({
     required:true,
     default:false
   },
+  relatedTreatment:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Treatments',
+    required:true
+  }
 });
 
 module.exports = mongoose.model('Vouchers', VoucherSchema);
