@@ -38,6 +38,13 @@ let TreatmentUnitSchema = new Schema({
     type:Boolean,
     required:true,
     default:false
+  },
+  patientTreatmentID: {
+    type:String,
+  },
+  seq: {
+    type:Number,
+    required:true,  
   }
 });
 

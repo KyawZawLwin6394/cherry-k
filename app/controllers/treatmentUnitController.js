@@ -45,8 +45,18 @@ exports.getTreatmentUnit = async (req, res) => {
 };
 
 exports.createTreatmentUnit = async (req, res, next) => {
+  let data = req.body;
   try {
-    const newTreatmentUnit = new TreatmentUnit(req.body);
+    //prepare PT-ID
+    const latestDocument =await TreatmentUnit.find({},{seq:1}).sort({_id: -1}).limit(1).exec();
+    if (!latestDocument[0].seq) data= {...data, seq:'1', patientTreatmentID:"PT-001"} // if seq is undefined set initial patientID and seq
+    console.log('here')
+    if (latestDocument[0].seq) {
+      const increment = latestDocument[0].seq+1
+      data = {...data, patientTreatmentID:"PT-"+increment, seq:increment}
+    }
+    console.log(data)
+    const newTreatmentUnit = new TreatmentUnit(data);
     const result = await newTreatmentUnit.save();
     res.status(200).send({
       message: 'TreatmentUnit create success',
