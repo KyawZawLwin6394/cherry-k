@@ -31,7 +31,14 @@ let TransactionSchema = new Schema({
   relatedTreatment: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'Treatments',
-    required:true
+  },
+  relatedBank: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'AccountingLists'
+  },
+  relatedCash: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'AccountingLists'
   },
   treatmentFlag: {
     type:Boolean, 

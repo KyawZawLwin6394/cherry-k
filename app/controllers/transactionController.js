@@ -15,7 +15,7 @@ exports.listAllTransactions = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Transaction.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction');
+    let result = await Transaction.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
     console.log(result)
     count = await Transaction.find(query).count();
     const division = count / limit;
@@ -38,7 +38,7 @@ exports.listAllTransactions = async (req, res) => {
 };
 
 exports.getTransaction = async (req, res) => {
-  const result = await Transaction.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction')
+  const result = await Transaction.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -65,7 +65,7 @@ exports.updateTransaction = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction');
+    ).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
