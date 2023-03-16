@@ -41,10 +41,11 @@ let AccountingListSchema = new Schema({
         required: true,
         default: false
     },
-    currency: {
-        type: String,
+    relatedCurrency: {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Currencies',
         required:true
-    },
+      },
     carryForWork: {
         type:Boolean,
         required: true

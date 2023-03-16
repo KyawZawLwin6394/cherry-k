@@ -29,13 +29,17 @@ let TransactionSchema = new Schema({
     required:true,
   },
   relatedTreatment: {
-    type:Boolean,
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Treatments',
+    required:true
+  },
+  treatmentFlag: {
+    type:Boolean, 
     required:true
   },
   relatedTransaction: {
     type: mongoose.Schema.Types.ObjectId,
     ref:'Transactions',
-    required:true,
     default:null
   },
   isDeleted: {
