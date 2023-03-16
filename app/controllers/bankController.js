@@ -1,6 +1,5 @@
 'use strict';
 const Bank = require('../models/bank');
-var ObjectID = require("mongodb").ObjectID; //to check if the value is objectid or not
 
 exports.listAllBanks = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
