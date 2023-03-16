@@ -50,6 +50,34 @@ exports.createExpense = async (req, res, next) => {
         const newBody = req.body;
         const newExpense = new Expense(newBody);
         const result = await newExpense.save();
+        const transaction = [
+            {
+                "amount": req.amount,
+                "date": req.date,
+                "remark": req.remark,
+                "type": "Debit",
+                "relatedTreatment": req.relatedTreatment,
+                "treatmentFlag": false,
+                "relatedTransaction": null,
+                "relatedAccounting": req.relatedAccounting,
+                "relatedBank": req.relatedBank,
+                "relatedCash": req.relatedCash
+
+            },
+            {
+                "amount": req.amount,
+                "date": req.date,
+                "remark": req.remark,
+                "type": "Credit",
+                "relatedTreatment": req.relatedTreatment,
+                "treatmentFlag": false,
+                "relatedTransaction": null,
+                "relatedAccounting": req.relatedAccounting,
+                "relatedBank": req.relatedBank,
+                "relatedCash": req.relatedCash
+
+            }
+        ]
         res.status(200).send({
             message: 'Expense create success',
             success: true,
