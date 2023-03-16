@@ -39,10 +39,9 @@ let BankSchema = new Schema({
     required:true,
     default:false
   },
-  relatedCurrency: {
-    type:mongoose.Schema.Types.ObjectId,
-    required:true,
-    ref:'Currencies'
+  currency: {
+    type:String,
+    required:true
   },
   relatedAccounting:{
     type:mongoose.Schema.Types.ObjectId,

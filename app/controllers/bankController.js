@@ -16,7 +16,7 @@ exports.listAllBanks = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Bank.find(query).limit(limit).skip(skip);
+    let result = await Bank.find(query).limit(limit).skip(skip).populate('relatedAccounting');
     console.log(result)
     count = await Bank.find(query).count();
     const division = count / limit;
@@ -39,7 +39,7 @@ exports.listAllBanks = async (req, res) => {
 };
 
 exports.getBank = async (req, res) => {
-  const result = await Bank.find({ _id: req.params.id,isDeleted:false })
+  const result = await Bank.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -66,7 +66,7 @@ exports.updateBank = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    );
+    ).populate('relatedAccounting');
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })

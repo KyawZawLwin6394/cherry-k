@@ -49,5 +49,12 @@ client.connect(function(err) {
   },function(err, result) {
     if (err) {console.log(err)} else {console.log('Treatment List Indexes Created Successfully!')}
   })
+
+  db.collection('currencies').createIndex({
+    code:'text',
+    name:'text'
+  },function(err, result) {
+    if (err) {console.log(err)} else {console.log('Currency Indexes Created Successfully!')}
+  })
   
 });
