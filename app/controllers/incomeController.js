@@ -1,5 +1,6 @@
 'use strict';
 const Income = require('../models/income');
+const Transaction = require('../models/transaction')
 
 exports.listAllIncomes = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -8,7 +9,7 @@ exports.listAllIncomes = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -38,7 +39,7 @@ exports.listAllIncomes = async (req, res) => {
 };
 
 exports.getIncome = async (req, res) => {
-  const result = await Income.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting')
+  const result = await Income.find({ _id: req.params.id, isDeleted: false }).populate('relatedAccounting')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -49,10 +50,44 @@ exports.createIncome = async (req, res, next) => {
     const newBody = req.body;
     const newIncome = new Income(newBody);
     const result = await newIncome.save();
+    const firstTransaction =
+    {
+      "initialExchangeRate": newBody.initialExchangeRate,
+      "amount": newBody.finalAmount,
+      "date": newBody.date,
+      "remark": newBody.remark,
+      "type": "Debit",
+      "relatedTreatment": newBody.relatedTreatment,
+      "treatmentFlag": false,
+      "relatedTransaction": null,
+      "relatedAccounting": newBody.relatedAccounting
+    }
+    const newTrans = new Transaction(firstTransaction)
+    const fTransResult = await newTrans.save();
+    console.log(fTransResult)
+    const secondTransaction = {
+      "initialExchangeRate": newBody.initialExchangeRate,
+      "amount": newBody.finalAmount,
+      "date": newBody.date,
+      "remark": newBody.remark,
+      "type": "Debit",
+      "relatedTreatment": newBody.relatedTreatment,
+      "treatmentFlag": false,
+      "relatedTransaction": fTransResult._id,
+      "relatedAccounting": newBody.relatedAccounting,
+      "relatedBank": newBody.relatedBank,
+      "relatedCash": newBody.relatedCash
+    }
+    const secTrans = new Transaction(secondTransaction)
+    const secTransResult = await secTrans.save();
+    console.log(secTransResult)
+
     res.status(200).send({
       message: 'Income create success',
       success: true,
-      data: result
+      data: result,
+      firstTrans: fTransResult,
+      secTrans: secTransResult
     });
   } catch (error) {
     return res.status(500).send({ "error": true, message: error.message })

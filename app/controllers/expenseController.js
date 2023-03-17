@@ -50,38 +50,44 @@ exports.createExpense = async (req, res, next) => {
         const newBody = req.body;
         const newExpense = new Expense(newBody);
         const result = await newExpense.save();
-        const transaction = [
-            {
-                "amount": req.amount,
-                "date": req.date,
-                "remark": req.remark,
-                "type": "Debit",
-                "relatedTreatment": req.relatedTreatment,
-                "treatmentFlag": false,
-                "relatedTransaction": null,
-                "relatedAccounting": req.relatedAccounting,
-                "relatedBank": req.relatedBank,
-                "relatedCash": req.relatedCash
+        const firstTransaction =
+        {
+            "initialExchangeRate":newBody.initialExchangeRate,
+            "amount": newBody.finalAmount,
+            "date": newBody.date,
+            "remark": newBody.remark,
+            "type": "Debit",
+            "relatedTreatment": newBody.relatedTreatment,
+            "treatmentFlag": false,
+            "relatedTransaction": null,
+            "relatedAccounting": newBody.relatedAccounting
+        }
+        const newTrans = new Transaction(firstTransaction)
+        const fTransResult = await newTrans.save();
+        console.log(fTransResult)
+        const secondTransaction = {
+            "initialExchangeRate":newBody.initialExchangeRate,
+            "amount": newBody.finalAmount,
+            "date": newBody.date,
+            "remark": newBody.remark,
+            "type": "Debit",
+            "relatedTreatment": newBody.relatedTreatment,
+            "treatmentFlag": false,
+            "relatedTransaction": fTransResult._id,
+            "relatedAccounting": newBody.relatedAccounting,
+            "relatedBank": newBody.relatedBank,
+            "relatedCash": newBody.relatedCash
+        }
+        const secTrans = new Transaction(secondTransaction)
+        const secTransResult = await secTrans.save();
+        console.log(secTransResult)
 
-            },
-            {
-                "amount": req.amount,
-                "date": req.date,
-                "remark": req.remark,
-                "type": "Credit",
-                "relatedTreatment": req.relatedTreatment,
-                "treatmentFlag": false,
-                "relatedTransaction": null,
-                "relatedAccounting": req.relatedAccounting,
-                "relatedBank": req.relatedBank,
-                "relatedCash": req.relatedCash
-
-            }
-        ]
         res.status(200).send({
             message: 'Expense create success',
             success: true,
-            data: result
+            data: result,
+            firstTrans: fTransResult,
+            secTrans : secTransResult
         });
     } catch (error) {
         return res.status(500).send({ "error": true, message: error.message })
