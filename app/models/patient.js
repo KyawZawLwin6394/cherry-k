@@ -22,6 +22,9 @@ let PatientSchema = new Schema({
   dateOfBirth: {
     type: Date,
   },
+  date: {
+    type:String
+  },  
   email: {
     type: String,
     unique: true,

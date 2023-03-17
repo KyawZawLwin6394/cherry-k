@@ -15,6 +15,9 @@ let AttachmentSchema = new Schema({
     },
     fileName: {
         type: String,
+    },
+    image:{
+        type:String
     }
 
 });
