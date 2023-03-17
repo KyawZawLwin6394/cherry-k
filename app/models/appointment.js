@@ -55,7 +55,7 @@ let AppointmentSchema = new Schema({
   },
   token: {
     type:String
-  },
+  }
 });
 
 module.exports = mongoose.model('Appointments', AppointmentSchema);
