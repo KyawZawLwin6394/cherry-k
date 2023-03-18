@@ -41,13 +41,11 @@ let BankSchema = new Schema({
   },
   relatedCurrency: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'Currencies',
-    required:true
+    ref:'Currencies'
   },
   relatedAccounting:{
     type:mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists',
-    required:true
+    ref:'AccountingLists'
   }
 });
 
