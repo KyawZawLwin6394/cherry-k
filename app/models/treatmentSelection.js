@@ -3,18 +3,9 @@
 const mongoose = require('mongoose');
 mongoose.promise = global.Promise;
 const Schema = mongoose.Schema;
-const validator = require('validator');
 
 
 let TreatmentSelectionSchema = new Schema({
-  treatmentName: {
-    type: String,
-    required: true
-  },
-  treatmentCode: {
-    type: String,
-    required:true,
-  },
   paymentMethod: {
     type:String,
     enum:['Credit','Cash Down']
@@ -45,6 +36,11 @@ let TreatmentSelectionSchema = new Schema({
     required:true,
     default:false
   },
+  relatedTreatment: {
+    type:mongoose.Schema.Types.ObjectId,
+    required:true,
+    ref:'Treatments'
+  }
 });
 const patient = mongoose.model('TreatmentSelections',TreatmentSelectionSchema)
 module.exports = patient;

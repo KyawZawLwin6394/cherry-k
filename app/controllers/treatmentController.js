@@ -16,7 +16,7 @@ exports.listAllTreatments = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Treatment.find(query).limit(limit).skip(skip).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id');
+    let result = await Treatment.find(query).limit(limit).skip(skip).populate('relatedAppointment').populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id');
     console.log(result)
     count = await Treatment.find(query).count();
     const division = count / limit;
@@ -34,31 +34,38 @@ exports.listAllTreatments = async (req, res) => {
       list: result,
     });
   } catch (e) {
-    return res.status(500).send({ error: true, message: e.message });
+    console.log(e)
+    //return res.status(500).send({ error: true, message: e.message });
   }
 };
 
 exports.getTreatment = async (req, res) => {
-  const result = await Treatment.find({ _id: req.params.id, isDeleted: false }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id')
+  const result = await Treatment.find({ _id: req.params.id, isDeleted: false }).populate('relatedAppointment').populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.createTreatment = async (req, res, next) => {
+  var appointments = []
+  var population = []
+  let data = req.body;
   try {
     const appointmentConfig = {
       relatedPatient: req.body.relatedPatient,
       relatedDoctor: req.body.relatedDoctor,
       relatedTherapist: req.body.relatedTherapist
     }
-    let appointments = []
     for (let i = 0; i < req.body.treatmentTimes; i++) {
       appointments.push(appointmentConfig) //perparing for insertMany
     }
     const appointmentResult = await Appointment.insertMany(appointments)
-    console.log(appointmentResult)
-    const newBody = req.body;
+    appointmentResult.map (function(element,index) {
+      population.push(element._id)
+    })
+    data = {...data,   relatedAppointment: population }
+    console.log(data)
+    const newBody = data;
     const newTreatment = new Treatment(newBody);
     const result = await newTreatment.save();
     res.status(200).send({
@@ -78,7 +85,7 @@ exports.updateTreatment = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id')
+    ).populate('relatedAppointment').populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id')
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })

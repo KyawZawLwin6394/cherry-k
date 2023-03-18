@@ -15,7 +15,7 @@ exports.listAllTreatmentSelections = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await TreatmentSelection.find(query).limit(limit).skip(skip);
+        let result = await TreatmentSelection.find(query).limit(limit).skip(skip).populate('relatedTreatment');
         let count = await TreatmentSelection.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
@@ -36,7 +36,7 @@ exports.listAllTreatmentSelections = async (req, res) => {
 };
 
 exports.getTreatmentSelection = async (req, res) => {
-    const result = await TreatmentSelection.find({ _id: req.params.id,isDeleted:false });
+    const result = await TreatmentSelection.find({ _id: req.params.id,isDeleted:false }).populate('relatedTreatment');
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -73,7 +73,7 @@ exports.updateTreatmentSelection = async (req, res, next) => {
             { _id: req.body.id },
             data,
             { new: true },
-        );
+        ).populate('relatedTreatment');
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })

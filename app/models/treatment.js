@@ -79,6 +79,11 @@ let TreatmentSchema = new Schema({
     type:mongoose.Schema.Types.ObjectId,
     ref:'Patients',
     required:true
+  },
+  relatedAppointment: {
+    type:[mongoose.Schema.Types.ObjectId],
+    required:true,
+    ref:'Appointments'
   }
 });
 
