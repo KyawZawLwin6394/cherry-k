@@ -46,6 +46,10 @@ let BankSchema = new Schema({
   relatedAccounting:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'AccountingLists'
+  },
+  accountName: {
+    type:String,
+    required:true
   }
 });
 
