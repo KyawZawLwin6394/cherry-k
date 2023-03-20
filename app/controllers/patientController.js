@@ -66,7 +66,7 @@ exports.createPatient = async (req, res, next) => {
     //prepare CUS-ID
     const latestDocument =await Patient.find({},{seq:1}).sort({_id: -1}).limit(1).exec();
     console.log(latestDocument)
-    if (latestDocument.length === 0) data= {...data, seq:'1', patientID:"CUS-001"} // if seq is undefined set initial patientID and seq
+    if (latestDocument.length === 0) data= {...data, seq:'1', patientID:"CUS-1"} // if seq is undefined set initial patientID and seq
     console.log(data)
     if (latestDocument.length) {
       const increment = latestDocument[0].seq+1

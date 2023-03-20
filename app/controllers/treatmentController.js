@@ -16,7 +16,7 @@ exports.listAllTreatments = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Treatment.find(query).limit(limit).skip(skip).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id');
+    let result = await Treatment.find(query).limit(limit).skip(skip).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine');
     console.log(result)
     count = await Treatment.find(query).count();
     const division = count / limit;

@@ -7,8 +7,8 @@ const verifyToken = require("../lib/verifyToken");
 module.exports = (app) => {
 
     app.route('/api/medicine-sale')
-        .post(verifyToken ,catchError(medicineSale.createMedicineSale))
-        .put(verifyToken,catchError(medicineSale.updateMedicineSale))
+        .post(catchError(medicineSale.createMedicineSale))
+        .put(catchError(medicineSale.updateMedicineSale))
         
     app.route('/api/medicine-sale/:id')
         .get(verifyToken,catchError(medicineSale.getMedicineSale))

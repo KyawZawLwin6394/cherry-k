@@ -11,10 +11,10 @@ module.exports = (app) => {
         .put(verifyToken,catchError(medicineItem.updateMedicineItem))
         
     app.route('/api/medicine-item/:id')
-        .get(verifyToken ,catchError(medicineItem.getMedicineItem))
-        .delete(verifyToken ,catchError(medicineItem.deleteMedicineItem)) 
-        .post(verifyToken ,catchError(medicineItem.activateMedicineItem))
+        .get(catchError(medicineItem.getMedicineItem))
+        .delete(catchError(medicineItem.deleteMedicineItem)) 
+        .post(catchError(medicineItem.activateMedicineItem))
 
-    app.route('/api/medicine-items').get(verifyToken,catchError(medicineItem.listAllMedicineItems))
+    app.route('/api/medicine-items').get(catchError(medicineItem.listAllMedicineItems))
 
 };

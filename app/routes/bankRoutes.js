@@ -15,5 +15,5 @@ module.exports = (app) => {
         .delete(verifyToken,catchError(bank.deleteBank)) 
         .post(verifyToken ,catchError(bank.activateBank))
 
-    app.route('/api/banks').get(verifyToken, catchError(bank.listAllBanks))
+    app.route('/api/banks').get(catchError(bank.listAllBanks))
 };
