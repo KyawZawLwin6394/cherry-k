@@ -47,7 +47,11 @@ exports.createTreatmentSelection = async (req, res, next) => {
         const appointmentConfig = {
             relatedPatient: req.body.relatedPatient,
             relatedDoctor: req.body.relatedDoctor,
-            relatedTherapist: req.body.relatedTherapist
+            relatedTherapist: req.body.relatedTherapist,
+            originalDate:req.body.originalDate,
+            date:req.body.date,
+            time:req.body.time,
+            phone:req.body.phone
           }
           let appointments = []
           for (let i = 0; i < req.body.treatmentTimes; i++) {
