@@ -49,6 +49,10 @@ let IncomeSchema = new Schema({
     relatedCashAccount: {
         type:mongoose.Schema.Types.ObjectId,
         ref:'AccountingLists'
+    },
+    relatedCredit: {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'AccountingLists'
     }
 });
 
