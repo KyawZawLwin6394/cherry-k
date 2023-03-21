@@ -41,6 +41,10 @@ let ExpenseSchema = new Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    relatedCredit: {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'AccountingLists'
     }
 });
 

@@ -52,7 +52,7 @@ exports.createExpense = async (req, res, next) => {
         const result = await newExpense.save();
         const firstTransaction =
         {
-            "initialExchangeRate":newBody.initialExchangeRate,
+            "initialExchangeRate": newBody.initialExchangeRate,
             "amount": newBody.finalAmount,
             "date": newBody.date,
             "remark": newBody.remark,
@@ -65,29 +65,48 @@ exports.createExpense = async (req, res, next) => {
         const newTrans = new Transaction(firstTransaction)
         const fTransResult = await newTrans.save();
         console.log(fTransResult)
-        const secondTransaction = {
-            "initialExchangeRate":newBody.initialExchangeRate,
-            "amount": newBody.finalAmount,
-            "date": newBody.date,
-            "remark": newBody.remark,
-            "type": "Debit",
-            "relatedTreatment": newBody.relatedTreatment,
-            "treatmentFlag": false,
-            "relatedTransaction": fTransResult._id,
-            "relatedAccounting": newBody.relatedAccounting,
-            "relatedBank": newBody.relatedBank,
-            "relatedCash": newBody.relatedCash
+        if (req.body.relatedCredit) {
+            //credit
+            const secondTransaction = {
+                "initialExchangeRate": newBody.initialExchangeRate,
+                "amount": newBody.finalAmount,
+                "date": newBody.date,
+                "remark": newBody.remark,
+                "type": "Debit",
+                "relatedTreatment": newBody.relatedTreatment,
+                "treatmentFlag": false,
+                "relatedTransaction": fTransResult._id,
+                "relatedAccounting": newBody.relatedAccounting,
+                "relatedCredit":newBody.relatedCredit
+            }
+            const secTrans = new Transaction(secondTransaction)
+            const secTransResult = await secTrans.save();
+            console.log(secTransResult)
+        } else {
+            //bank or cash
+            const secondTransaction = {
+                "initialExchangeRate": newBody.initialExchangeRate,
+                "amount": newBody.finalAmount,
+                "date": newBody.date,
+                "remark": newBody.remark,
+                "type": "Debit",
+                "relatedTreatment": newBody.relatedTreatment,
+                "treatmentFlag": false,
+                "relatedTransaction": fTransResult._id,
+                "relatedAccounting": newBody.relatedAccounting,
+                "relatedBank": newBody.relatedBank,
+                "relatedCash": newBody.relatedCash
+            }
+            const secTrans = new Transaction(secondTransaction)
+            const secTransResult = await secTrans.save();
+            console.log(secTransResult)
         }
-        const secTrans = new Transaction(secondTransaction)
-        const secTransResult = await secTrans.save();
-        console.log(secTransResult)
-
         res.status(200).send({
             message: 'Expense create success',
             success: true,
             data: result,
             firstTrans: fTransResult,
-            secTrans : secTransResult
+            secTrans: secTransResult
         });
     } catch (error) {
         return res.status(500).send({ "error": true, message: error.message })
