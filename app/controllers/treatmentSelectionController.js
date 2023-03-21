@@ -44,6 +44,19 @@ exports.getTreatmentSelection = async (req, res) => {
 
 exports.createTreatmentSelection = async (req, res, next) => {
     try {
+        const appointmentConfig = {
+            relatedPatient: req.body.relatedPatient,
+            relatedDoctor: req.body.relatedDoctor,
+            relatedTherapist: req.body.relatedTherapist
+          }
+          let appointments = []
+          for (let i = 0; i < req.body.treatmentTimes; i++) {
+            appointments.push(appointmentConfig) //perparing for insertMany
+          }
+          const appointmentResult = await Appointment.insertMany(appointments)
+          console.log(appointmentResult)
+          
+
         let data = req.body;
         if (data.paidAmount) {
             data= {...data, leftOverAmount:data.totalAmount-data.paidAmount} // leftOverAmount Calculation
@@ -55,7 +68,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
         res.status(200).send({
             message: 'Treatment Selection create success',
             success: true,
-            data: result
+            data: result,
+            appointmentAutoGenerate: appointmentResult
         });
     } catch (error) {
         return res.status(500).send({ "error": true, message: error.message })

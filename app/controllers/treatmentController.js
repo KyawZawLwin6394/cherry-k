@@ -47,17 +47,17 @@ exports.getTreatment = async (req, res) => {
 
 exports.createTreatment = async (req, res, next) => {
   try {
-    const appointmentConfig = {
-      relatedPatient: req.body.relatedPatient,
-      relatedDoctor: req.body.relatedDoctor,
-      relatedTherapist: req.body.relatedTherapist
-    }
-    let appointments = []
-    for (let i = 0; i < req.body.treatmentTimes; i++) {
-      appointments.push(appointmentConfig) //perparing for insertMany
-    }
-    const appointmentResult = await Appointment.insertMany(appointments)
-    console.log(appointmentResult)
+    // const appointmentConfig = {
+    //   relatedPatient: req.body.relatedPatient,
+    //   relatedDoctor: req.body.relatedDoctor,
+    //   relatedTherapist: req.body.relatedTherapist
+    // }
+    // let appointments = []
+    // for (let i = 0; i < req.body.treatmentTimes; i++) {
+    //   appointments.push(appointmentConfig) //perparing for insertMany
+    // }
+    // const appointmentResult = await Appointment.insertMany(appointments)
+    // console.log(appointmentResult)
     const newBody = req.body;
     const newTreatment = new Treatment(newBody);
     const result = await newTreatment.save();
@@ -65,7 +65,7 @@ exports.createTreatment = async (req, res, next) => {
       message: 'Treatment create success',
       success: true,
       data: result,
-      appointmentAutoGenerate: appointmentResult
+      //appointmentAutoGenerate: appointmentResult
     });
   } catch (error) {
     return res.status(500).send({ "error": true, message: error.message })
