@@ -56,7 +56,7 @@ exports.createIncome = async (req, res, next) => {
       "amount": newBody.finalAmount,
       "date": newBody.date,
       "remark": newBody.remark,
-      "type": "Debit",
+      "type": "Credit",
       "relatedTreatment": newBody.relatedTreatment,
       "treatmentFlag": false,
       "relatedTransaction": null,

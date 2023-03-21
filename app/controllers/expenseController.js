@@ -72,7 +72,7 @@ exports.createExpense = async (req, res, next) => {
                 "amount": newBody.finalAmount,
                 "date": newBody.date,
                 "remark": newBody.remark,
-                "type": "Debit",
+                "type": "Credit",
                 "relatedTreatment": newBody.relatedTreatment,
                 "treatmentFlag": false,
                 "relatedTransaction": fTransResult._id,
@@ -80,7 +80,7 @@ exports.createExpense = async (req, res, next) => {
                 "relatedCredit":newBody.relatedCredit
             }
             const secTrans = new Transaction(secondTransaction)
-            const secTransResult = await secTrans.save();
+            var secTransResult = await secTrans.save();
             console.log(secTransResult)
         } else {
             //bank or cash
@@ -89,7 +89,7 @@ exports.createExpense = async (req, res, next) => {
                 "amount": newBody.finalAmount,
                 "date": newBody.date,
                 "remark": newBody.remark,
-                "type": "Debit",
+                "type": "Credit",
                 "relatedTreatment": newBody.relatedTreatment,
                 "treatmentFlag": false,
                 "relatedTransaction": fTransResult._id,
@@ -98,7 +98,7 @@ exports.createExpense = async (req, res, next) => {
                 "relatedCash": newBody.relatedCash
             }
             const secTrans = new Transaction(secondTransaction)
-            const secTransResult = await secTrans.save();
+            var secTransResult = await secTrans.save();
             console.log(secTransResult)
         }
         res.status(200).send({
