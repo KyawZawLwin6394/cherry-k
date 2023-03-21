@@ -12,7 +12,7 @@ let AccountingListSchema = new Schema({
     },
     accountingTypes: {
         type: String,
-        enum:['Assets','Liabilities','Equity','Revenue','COGS','Administration Expenses','Operation Expenses','Staff Expenses','Marketing Expenses','Other Expenses','Other Income'],
+        enum:['Current Assets','Current Liabilities','Equity','Revenue','COGS','Administration Expenses','Operation Expenses','Staff Expenses','Marketing Expenses','Other Expenses','Other Income','Fixed Assets','Longterm Liabilities'],
         required: true,
     },
     name: {
@@ -22,15 +22,14 @@ let AccountingListSchema = new Schema({
     relatedTreatment: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'Treatments',
-        required: true,
+       
     },
     amount: {
         type: Number,
         required: true,
     },
     openingBalance: {
-        type: Number,
-        required: true,
+        type: Number
     },
     generalFlag: {
         type: Boolean,
@@ -42,8 +41,7 @@ let AccountingListSchema = new Schema({
         default: false
     },
     relatedCurrency: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Currencies',
+        type:String,
         required:true
       },
     carryForWork: {

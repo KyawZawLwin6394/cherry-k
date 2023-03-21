@@ -7,7 +7,7 @@ const verifyToken = require('../lib/verifyToken');
 module.exports = (app) => {
 
     app.route('/api/bank')
-        .post(verifyToken ,catchError(bank.createBank))
+        .post(catchError(bank.createBank))
         .put(verifyToken,catchError(bank.updateBank))
         
     app.route('/api/bank/:id')
@@ -15,5 +15,5 @@ module.exports = (app) => {
         .delete(verifyToken,catchError(bank.deleteBank)) 
         .post(verifyToken ,catchError(bank.activateBank))
 
-    app.route('/api/banks').get(verifyToken, catchError(bank.listAllBanks))
+    app.route('/api/banks').get(catchError(bank.listAllBanks))
 };

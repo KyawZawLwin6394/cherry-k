@@ -28,7 +28,6 @@ let BankSchema = new Schema({
   },
   balance: {
     type: Number,
-    required:true,
   },
   bankAddress: {
     type: String,
@@ -50,6 +49,9 @@ let BankSchema = new Schema({
   accountName: {
     type:String,
     required:true
+  },
+  bank:{
+    type:String
   }
 });
 

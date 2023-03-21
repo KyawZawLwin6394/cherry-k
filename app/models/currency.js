@@ -24,10 +24,10 @@ let CurrencySchema = new Schema({
     default:Date.now(),
     required:true,
   },
-  description: {
-    type:String,
-    required:true,
-  },
+  // description: {
+  //   type:String,
+  //   required:true,
+  // },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -15,5 +15,5 @@ module.exports = (app) => {
         .delete(verifyToken,catchError(treatment.deleteTreatment)) 
         .post(verifyToken ,catchError(treatment.activateTreatment))
 
-    app.route('/api/treatments').get(verifyToken, catchError(treatment.listAllTreatments))
+    app.route('/api/treatments').get(catchError(treatment.listAllTreatments))
 };

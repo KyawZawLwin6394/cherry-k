@@ -55,7 +55,8 @@ exports.createAccountingList = async (req, res, next) => {
             data: result
         });
     } catch (error) {
-        return res.status(500).send({ "error": true, message: error.message })
+        console.log(error)
+        //return res.status(500).send({ "error": true, message: error.message })
     }
 };
 

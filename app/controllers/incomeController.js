@@ -64,7 +64,6 @@ exports.createIncome = async (req, res, next) => {
     }
     const newTrans = new Transaction(firstTransaction)
     const fTransResult = await newTrans.save();
-    console.log(fTransResult)
     const secondTransaction = {
       "initialExchangeRate": newBody.initialExchangeRate,
       "amount": newBody.finalAmount,
@@ -80,8 +79,7 @@ exports.createIncome = async (req, res, next) => {
     }
     const secTrans = new Transaction(secondTransaction)
     const secTransResult = await secTrans.save();
-    console.log(secTransResult)
-
+    console.log(result, fTransResult, secTransResult)
     res.status(200).send({
       message: 'Income create success',
       success: true,
