@@ -15,6 +15,6 @@ module.exports = (app) => {
         .delete(verifyToken,catchError(medicineList.deleteMedicineList)) 
         .post(verifyToken,catchError(medicineList.activateMedicineList))
 
-    app.route('/api/medicine-lists').get(verifyToken,catchError(medicineList.listAllMedicineLists))
+    app.route('/api/medicine-lists').get(catchError(medicineList.listAllMedicineLists))
 
 };
