@@ -15,7 +15,7 @@ exports.listAllAccountingLists = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await AccountingList.find(query).limit(limit).skip(skip).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id');
+        let result = await AccountingList.find(query).skip(skip).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id');
         console.log(result)
         count = await AccountingList.find(query).count();
         const division = count / limit;
