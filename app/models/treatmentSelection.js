@@ -10,8 +10,9 @@ let TreatmentSelectionSchema = new Schema({
     type:String,
     enum:['Credit','Bank','Cash']
   },
-  bankInformation: {
-    type: String,
+  relatedBank: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:'AccountingLists',
     required:true
   },
   paidAmount: {
@@ -40,6 +41,11 @@ let TreatmentSelectionSchema = new Schema({
     type:mongoose.Schema.Types.ObjectId,
     required:true,
     ref:'Treatments'
+  },
+  relatedCash: {
+    type:mongoose.Schema.Types.ObjectId,
+    required:true,
+    ref:'AccountingLists'
   }
 });
 const patient = mongoose.model('TreatmentSelections',TreatmentSelectionSchema)
