@@ -8,7 +8,7 @@ const Schema = mongoose.Schema;
 let TreatmentSelectionSchema = new Schema({
   paymentMethod: {
     type:String,
-    enum:['Credit','Cash Down']
+    enum:['Credit','Bank','Cash']
   },
   bankInformation: {
     type: String,
