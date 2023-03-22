@@ -17,4 +17,6 @@ module.exports = (app) => {
 
     app.route('/api/medicine-sales').get(catchError(medicineSale.listAllMedicineSales))
 
+    app.route('/api/medicine-sales/transaction').post(catchError(medicineSale.createMedicineSaleTransaction))
+
 };

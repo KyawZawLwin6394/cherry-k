@@ -1,5 +1,6 @@
 'use strict';
 const MedicineSale = require('../models/medicineSale');
+const Transaction = require('../models/transaction');
 
 exports.listAllMedicineSales = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -8,7 +9,7 @@ exports.listAllMedicineSales = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -38,7 +39,7 @@ exports.listAllMedicineSales = async (req, res) => {
 };
 
 exports.getMedicineSale = async (req, res) => {
-  const result = await MedicineSale.find({ _id: req.params.id, isDeleted:false }).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems._id');
+  const result = await MedicineSale.find({ _id: req.params.id, isDeleted: false }).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems._id');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -58,6 +59,42 @@ exports.createMedicineSale = async (req, res, next) => {
   }
 };
 
+exports.createMedicineSaleTransaction = async (req, res, next) => {
+  try {
+    //first transaction 
+    const fTransaction = new Transaction({
+      "amount": req.body.amount,
+      "date": req.body.date,
+      "remark": req.body.remark,
+      "relatedAccounting": req.body.relatedAccounting,
+      "type": "Credit"
+    })
+    const fTransResult = await fTransaction.save()
+    const secTransaction = new Transaction(
+      {
+        "amount": req.body.amount,
+        "date": req.body.date,
+        "remark": req.body.remark,
+        "relatedAccounting": req.body.relatedAccounting,
+        "relatedBank": req.body.relatedBank,
+        "relatedCash": req.body.relatedCash,
+        "type": "Credit",
+        "relatedTransaction":fTransResult._id
+      }
+    )
+    const secTransResult = await secTransaction.save()
+    res.status(200).send({
+      message: 'MedicineSale Transaction success',
+      success: true,
+      fTrans:fTransResult,
+      sTrans:secTransResult
+    });
+  } catch (error) {
+    return res.status(500).send({ "error": true, message: error.message })
+  }
+};
+
+
 exports.updateMedicineSale = async (req, res, next) => {
   try {
     const result = await MedicineSale.findOneAndUpdate(
@@ -65,8 +102,8 @@ exports.updateMedicineSale = async (req, res, next) => {
       req.body,
       { new: true },
     );
-    if (!result) return res.status(500).send({ error:true, message: 'Query Error!'})
-    if (result===0) return res.status(500).send({ error:true, message: 'No Records!'})
+    if (!result) return res.status(500).send({ error: true, message: 'Query Error!' })
+    if (result === 0) return res.status(500).send({ error: true, message: 'No Records!' })
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
