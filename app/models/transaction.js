@@ -26,7 +26,7 @@ let TransactionSchema = new Schema({
   type: {
     type: String,
     enum:['Debit','Credit'],
-    required:true,
+    // required:true,
   },
   relatedTreatment: {
     type:mongoose.Schema.Types.ObjectId,
@@ -42,7 +42,7 @@ let TransactionSchema = new Schema({
   },
   treatmentFlag: {
     type:Boolean, 
-    required:true
+    // required:true
   },
   relatedTransaction: {
     type: mongoose.Schema.Types.ObjectId,
@@ -51,7 +51,7 @@ let TransactionSchema = new Schema({
   },
   isDeleted: {
     type:Boolean,
-    required:true,
+    // required:true,
     default:false
   }
 });

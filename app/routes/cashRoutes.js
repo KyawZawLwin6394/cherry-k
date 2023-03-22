@@ -15,5 +15,7 @@ module.exports = (app) => {
         .delete(verifyToken,catchError(cash.deleteCash)) 
         .post(verifyToken ,catchError(cash.activateCash))
 
-    app.route('/api/cashes').get(catchError(cash.listAllCashes))
+
+    app.route('/api/cashes').get( catchError(cash.listAllCashes))
+
 };

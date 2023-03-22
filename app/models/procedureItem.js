@@ -53,6 +53,6 @@ let procedureItemSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('procedureItems', procedureItemSchema);
+module.exports = mongoose.model('ProcedureItems', procedureItemSchema);
 
 //Author: Kyaw Zaw Lwin

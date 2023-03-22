@@ -6,6 +6,14 @@ const Schema = mongoose.Schema;
 
 
 let MedicineSaleSchema = new Schema({
+  voucherCode: {
+    type:String,
+    required:true
+  },
+  createdAt: {
+    type:Date,
+    default:Date.now()
+  },
   relatedTreatment: {
     type: mongoose.Schema.Types.ObjectId,
     ref:'Treatments',

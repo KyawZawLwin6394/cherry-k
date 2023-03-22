@@ -28,7 +28,6 @@ let BankSchema = new Schema({
   },
   balance: {
     type: Number,
-    required:true,
   },
   bankAddress: {
     type: String,
@@ -41,13 +40,18 @@ let BankSchema = new Schema({
   },
   relatedCurrency: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'Currencies',
-    required:true
+    ref:'Currencies'
   },
   relatedAccounting:{
     type:mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists',
+    ref:'AccountingLists'
+  },
+  accountName: {
+    type:String,
     required:true
+  },
+  bank:{
+    type:String
   }
 });
 

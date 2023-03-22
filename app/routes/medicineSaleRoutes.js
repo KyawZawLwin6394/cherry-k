@@ -9,12 +9,15 @@ module.exports = (app) => {
     app.route('/api/medicine-sale')
         .post(catchError(medicineSale.createMedicineSale))
         .put(catchError(medicineSale.updateMedicineSale))
+
         
     app.route('/api/medicine-sale/:id')
         .get(verifyToken,catchError(medicineSale.getMedicineSale))
         .delete(verifyToken,catchError(medicineSale.deleteMedicineSale)) 
         .post(verifyToken,catchError(medicineSale.activateMedicineSale))
 
-    app.route('/api/medicine-sales').get(verifyToken,catchError(medicineSale.listAllMedicineSales))
+    app.route('/api/medicine-sales').get(catchError(medicineSale.listAllMedicineSales))
+
+    app.route('/api/medicine-sales/transaction').post(catchError(medicineSale.createMedicineSaleTransaction))
 
 };
