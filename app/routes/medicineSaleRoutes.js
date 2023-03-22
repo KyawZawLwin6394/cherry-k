@@ -8,7 +8,8 @@ module.exports = (app) => {
 
     app.route('/api/medicine-sale')
         .post(catchError(medicineSale.createMedicineSale))
-        .put(verifyToken,catchError(medicineSale.updateMedicineSale))
+        .put(catchError(medicineSale.updateMedicineSale))
+
         
     app.route('/api/medicine-sale/:id')
         .get(verifyToken,catchError(medicineSale.getMedicineSale))

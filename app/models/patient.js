@@ -62,7 +62,9 @@ let PatientSchema = new Schema({
   patientStatus: {
     type:String,
     enum:['New','Old'],
+
     default:'New',
+
   },
   patientID: {
     type:String,

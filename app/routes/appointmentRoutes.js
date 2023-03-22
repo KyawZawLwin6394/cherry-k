@@ -18,7 +18,7 @@ module.exports = (app) => {
     app.route('/api/appointments-filter')
         .get(verifyToken,catchError(appointment.filterAppointments))
 
-    app.route('/api/appointments').get(verifyToken, catchError(appointment.listAllAppointments))
+    app.route('/api/appointments').get(catchError(appointment.listAllAppointments))
     app.route('/api/appointment-search')
         .post(verifyToken ,catchError(appointment.searchAppointment))
 };

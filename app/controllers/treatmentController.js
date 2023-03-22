@@ -16,7 +16,9 @@ exports.listAllTreatments = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Treatment.find(query).limit(limit).skip(skip).populate('relatedAppointment').populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id');
+
+    let result = await Treatment.find(query).limit(limit).skip(skip).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine');
+
     console.log(result)
     count = await Treatment.find(query).count();
     const division = count / limit;
@@ -49,13 +51,16 @@ exports.getTreatment = async (req, res) => {
 exports.createTreatment = async (req, res, next) => {
   let data = req.body;
   try {
+
     console.log(data)
     const newBody = data;
+
     const newTreatment = new Treatment(newBody);
     const result = await newTreatment.save();
     res.status(200).send({
       message: 'Treatment create success',
       success: true,
+
       data: result
     });
   } catch (error) {
