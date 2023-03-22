@@ -6,47 +6,43 @@ const Schema = mongoose.Schema;
 
 
 let PatientTreatmentSchema = new Schema({
-  relatedAccounting: {
+  relatedPatient: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists',
+    ref:'Patients',
     required: true
   },
-  amount: {
-    type: String,
+  relatedTreatment: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:'Treatments',
     required: true,
   },
-  date: {
-    type:Date,
+  leftOverAmount: {
+    type:Number,
     required:true
   },
-  remark: {
-    type: String,
+  paidAmount: {
+    type: Number,
     required:true,
   },
-  type: {
-    type: String,
-    enum:['Debit','Credit'],
-    // required:true,
-  },
-  relatedTreatment: {
+  relatedTreatmentSelection: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'Treatments',
+    ref:'TreatmentSelections',
+    required:true
   },
-  relatedBank: {
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists',
+  fullyPaid: {
+    type: Boolean,
+    required:true
   },
-  relatedCash: {
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists',
+  finishedAppointments: {
+    type:[mongoose.Schema.Types.ObjectId],
+    ref:'Appointments',
   },
-  treatmentFlag: {
-    type:Boolean, 
-    // required:true
+  remainingAppointments: {
+    type:[mongoose.Schema.Types.ObjectId],
+    ref:'Appointments',
   },
   isDeleted: {
     type:Boolean,
-    // required:true,
     default:false
   }
 });

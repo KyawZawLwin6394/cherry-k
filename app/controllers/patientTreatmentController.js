@@ -1,12 +1,12 @@
 'use strict';
-const Transaction = require('../models/transaction');
+const PatientTreatment = require('../models/patientTreatment');
 
-exports.listAllTransactions = async (req, res) => {
+exports.listAllPatientTreatments = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
   let count = 0;
   let page = 0;
   try {
-    limit = +limit <= 100 ? +limit : 10; //limit
+    limit = +limit <= 100 ? +limit : 20; //limit
     skip = +skip || 0;
     let query = {isDeleted:false},
       regexKeyword;
@@ -15,9 +15,10 @@ exports.listAllTransactions = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Transaction.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+    console.log(query)
+    let result = await PatientTreatment.find(query).limit(limit).skip(skip);
     console.log(result)
-    count = await Transaction.find(query).count();
+    count = await PatientTreatment.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
 
@@ -37,51 +38,49 @@ exports.listAllTransactions = async (req, res) => {
   }
 };
 
-exports.getTransaction = async (req, res) => {
-  const result = await Transaction.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+exports.getPatientTreatment = async (req, res) => {
+  const result = await PatientTreatment.find({ _id: req.params.id,isDeleted:false })
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
-exports.getRelatedTransaction = async (req, res) => {
-  const result = await Transaction.find({ relatedAccounting: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
-  if (!result)
-    return res.status(500).json({ error: true, message: 'No Record Found' });
-  return res.status(200).send({ success: true, data: result });
-};
-
-exports.createTransaction = async (req, res, next) => {
+exports.createPatientTreatment = async (req, res, next) => {
   try {
-    const newBody = req.body;
-    const newTransaction = new Transaction(newBody);
-    const result = await newTransaction.save();
+    let data = req.body
+    if (data.leftOverAmount==0) data = {...data, fullyPaid:false}
+    const newBody = data;
+    const newPatientTreatment = new PatientTreatment(newBody);
+    const result = await newPatientTreatment.save();
     res.status(200).send({
-      message: 'Transaction create success',
+      message: 'PatientTreatment create success',
       success: true,
       data: result
     });
   } catch (error) {
+    console.log(error )
     return res.status(500).send({ "error": true, message: error.message })
   }
 };
 
-exports.updateTransaction = async (req, res, next) => {
+exports.updatePatientTreatment = async (req, res, next) => {
   try {
-    const result = await Transaction.findOneAndUpdate(
+    let data = req.body;
+    if (data.leftOverAmount==0) data = {...data, fullyPaid:false}
+    const result = await PatientTreatment.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+    )
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
 
-exports.deleteTransaction = async (req, res, next) => {
+exports.deletePatientTreatment = async (req, res, next) => {
   try {
-    const result = await Transaction.findOneAndUpdate(
+    const result = await PatientTreatment.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: true },
       { new: true },
@@ -93,9 +92,9 @@ exports.deleteTransaction = async (req, res, next) => {
   }
 }
 
-exports.activateTransaction = async (req, res, next) => {
+exports.activatePatientTreatment = async (req, res, next) => {
   try {
-    const result = await Transaction.findOneAndUpdate(
+    const result = await PatientTreatment.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: false },
       { new: true },

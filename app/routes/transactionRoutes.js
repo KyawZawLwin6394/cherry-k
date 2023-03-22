@@ -1,4 +1,4 @@
-"use strict";
+ "use strict";
 
 const transaction = require("../controllers/transactionController");
 const { catchError } = require("../lib/errorHandler");
@@ -9,6 +9,9 @@ module.exports = (app) => {
     app.route('/api/transaction')
         .post(catchError(transaction.createTransaction))
         .put(catchError(transaction.updateTransaction))
+
+    app.route('/api/transactions/related/:id')
+        .get (catchError(transaction.getRelatedTransaction))
         
     app.route('/api/transaction/:id')
         .get(verifyToken ,catchError(transaction.getTransaction))

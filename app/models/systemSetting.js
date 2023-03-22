@@ -15,7 +15,7 @@ let SystemSettingSchema = new Schema({
     required: true,
   },
   email: {
-    type:Date,
+    type:String,
     required:true
   },
   address: {
@@ -32,6 +32,10 @@ let SystemSettingSchema = new Schema({
   fiscalYearEndDate: {
     type:Date,
     required:true
+  },
+  isDeleted: {
+    type:Boolean,
+    default:false
   }
 });
 

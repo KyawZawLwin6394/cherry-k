@@ -1,12 +1,12 @@
 'use strict';
-const Transaction = require('../models/transaction');
+const SystemSetting = require('../models/systemSetting');
 
-exports.listAllTransactions = async (req, res) => {
+exports.listAllSystemSettings = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
   let count = 0;
   let page = 0;
   try {
-    limit = +limit <= 100 ? +limit : 10; //limit
+    limit = +limit <= 100 ? +limit : 20; //limit
     skip = +skip || 0;
     let query = {isDeleted:false},
       regexKeyword;
@@ -15,9 +15,10 @@ exports.listAllTransactions = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Transaction.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+    console.log(query)
+    let result = await SystemSetting.find(query).limit(limit).skip(skip);
     console.log(result)
-    count = await Transaction.find(query).count();
+    count = await SystemSetting.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
 
@@ -37,51 +38,45 @@ exports.listAllTransactions = async (req, res) => {
   }
 };
 
-exports.getTransaction = async (req, res) => {
-  const result = await Transaction.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+exports.getSystemSetting = async (req, res) => {
+  const result = await SystemSetting.find({ _id: req.params.id,isDeleted:false })
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
-exports.getRelatedTransaction = async (req, res) => {
-  const result = await Transaction.find({ relatedAccounting: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
-  if (!result)
-    return res.status(500).json({ error: true, message: 'No Record Found' });
-  return res.status(200).send({ success: true, data: result });
-};
-
-exports.createTransaction = async (req, res, next) => {
+exports.createSystemSetting = async (req, res, next) => {
   try {
     const newBody = req.body;
-    const newTransaction = new Transaction(newBody);
-    const result = await newTransaction.save();
+    const newSystemSetting = new SystemSetting(newBody);
+    const result = await newSystemSetting.save();
     res.status(200).send({
-      message: 'Transaction create success',
+      message: 'SystemSetting create success',
       success: true,
       data: result
     });
   } catch (error) {
+    console.log(error )
     return res.status(500).send({ "error": true, message: error.message })
   }
 };
 
-exports.updateTransaction = async (req, res, next) => {
+exports.updateSystemSetting = async (req, res, next) => {
   try {
-    const result = await Transaction.findOneAndUpdate(
+    const result = await SystemSetting.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+    )
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
 
-exports.deleteTransaction = async (req, res, next) => {
+exports.deleteSystemSetting = async (req, res, next) => {
   try {
-    const result = await Transaction.findOneAndUpdate(
+    const result = await SystemSetting.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: true },
       { new: true },
@@ -93,9 +88,9 @@ exports.deleteTransaction = async (req, res, next) => {
   }
 }
 
-exports.activateTransaction = async (req, res, next) => {
+exports.activateSystemSetting = async (req, res, next) => {
   try {
-    const result = await Transaction.findOneAndUpdate(
+    const result = await SystemSetting.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: false },
       { new: true },
