@@ -7,13 +7,13 @@ const verifyToken = require('../lib/verifyToken');
 module.exports = (app) => {
 
     app.route('/api/income')
-        .post(verifyToken ,catchError(income.createIncome))
+        .post(catchError(income.createIncome))
         .put(verifyToken,catchError(income.updateIncome))
         
     app.route('/api/income/:id')
-        .get(verifyToken ,catchError(income.getIncome))
+        .get(catchError(income.getIncome))
         .delete(verifyToken,catchError(income.deleteIncome)) 
         .post(verifyToken ,catchError(income.activateIncome))
 
-    app.route('/api/incomes').get(verifyToken, catchError(income.listAllIncomes))
+    app.route('/api/incomes').get( catchError(income.listAllIncomes))
 };

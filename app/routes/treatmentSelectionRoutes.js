@@ -17,4 +17,6 @@ module.exports = (app) => {
 
     app.route('/api/treatment-selections').get(verifyToken, catchError(treatmentSelection.listAllTreatmentSelections))
 
+    app.route('/api/treatment-selections/transaction').post(catchError(treatmentSelection.createTreatmentTransaction))
+
 };

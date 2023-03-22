@@ -47,23 +47,8 @@ exports.getTreatment = async (req, res) => {
 };
 
 exports.createTreatment = async (req, res, next) => {
-  var appointments = []
-  var population = []
   let data = req.body;
   try {
-    const appointmentConfig = {
-      relatedPatient: req.body.relatedPatient,
-      relatedDoctor: req.body.relatedDoctor,
-      relatedTherapist: req.body.relatedTherapist
-    }
-    for (let i = 0; i < req.body.treatmentTimes; i++) {
-      appointments.push(appointmentConfig) //perparing for insertMany
-    }
-    const appointmentResult = await Appointment.insertMany(appointments)
-    appointmentResult.map (function(element,index) {
-      population.push(element._id)
-    })
-    data = {...data,   relatedAppointment: population }
     console.log(data)
     const newBody = data;
     const newTreatment = new Treatment(newBody);
@@ -71,8 +56,7 @@ exports.createTreatment = async (req, res, next) => {
     res.status(200).send({
       message: 'Treatment create success',
       success: true,
-      data: result,
-      appointmentAutoGenerate: appointmentResult
+      data: result
     });
   } catch (error) {
     return res.status(500).send({ "error": true, message: error.message })
