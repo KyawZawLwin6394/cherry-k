@@ -78,7 +78,7 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
         "relatedAccounting": req.body.relatedAccounting,
         "relatedBank": req.body.relatedBank,
         "relatedCash": req.body.relatedCash,
-        "type": "Credit",
+        "type": "Debit",
         "relatedTransaction":fTransResult._id
       }
     )
