@@ -16,7 +16,7 @@ exports.listAllPatientTreatments = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     console.log(query)
-    let result = await PatientTreatment.find(query).limit(limit).skip(skip);
+    let result = await PatientTreatment.find(query).limit(limit).skip(skip).populate('relatedPatient').populate('relatedTreatment');
     console.log(result)
     count = await PatientTreatment.find(query).count();
     const division = count / limit;
@@ -39,7 +39,7 @@ exports.listAllPatientTreatments = async (req, res) => {
 };
 
 exports.getPatientTreatment = async (req, res) => {
-  const result = await PatientTreatment.find({ _id: req.params.id,isDeleted:false })
+  const result = await PatientTreatment.find({ _id: req.params.id,isDeleted:false }).populate('relatedPatient').populate('relatedTreatment')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
