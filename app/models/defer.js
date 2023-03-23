@@ -7,9 +7,9 @@ const validator = require('validator');
 
 
 let DeferSchema = new Schema({
-  relatedMedicineSale: {
+  relatedPatientTreatment: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'MedicineSales',
+    ref:'PatientTreatments',
     required:true
   },
   leftOverAmount: {
