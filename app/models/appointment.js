@@ -57,7 +57,7 @@ let AppointmentSchema = new Schema({
     type:String
   },
   relatedTreatmentSelection: {
-    type:mongoose.Schema.Types.ObjectId,
+    type:[mongoose.Schema.Types.ObjectId],
     ref:'TreatmentSelections'
   }
 });
