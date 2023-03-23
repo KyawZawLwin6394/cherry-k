@@ -55,6 +55,10 @@ let AppointmentSchema = new Schema({
   },
   token: {
     type:String
+  },
+  relatedTreatmentSelection: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'TreatmentSelections'
   }
 });
 

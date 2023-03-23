@@ -40,14 +40,16 @@ exports.listAllTreatmentSelections = async (req, res) => {
 };
 
 exports.getTreatmentSelection = async (req, res) => {
-    const result = await TreatmentSelection.find({ _id: req.params.id, isDeleted: false }).populate('relatedTreatment');
+    const result = await TreatmentSelection.find({ _id: req.params.id, isDeleted: false }).populate('relatedTreatment').populate('relatedAppointments');
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
 };
 
 exports.createTreatmentSelection = async (req, res, next) => {
+    let data = req.body;
     try {
+        
         const treatmentResult = await Treatment.find({_id:req.body.relatedTreatment})
         const appointmentConfig = {
             relatedPatient: req.body.relatedPatient,
@@ -56,18 +58,29 @@ exports.createTreatmentSelection = async (req, res, next) => {
             phone: req.body.phone
         }
         var dataconfigs = []
+        var relatedAppointments = []
         for (let i = 0; i < treatmentResult[0].treatmentTimes; i++) {
             console.log(i)
             dataconfigs.push(appointmentConfig) //perparing for insertMany
         }
         const appointmentResult = await Appointment.insertMany(dataconfigs)
-        let data = req.body;
+        appointmentResult.map(function (element, index) {
+            relatedAppointments.push(element._id)
+        })
+        data = {...data, relatedAppointments:relatedAppointments}
         if (data.paidAmount) {
             data = { ...data, leftOverAmount: data.totalAmount - data.paidAmount } // leftOverAmount Calculation
         }
         if (data.paidAmount === 0) data = { ...data, leftOverAmount: data.totalAmount }
+
+        
         const newTreatmentSelection = new TreatmentSelection(data);
         const result = await newTreatmentSelection.save();
+        const accResult = await appointment.findOneAndUpdate(
+            { _id: req.body.appointment },
+            {relatedTreatmentSelection:result._id},
+            { new: true },
+          )
         res.status(200).send({
             message: 'Treatment Selection create success',
             success: true,

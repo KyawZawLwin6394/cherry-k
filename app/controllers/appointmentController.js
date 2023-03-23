@@ -32,7 +32,7 @@ exports.listAllAppointments = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Appointment.find(query).limit(limit).skip(skip).populate('relatedPatient').populate('relatedDoctor').populate('relatedTherapist');
+    let result = await Appointment.find(query).limit(limit).skip(skip).populate('relatedPatient').populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection');
     console.log(result)
     count = await Appointment.find(query).count();
     const division = count / limit;
@@ -55,7 +55,7 @@ exports.listAllAppointments = async (req, res) => {
 };
 
 exports.getAppointment = async (req, res) => {
-  const result = await Appointment.find({ _id: req.params.id,isDeleted:false }).populate('relatedPatient').populate('relatedDoctor').populate('relatedTherapist');
+  const result = await Appointment.find({ _id: req.params.id,isDeleted:false }).populate('relatedPatient').populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });

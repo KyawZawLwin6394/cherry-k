@@ -44,6 +44,11 @@ let TreatmentSelectionSchema = new Schema({
   relatedCash: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'AccountingLists'
+  },
+  relatedAppointments : {
+    type:[mongoose.Schema.Types.ObjectId],
+    ref:'Appointments',
+    required:true
   }
 });
 const patient = mongoose.model('TreatmentSelections',TreatmentSelectionSchema)
