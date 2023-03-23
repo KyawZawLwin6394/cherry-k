@@ -3,6 +3,7 @@ const TreatmentSelection = require('../models/treatmentSelection');
 const Appointment = require('../models/appointment');
 const Transaction = require('../models/transaction');
 const appointment = require('../models/appointment');
+const Treatment = require('../models/treatment')
 
 exports.listAllTreatmentSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -47,30 +48,24 @@ exports.getTreatmentSelection = async (req, res) => {
 
 exports.createTreatmentSelection = async (req, res, next) => {
     try {
+        const treatmentResult = await Treatment.find({_id:req.body.relatedTreatment})
         const appointmentConfig = {
             relatedPatient: req.body.relatedPatient,
             relatedDoctor: req.body.relatedDoctor,
-            relatedTherapist: req.body.relatedTherapist,
             originalDate: req.body.originalDate,
-            date: req.body.date,
-            time: req.body.time,
             phone: req.body.phone
         }
-        console.log(appointmentConfig)
-        let appointments = []
-        for (let i = 0; i < req.body.treatmentTimes; i++) {
-            appointments.push(appointmentConfig) //perparing for insertMany
+        var dataconfigs = []
+        for (let i = 0; i < treatmentResult[0].treatmentTimes; i++) {
+            console.log(i)
+            dataconfigs.push(appointmentConfig) //perparing for insertMany
         }
-        const appointmentResult = await Appointment.insertMany(appointments)
-        console.log(appointmentResult)
-
-
+        const appointmentResult = await Appointment.insertMany(dataconfigs)
         let data = req.body;
         if (data.paidAmount) {
             data = { ...data, leftOverAmount: data.totalAmount - data.paidAmount } // leftOverAmount Calculation
         }
         if (data.paidAmount === 0) data = { ...data, leftOverAmount: data.totalAmount }
-        console.log(data)
         const newTreatmentSelection = new TreatmentSelection(data);
         const result = await newTreatmentSelection.save();
         res.status(200).send({
