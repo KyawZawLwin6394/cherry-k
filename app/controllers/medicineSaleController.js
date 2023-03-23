@@ -1,6 +1,7 @@
 'use strict';
 const MedicineSale = require('../models/medicineSale');
 const Transaction = require('../models/transaction');
+const Accounting = require('../models/accountingList')
 
 exports.listAllMedicineSales = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -93,13 +94,25 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
         "relatedTransaction":fTransResult._id
       }
     )
-    const secTransResult = await secTransaction.save()
+    const secTransResult = await secTransaction.save();
+    let objID= ''
+    if (req.body.relatedBank) objID=req.body.relatedBank
+    if (req.body.relatedCash) objID=req.body.relatedCash
+    const acc = await Accounting.find({_id:objID})
+    const accResult = await Accounting.findOneAndUpdate(
+      { _id: objID },
+      {amount:parseInt(req.body.amount)+parseInt(acc[0].amount)},
+      { new: true },
+    )
     res.status(200).send({
       message: 'MedicineSale Transaction success',
       success: true,
       fTrans:fTransResult,
-      sTrans:secTransResult
+      sTrans:secTransResult,
+      accResult:accResult
     });
+
+    
   } catch (error) {
     return res.status(500).send({ "error": true, message: error.message })
   }

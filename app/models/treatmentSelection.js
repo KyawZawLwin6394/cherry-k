@@ -12,8 +12,7 @@ let TreatmentSelectionSchema = new Schema({
   },
   relatedBank: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists',
-    required:true
+    ref:'AccountingLists'
   },
   paidAmount: {
     type: Number,
@@ -44,7 +43,6 @@ let TreatmentSelectionSchema = new Schema({
   },
   relatedCash: {
     type:mongoose.Schema.Types.ObjectId,
-    required:true,
     ref:'AccountingLists'
   }
 });

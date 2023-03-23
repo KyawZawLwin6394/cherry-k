@@ -55,7 +55,7 @@ exports.createRepayment = async (req, res, next) => {
     //update PatientTreament's leftover amount
     const patientTreatmentResults = await PatientTreatment.findOneAndUpdate(
         { _id: data.relatedPateintTreatment },
-        {leftOverAmount:data.repaymentAmount},
+        {leftOverAmount:data.remaningCredit},
         { new: true },
       )
 
