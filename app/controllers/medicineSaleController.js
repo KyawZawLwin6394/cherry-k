@@ -46,7 +46,18 @@ exports.getMedicineSale = async (req, res) => {
 };
 
 exports.createMedicineSale = async (req, res, next) => {
+  let data = req.body;
   try {
+    //prepare CUS-ID
+    const latestDocument =await MedicineSale.find({},{seq:1}).sort({_id: -1}).limit(1).exec();
+    console.log(latestDocument)
+    if (latestDocument.length === 0) data= {...data, seq:'1', voucherCode:"MVC-1"} // if seq is undefined set initial patientID and seq
+    console.log(data)
+    if (latestDocument.length) {
+      const increment = latestDocument[0].seq+1
+      data = {...data, voucherCode:"MVC-"+increment, seq:increment}
+    }
+    console.log(data)
     const newMedicineSale = new MedicineSale(req.body);
     const result = await newMedicineSale.save();
     res.status(200).send({
