@@ -1,7 +1,8 @@
 'use strict';
 const TreatmentSelection = require('../models/treatmentSelection');
 const Appointment = require('../models/appointment');
-const Transaction = require('../models/transaction')
+const Transaction = require('../models/transaction');
+const appointment = require('../models/appointment');
 
 exports.listAllTreatmentSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -50,12 +51,12 @@ exports.createTreatmentSelection = async (req, res, next) => {
             relatedPatient: req.body.relatedPatient,
             relatedDoctor: req.body.relatedDoctor,
             relatedTherapist: req.body.relatedTherapist,
-
             originalDate: req.body.originalDate,
             date: req.body.date,
             time: req.body.time,
             phone: req.body.phone
         }
+        console.log(appointmentConfig)
         let appointments = []
         for (let i = 0; i < req.body.treatmentTimes; i++) {
             appointments.push(appointmentConfig) //perparing for insertMany
