@@ -3,6 +3,7 @@ const Appointment = require('../models/appointment');
 const Patient = require('../models/patient');
 const Doctor = require('../models/doctor');
 var ObjectID = require("mongodb").ObjectID; //to check if the value is objectid or not
+const Treatment = require('../models/treatment');
 
 function formatDateAndTime(dateString) { // format mongodb ISO 8601 date format into two readable var {date, time}.
   const date = new Date(dateString);
@@ -53,12 +54,14 @@ exports.listAllAppointments = async (req, res) => {
     return res.status(500).send({ error: true, message: e.message });
   }
 };
-
+["641c1f11cd0486501457adfc","641c1f370bc9d637ccb657cd","641c1f370bc9d637ccb657ce"]
 exports.getAppointment = async (req, res) => {
   const result = await Appointment.find({ _id: req.params.id,isDeleted:false }).populate('relatedPatient').populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection')
-  if (!result)
-    return res.status(500).json({ error: true, message: 'No Record Found' });
-  return res.status(200).send({ success: true, data: result });
+  if (!result) return res.status(500).json({ error: true, message: 'No Record Found' });
+  console.log(result[0].relatedTreatmentSelection[0].relatedTreatment)
+  const relateTreatment = await Treatment.find({_id: result[0].relatedTreatmentSelection[0].relatedTreatment}).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine').populate('relatedAppointment')
+  if (relateTreatment.length === 0 ) return res.status(500).json ({error:true, message:"There's no related treatment id in the database"})
+  return res.status(200).send({ success: true, data: result, treatment:relateTreatment });
 };
 
 exports.createAppointment = async (req, res, next) => {
