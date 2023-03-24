@@ -78,7 +78,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
         const result = await newTreatmentSelection.save();
         const accResult = await appointment.findOneAndUpdate(
             { _id: req.body.appointment },
-            {relatedTreatmentSelection:result._id},
+            {$addToSet:{relatedTreatmentSelection:result._id}},
             { new: true },
           )
         res.status(200).send({
