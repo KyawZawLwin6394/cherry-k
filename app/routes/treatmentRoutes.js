@@ -11,9 +11,9 @@ module.exports = (app) => {
         .put(verifyToken,catchError(treatment.updateTreatment))
         
     app.route('/api/treatment/:id')
-        .get(verifyToken ,catchError(treatment.getTreatment))
-        .delete(verifyToken,catchError(treatment.deleteTreatment)) 
-        .post(verifyToken ,catchError(treatment.activateTreatment))
+        .get(catchError(treatment.getTreatment))
+        .delete(catchError(treatment.deleteTreatment)) 
+        .post(catchError(treatment.activateTreatment))
 
     app.route('/api/treatments').get(catchError(treatment.listAllTreatments))
 };

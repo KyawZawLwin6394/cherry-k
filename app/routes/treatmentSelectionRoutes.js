@@ -7,15 +7,15 @@ const verifyToken = require('../lib/verifyToken');
 module.exports = (app) => {
 
     app.route('/api/treatment-selection')
-        .post(verifyToken, catchError(treatmentSelection.createTreatmentSelection))
-        .put(verifyToken, catchError(treatmentSelection.updateTreatmentSelection))
+        .post( catchError(treatmentSelection.createTreatmentSelection))
+        .put( catchError(treatmentSelection.updateTreatmentSelection))
 
     app.route('/api/treatment-selection/:id')
-        .get(verifyToken, catchError(treatmentSelection.getTreatmentSelection))
-        .delete(verifyToken, catchError(treatmentSelection.deleteTreatmentSelection))
-        .post(verifyToken, catchError(treatmentSelection.activateTreatmentSelection))
+        .get( catchError(treatmentSelection.getTreatmentSelection))
+        .delete( catchError(treatmentSelection.deleteTreatmentSelection))
+        .post( catchError(treatmentSelection.activateTreatmentSelection))
 
-    app.route('/api/treatment-selections').get(verifyToken, catchError(treatmentSelection.listAllTreatmentSelections))
+    app.route('/api/treatment-selections').get( catchError(treatmentSelection.listAllTreatmentSelections))
 
     app.route('/api/treatment-selections/transaction').post(catchError(treatmentSelection.createTreatmentTransaction))
 
