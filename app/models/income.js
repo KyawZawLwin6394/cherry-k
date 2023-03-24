@@ -24,17 +24,15 @@ let IncomeSchema = new Schema({
         required: true,
     },
     initialCurrency: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'Currencies',
+        type: String,
         required: true,
     },
-        finalAmount: {
-            type: Number,
-            required: true,
-        },
+    finalAmount: {
+        type: Number,
+        required: true,
+    },
     finalCurrency: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'Currencies',
+        type: String,
         required: true,
     },
     isDeleted: {
@@ -43,16 +41,16 @@ let IncomeSchema = new Schema({
         default: false
     },
     relatedBankAccount: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'AccountingLists    '
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AccountingLists    '
     },
     relatedCashAccount: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'AccountingLists'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AccountingLists'
     },
     relatedCredit: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'AccountingLists'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AccountingLists'
     }
 });
 
