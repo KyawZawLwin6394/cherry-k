@@ -47,6 +47,10 @@ let AccountingListSchema = new Schema({
     carryForWork: {
         type:Boolean,
         required: true
+    },
+    relatedBank: {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Banks'
     }
 });
 

@@ -24,8 +24,7 @@ let ExpenseSchema = new Schema({
         required: true,
     },
     initialCurrency: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'Currencies',
+        type:String,
         required: true,
     },
     finalAmount: {
@@ -33,8 +32,7 @@ let ExpenseSchema = new Schema({
         required: true,
     },
     finalCurrency: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'Currencies',
+        type: String,
         required: true,
     },
     isDeleted: {

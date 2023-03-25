@@ -1,8 +1,7 @@
 'use strict';
-const Repayment = require('../models/repayment');
-const PatientTreatment = require('../models/patientTreatment');
+const AccountHeader = require('../models/accountHeader');
 
-exports.listAllRepayments = async (req, res) => {
+exports.listAllAccountHeaders = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
   let count = 0;
   let page = 0;
@@ -16,9 +15,9 @@ exports.listAllRepayments = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Repayment.find(query).limit(limit).skip(skip).populate('relatedPateintTreatment');
+    let result = await AccountHeader.find(query).limit(limit).skip(skip).populate('relatedAccounting');
     console.log(result)
-    count = await Repayment.find(query).count();
+    count = await AccountHeader.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
 
@@ -38,40 +37,22 @@ exports.listAllRepayments = async (req, res) => {
   }
 };
 
-exports.getRepayment = async (req, res) => {
-  const result = await Repayment.find({ _id: req.params.id,isDeleted:false }).populate('relatedPateintTreatment')
+exports.getAccountHeader = async (req, res) => {
+  const result = await AccountHeader.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
-exports.getRelatedPayment = async (req, res) => {
-  console.log(req.params.relatedPateintTreatmentid)
-  const result = await Repayment.find({ relatedPateintTreatment: req.params.relatedPateintTreatmentid,isDeleted:false }).populate('relatedPateintTreatment')
-  if (!result)
-    return res.status(500).json({ error: true, message: 'No Record Found' });
-  return res.status(200).send({ success: true, data: result });
-};
-
-exports.createRepayment = async (req, res, next) => {
-    let data = req.body;
+exports.createAccountHeader = async (req, res, next) => {
   try {
-    const newBody = data;
-    const newRepayment = new Repayment(newBody);
-    const result = await newRepayment.save();
-
-    //update PatientTreament's leftover amount
-    const patientTreatmentResults = await PatientTreatment.findOneAndUpdate(
-        { _id: data.relatedPateintTreatment },
-        {leftOverAmount:data.remaningCredit},
-        { new: true },
-      )
-
+    const newBody = req.body;
+    const newAccountHeader = new AccountHeader(newBody);
+    const result = await newAccountHeader.save();
     res.status(200).send({
-      message: 'Repayment create success',
+      message: 'AccountHeader create success',
       success: true,
-      data: result,
-      patientTreatment: patientTreatmentResults
+      data: result
     });
   } catch (error) {
     console.log(error )
@@ -79,22 +60,22 @@ exports.createRepayment = async (req, res, next) => {
   }
 };
 
-exports.updateRepayment = async (req, res, next) => {
+exports.updateAccountHeader = async (req, res, next) => {
   try {
-    const result = await Repayment.findOneAndUpdate(
+    const result = await AccountHeader.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedPateintTreatment');
+    ).populate('relatedAccounting');
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
 
-exports.deleteRepayment = async (req, res, next) => {
+exports.deleteAccountHeader = async (req, res, next) => {
   try {
-    const result = await Repayment.findOneAndUpdate(
+    const result = await AccountHeader.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: true },
       { new: true },
@@ -106,9 +87,9 @@ exports.deleteRepayment = async (req, res, next) => {
   }
 }
 
-exports.activateRepayment = async (req, res, next) => {
+exports.activateAccountHeader = async (req, res, next) => {
   try {
-    const result = await Repayment.findOneAndUpdate(
+    const result = await AccountHeader.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: false },
       { new: true },
