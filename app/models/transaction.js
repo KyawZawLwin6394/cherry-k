@@ -53,6 +53,11 @@ let TransactionSchema = new Schema({
     type:Boolean,
     // required:true,
     default:false
+  },
+  relatedMedicineSlae: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:'MedicineSales',
+    default:null
   }
 });
 
