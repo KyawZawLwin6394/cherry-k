@@ -45,6 +45,14 @@ exports.getRepayment = async (req, res) => {
   return res.status(200).send({ success: true, data: result });
 };
 
+exports.getRelatedPayment = async (req, res) => {
+  console.log(req.params.relatedPateintTreatmentid)
+  const result = await Repayment.find({ relatedPateintTreatment: req.params.relatedPateintTreatmentid,isDeleted:false }).populate('relatedPateintTreatment')
+  if (!result)
+    return res.status(500).json({ error: true, message: 'No Record Found' });
+  return res.status(200).send({ success: true, data: result });
+};
+
 exports.createRepayment = async (req, res, next) => {
     let data = req.body;
   try {

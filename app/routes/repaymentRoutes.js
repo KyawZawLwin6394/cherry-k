@@ -16,4 +16,5 @@ module.exports = (app) => {
         .post(verifyToken ,catchError(repayment.activateRepayment))
 
     app.route('/api/repayments').get(catchError(repayment.listAllRepayments))
+    app.route('/api/repayments/:relatedPateintTreatmentid').get(catchError(repayment.getRelatedPayment))
 };
