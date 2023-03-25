@@ -21,4 +21,7 @@ module.exports = (app) => {
     app.route('/api/appointments').get(catchError(appointment.listAllAppointments))
     app.route('/api/appointment-search')
         .post(verifyToken ,catchError(appointment.searchAppointment))
+
+    app.route('/api/appointments/today')
+        .get(catchError(appointment.getTodaysAppointment))
 };
