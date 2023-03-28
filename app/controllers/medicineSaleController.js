@@ -46,13 +46,6 @@ exports.getMedicineSale = async (req, res) => {
   return res.status(200).send({ success: true, data: result });
 };
 
-exports.getOutstandingMedicineSale = async (req, res) => {
-  const result = await MedicineSale.find({ _id: req.params.id, isDeleted: false }).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems._id');
-  if (!result)
-    return res.status(500).json({ error: true, message: 'No Record Found' });
-  return res.status(200).send({ success: true, data: result });
-};
-
 exports.createMedicineSale = async (req, res, next) => {
   let data = req.body;
   try {
