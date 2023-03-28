@@ -73,13 +73,14 @@ exports.getTodaysAppointment = async (req, res) => {
 exports.getAppointment = async (req, res) => {
   try {
     const result = await Appointment.find({ _id: req.params.id, isDeleted: false }).populate('relatedPatient').populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection')
+    console.log (result)
     if (!result) return res.status(500).json({ error: true, message: 'No Record Found' });
-    console.log(result[0].relatedTreatmentSelection[0].relatedTreatment)
-    const relateTreatment = await Treatment.find({ _id: result[0].relatedTreatmentSelection[0].relatedTreatment }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine').populate('relatedAppointment')
-    if (relateTreatment.length === 0) return res.status(500).json({ error: true, message: "There's no related treatment id in the database" })
-    return res.status(200).send({ success: true, data: result, treatment: relateTreatment });
+    //const relateTreatment = await Treatment.find({ _id: result[0].relatedTreatmentSelection[0].relatedTreatment }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine').populate('relatedAppointment')
+    //if (relateTreatment.length === 0) return res.status(500).json({ error: true, message: "There's no related treatment id in the database" })
+    return res.status(200).send({ success: true, data: result, treatment: "relateTreatment" });
   } catch (error) {
-    return res.error(500).send({ error: true, message: error.message })
+    console.log(error)
+    //return res.status(500).send({ error: true, message: error.message })
   }
 };
 
