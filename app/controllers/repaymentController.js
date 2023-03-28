@@ -56,11 +56,13 @@ exports.getRelatedPayment = async (req, res) => {
 exports.createRepayment = async (req, res, next) => {
     let data = req.body;
   try {
+    data = {...data, remaningCredit:data.remaningCredit-data.repaymentAmount}
     const newBody = data;
     const newRepayment = new Repayment(newBody);
     const result = await newRepayment.save();
 
     //update PatientTreament's leftover amount
+    
     const patientTreatmentResults = await PatientTreatment.findOneAndUpdate(
         { _id: data.relatedPateintTreatment },
         {leftOverAmount:data.remaningCredit},

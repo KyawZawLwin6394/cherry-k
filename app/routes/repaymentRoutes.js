@@ -8,11 +8,11 @@ module.exports = (app) => {
 
     app.route('/api/repayment')
         .post(catchError(repayment.createRepayment))
-        .put(verifyToken,catchError(repayment.updateRepayment))
+        .put(catchError(repayment.updateRepayment))
         
     app.route('/api/repayment/:id')
         .get(verifyToken ,catchError(repayment.getRepayment))
-        .delete(verifyToken,catchError(repayment.deleteRepayment)) 
+        .delete(catchError(repayment.deleteRepayment)) 
         .post(verifyToken ,catchError(repayment.activateRepayment))
 
     app.route('/api/repayments').get(catchError(repayment.listAllRepayments))
