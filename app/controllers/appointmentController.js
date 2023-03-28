@@ -93,8 +93,8 @@ exports.createAppointment = async (req, res, next) => {
       })
       var pResult = await newPatient.save();
     }
-    const dateAndTime = formatDateAndTime(req.body.originalDate)
-    const newBody = { ...req.body, date: dateAndTime[0], time: dateAndTime[1] }
+    // const dateAndTime = formatDateAndTime(req.body.originalDate)
+    // const newBody = { ...req.body, date: dateAndTime[0], time: dateAndTime[1] }
     const newAppointment = new Appointment(newBody);
     const result = await newAppointment.save();
     res.status(200).send({
