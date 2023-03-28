@@ -85,15 +85,23 @@ exports.getAppointment = async (req, res) => {
 
 exports.createAppointment = async (req, res, next) => {
   try {
+    if (req.body.status == 'New') {
+      const newPatient = new Patient({
+        name:req.body.name,
+        email:req.body.email,
+        phone:req.body.phone
+      })
+      var pResult = await newPatient.save();
+    }
     const dateAndTime = formatDateAndTime(req.body.originalDate)
     const newBody = { ...req.body, date: dateAndTime[0], time: dateAndTime[1] }
-    console.log(newBody, 'newBody')
     const newAppointment = new Appointment(newBody);
     const result = await newAppointment.save();
     res.status(200).send({
       message: 'Appointment create success',
       success: true,
-      data: result
+      data: result,
+      patientResult:pResult
     });
   } catch (error) {
     return res.status(500).send({ "error": true, message: error.message })
