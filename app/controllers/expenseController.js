@@ -16,7 +16,7 @@ exports.listAllExpenses = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await Expense.find(query).limit(limit).skip(skip).populate('initialCurrency').populate('finalCurrency').populate('relatedAccounting');
+        let result = await Expense.find(query).limit(limit).skip(skip).populate('relatedAccounting');
         console.log(result)
         count = await Expense.find(query).count();
         const division = count / limit;
@@ -39,7 +39,7 @@ exports.listAllExpenses = async (req, res) => {
 };
 
 exports.getExpense = async (req, res) => {
-    const result = await Expense.find({ _id: req.params.id, isDeleted: false }).populate('initialCurrency').populate('finalCurrency').populate('relatedAccounting')
+    const result = await Expense.find({ _id: req.params.id, isDeleted: false }).populate('relatedAccounting')
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -119,7 +119,7 @@ exports.updateExpense = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        ).populate('relatedAccounting').populate('initialCurrency').populate('finalCurrency');
+        ).populate('finalCurrency');
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
