@@ -16,4 +16,7 @@ module.exports = (app) => {
         .post(verifyToken ,catchError(patientTreatment.activatePatientTreatment))
 
     app.route('/api/patient-treatments').get(catchError(patientTreatment.listAllPatientTreatments))
+
+    app.route('/api/patient-treatments/outstanding').get(catchError(patientTreatment.getOutstandingPatientTreatment))
+    app.route('/api/patient-treatments/well-done').get(catchError(patientTreatment.getWellDonePatientTreatment))
 };
