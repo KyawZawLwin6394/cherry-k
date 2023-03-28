@@ -95,7 +95,7 @@ exports.createAppointment = async (req, res, next) => {
     }
     // const dateAndTime = formatDateAndTime(req.body.originalDate)
     // const newBody = { ...req.body, date: dateAndTime[0], time: dateAndTime[1] }
-    const newAppointment = new Appointment(newBody);
+    const newAppointment = new Appointment(req.body);
     const result = await newAppointment.save();
     res.status(200).send({
       message: 'Appointment create success',
