@@ -58,6 +58,9 @@ let AppointmentSchema = new Schema({
   relatedTreatmentSelection: {
     type:[mongoose.Schema.Types.ObjectId],
     ref:'TreatmentSelections'
+  },
+  status: {
+    type:String
   }
 });
 

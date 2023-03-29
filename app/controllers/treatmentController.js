@@ -51,7 +51,7 @@ exports.getTreatment = async (req, res) => {
 exports.createTreatment = async (req, res, next) => {
   let data = req.body;
   try {
-
+    // need to add 
     console.log(data)
     const newBody = data;
 

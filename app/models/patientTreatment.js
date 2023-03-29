@@ -44,6 +44,9 @@ let PatientTreatmentSchema = new Schema({
   isDeleted: {
     type:Boolean,
     default:false
+  },
+  status:{
+    type:String
   }
 });
 
