@@ -7,8 +7,7 @@ const Schema = mongoose.Schema;
 
 let MedicineSaleSchema = new Schema({
   voucherCode: {
-    type:String,
-    required:true
+    type:String
   },
   createdAt: {
     type:Date,
@@ -16,8 +15,7 @@ let MedicineSaleSchema = new Schema({
   },
   relatedTreatment: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'Treatments',
-    required: true
+    ref:'Treatments'
   },
   relatedPatient: {
     type: mongoose.Schema.Types.ObjectId,
@@ -26,8 +24,7 @@ let MedicineSaleSchema = new Schema({
   },
   relatedAppointment: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'Appointments',
-    required: true,
+    ref:'Appointments'
   },
   remark: {
     type:String,
@@ -71,6 +68,9 @@ let MedicineSaleSchema = new Schema({
     required:true,
     default:false
   },
+  seq:{
+    type:Number
+  }
 });
 
 module.exports = mongoose.model('MedicineSales', MedicineSaleSchema);

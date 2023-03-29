@@ -50,16 +50,17 @@ exports.createMedicineSale = async (req, res, next) => {
   let data = req.body;
   try {
     //prepare CUS-ID
-    const latestDocument =await MedicineSale.find({},{seq:1}).sort({_id: -1}).limit(1).exec();
-    console.log(latestDocument)
-    if (latestDocument.length === 0) data= {...data, seq:'1', voucherCode:"MVC-1"} // if seq is undefined set initial patientID and seq
+    const latestDocument = await MedicineSale.find({},{seq:1}).sort({ _id: -1 }).limit(1).exec();
+    console.log(latestDocument,'latestDocument')
+    if (latestDocument.length == 0) data = { ...data, seq: 1, voucherCode: "MVC-1" } // if seq is undefined set initial patientID and seq
     console.log(data)
     if (latestDocument.length) {
-      const increment = latestDocument[0].seq+1
-      data = {...data, voucherCode:"MVC-"+increment, seq:increment}
+      const increment = latestDocument[0].seq + 1
+      console.log(increment)
+      data = { ...data, voucherCode: "MVC-" + increment, seq: increment }
+      console.log(data)
     }
-    console.log(data)
-    const newMedicineSale = new MedicineSale(req.body);
+    const newMedicineSale = new MedicineSale(data);
     const result = await newMedicineSale.save();
     res.status(200).send({
       message: 'MedicineSale create success',
@@ -91,28 +92,28 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
         "relatedBank": req.body.relatedBank,
         "relatedCash": req.body.relatedCash,
         "type": "Debit",
-        "relatedTransaction":fTransResult._id
+        "relatedTransaction": fTransResult._id
       }
     )
     const secTransResult = await secTransaction.save();
-    let objID= ''
-    if (req.body.relatedBank) objID=req.body.relatedBank
-    if (req.body.relatedCash) objID=req.body.relatedCash
-    const acc = await Accounting.find({_id:objID})
+    let objID = ''
+    if (req.body.relatedBank) objID = req.body.relatedBank
+    if (req.body.relatedCash) objID = req.body.relatedCash
+    const acc = await Accounting.find({ _id: objID })
     const accResult = await Accounting.findOneAndUpdate(
       { _id: objID },
-      {amount:parseInt(req.body.amount)+parseInt(acc[0].amount)},
+      { amount: parseInt(req.body.amount) + parseInt(acc[0].amount) },
       { new: true },
     )
     res.status(200).send({
       message: 'MedicineSale Transaction success',
       success: true,
-      fTrans:fTransResult,
-      sTrans:secTransResult,
-      accResult:accResult
+      fTrans: fTransResult,
+      sTrans: secTransResult,
+      accResult: accResult
     });
 
-    
+
   } catch (error) {
     return res.status(500).send({ "error": true, message: error.message })
   }
