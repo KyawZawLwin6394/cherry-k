@@ -1,5 +1,6 @@
 'use strict';
 const PatientTreatment = require('../models/patientTreatment');
+const Transaction = require('../models/transaction');
 
 exports.listAllPatientTreatments = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -63,13 +64,36 @@ exports.createPatientTreatment = async (req, res, next) => {
   try {
     let data = req.body
     if (data.leftOverAmount==0) data = {...data, fullyPaid:true}
+
+     //first transaction 
+     const fTransaction = new Transaction({
+      "amount": req.body.paidAmount,
+      "date": Date.now(),
+      "remark": req.body.remark,
+      "relatedAccounting": "6423eb525fb841d5566db371", //sales package credit
+      "type": "Credit"
+    })
+    const fTransResult = await fTransaction.save()
+    const secTransaction = new Transaction(
+      {
+        "amount": req.body.paidAmount,
+        "date": Date.now(),
+        "remark": req.body.remark,
+        "relatedAccounting": "6423fc9554015805ecc45913", //sales package recieveable debit
+        "type": "Debit",
+        "relatedTransaction": fTransResult._id
+      }
+    )
+    const secTransResult = await secTransaction.save();
     const newBody = data;
     const newPatientTreatment = new PatientTreatment(newBody);
     const result = await newPatientTreatment.save();
     res.status(200).send({
       message: 'PatientTreatment create success',
       success: true,
-      data: result
+      data: result,
+      fTrans:fTransResult,
+      sTrans:secTransResult
     });
   } catch (error) {
     console.log(error )

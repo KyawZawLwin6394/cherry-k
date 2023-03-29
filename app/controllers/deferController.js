@@ -52,7 +52,7 @@ exports.createDefer = async (req, res, next) => {
         "amount": req.body.deferredAmount,
         "date": req.body.deferredDate,
         "remark": req.body.remark,
-        "relatedAccounting":req.body.firstAccount,
+        "relatedAccounting":"6423eb525fb841d5566db371", //Sales-Package Debit
         "type": "Debit"
       })
       const fTransResult = await fTransaction.save()
@@ -61,7 +61,7 @@ exports.createDefer = async (req, res, next) => {
           "amount": req.body.deferredAmount,
           "date": req.body.deferredDate,
           "remark": req.body.remark,
-          "relatedAccounting":req.body.secAccount,
+          "relatedAccounting":"6423fcdf54015805ecc45917", //Sales Package Deferred Revenue
           "type": "Credit",
           "relatedTransaction":fTransResult._id
         }

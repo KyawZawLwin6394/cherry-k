@@ -6,10 +6,6 @@ const Schema = mongoose.Schema;
 
 
 let AccountHeaderSchema = new Schema({
-    code: {
-        type: String,
-        required: true
-    },
     name: {
         type: String,
         required: true,
@@ -29,6 +25,11 @@ let AccountHeaderSchema = new Schema({
     updatedAt: {
         type: Date,
     },
+    relatedAccountType: {
+        type:mongoose.Schema.Types.ObjectId,
+        required:true,
+        ref:'AccountTypes'
+    }
 });
 
 module.exports = mongoose.model('AccountHeaders', AccountHeaderSchema);

@@ -16,4 +16,5 @@ module.exports = (app) => {
         .post(verifyToken ,catchError(accountHeader.activateAccountHeader))
 
     app.route('/api/account-headers').get(catchError(accountHeader.listAllAccountHeaders))
+    app.route('/api/account-headers/related/:id').get (catchError(accountHeader.getRelatedAccountHeader))
 };

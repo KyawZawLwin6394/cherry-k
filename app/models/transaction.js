@@ -8,8 +8,7 @@ const Schema = mongoose.Schema;
 let TransactionSchema = new Schema({
   relatedAccounting: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists',
-    required: true
+    ref:'AccountingLists'
   },
   amount: {
     type: String,

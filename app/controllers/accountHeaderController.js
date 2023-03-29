@@ -15,7 +15,7 @@ exports.listAllAccountHeaders = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await AccountHeader.find(query).limit(limit).skip(skip).populate('relatedAccounting');
+    let result = await AccountHeader.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedAccountType');
     console.log(result)
     count = await AccountHeader.find(query).count();
     const division = count / limit;
@@ -38,7 +38,14 @@ exports.listAllAccountHeaders = async (req, res) => {
 };
 
 exports.getAccountHeader = async (req, res) => {
-  const result = await AccountHeader.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting')
+  const result = await AccountHeader.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedAccounting').populate('relatedAccountType');
+  if (!result)
+    return res.status(500).json({ error: true, message: 'No Record Found' });
+  return res.status(200).send({ success: true, data: result });
+};
+
+exports.getRelatedAccountHeader = async (req, res) => {
+  const result = await AccountHeader.find({ relatedAccountType: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedAccountType');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });

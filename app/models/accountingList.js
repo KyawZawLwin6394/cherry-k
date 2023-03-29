@@ -10,11 +10,17 @@ let AccountingListSchema = new Schema({
         type: String,
         required: true
     },
-    accountingTypes: {
-        type: String,
-        enum:['Current Assets','Payable','Inventory','Receivable','Current Liabilities','Equity','Revenue','COGS','Administration Expenses','Operation Expenses','Staff Expenses','Marketing Expenses','Other Expenses','Other Income','Fixed Assets','Longterm Liabilities'],
-        required: true,
+    relatedType: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'AccountTypes'
     },
+    relatedHeader: {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'AccountHeaders'
+    },
+    subHeader: {
+        type:String
+    },  
     name: {
         type: String,
         required: true
@@ -22,7 +28,6 @@ let AccountingListSchema = new Schema({
     relatedTreatment: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'Treatments',
-       
     },
     amount: {
         type: Number,
