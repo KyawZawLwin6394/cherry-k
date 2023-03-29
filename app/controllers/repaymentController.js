@@ -1,6 +1,7 @@
 'use strict';
 const Repayment = require('../models/repayment');
 const PatientTreatment = require('../models/patientTreatment');
+const Transaction = require('../models/transaction');
 
 exports.listAllRepayments = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -60,19 +61,20 @@ exports.createRepayment = async (req, res, next) => {
 
     //first transaction 
     const fTransaction = new Transaction({
-      "amount": req.body.paidAmount,
+      "amount": req.body.repaymentAmount,
       "date": Date.now(),
-      "remark": req.body.remark,
+      "remark": req.body.description,
       "relatedAccounting": "6423fc9554015805ecc45913", //sales package recieveable credit
       "type": "Credit"
     })
     const fTransResult = await fTransaction.save()
     const secTransaction = new Transaction(
       {
-        "amount": req.body.paidAmount,
+        "amount": req.body.repaymentAmount,
         "date": Date.now(),
-        "remark": req.body.remark,
-        "relatedBank": "6423fc9554015805ecc45913", //sales package recieveable debit
+        "remark": req.body.description,
+        "relatedBank": req.body.relatedBank,
+        "relatedCash":req.body.relatedCash,
         "type": "Debit",
         "relatedTransaction": fTransResult._id
       }
@@ -95,7 +97,9 @@ exports.createRepayment = async (req, res, next) => {
       message: 'Repayment create success',
       success: true,
       data: result,
-      patientTreatment: patientTreatmentResults
+      patientTreatment: patientTreatmentResults,
+      fTrans:fTransResult,
+      sTrans:secTransResult
     });
   } catch (error) {
     console.log(error )
