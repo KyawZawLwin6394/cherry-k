@@ -57,6 +57,28 @@ exports.createRepayment = async (req, res, next) => {
     let data = req.body;
   try {
     data = {...data, remaningCredit:data.remaningCredit-data.repaymentAmount}
+
+    //first transaction 
+    const fTransaction = new Transaction({
+      "amount": req.body.paidAmount,
+      "date": Date.now(),
+      "remark": req.body.remark,
+      "relatedAccounting": "6423fc9554015805ecc45913", //sales package recieveable credit
+      "type": "Credit"
+    })
+    const fTransResult = await fTransaction.save()
+    const secTransaction = new Transaction(
+      {
+        "amount": req.body.paidAmount,
+        "date": Date.now(),
+        "remark": req.body.remark,
+        "relatedBank": "6423fc9554015805ecc45913", //sales package recieveable debit
+        "type": "Debit",
+        "relatedTransaction": fTransResult._id
+      }
+    )
+    const secTransResult = await secTransaction.save();
+
     const newBody = data;
     const newRepayment = new Repayment(newBody);
     const result = await newRepayment.save();
