@@ -2,7 +2,7 @@
 
 const patient = require("../controllers/patientController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require("../lib/verifyToken");
+const verifyToken = require("../lib/");
 const upload = require('../lib/fieldUploader').upload;
 
 module.exports = (app) => {

@@ -2,18 +2,18 @@
 
 const income = require("../controllers/incomeController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require('../lib/verifyToken');
+const verifyToken = require('../lib/');
 
 module.exports = (app) => {
 
     app.route('/api/income')
         .post(catchError(income.createIncome))
-        .put(verifyToken,catchError(income.updateIncome))
+        .put(catchError(income.updateIncome))
         
     app.route('/api/income/:id')
         .get(catchError(income.getIncome))
-        .delete(verifyToken,catchError(income.deleteIncome)) 
-        .post(verifyToken ,catchError(income.activateIncome))
+        .delete(catchError(income.deleteIncome)) 
+        .post( catchError(income.activateIncome))
 
     app.route('/api/incomes').get( catchError(income.listAllIncomes))
 };

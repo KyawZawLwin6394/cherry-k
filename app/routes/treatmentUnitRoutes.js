@@ -2,19 +2,19 @@
 
 const treatmentUnit = require("../controllers/treatmentUnitController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require("../lib/verifyToken");
+const verifyToken = require("../lib/");
 
 module.exports = (app) => {
 
     app.route('/api/treatment-unit')
-        .post(verifyToken,catchError(treatmentUnit.createTreatmentUnit))
-        .put(verifyToken,catchError(treatmentUnit.updateTreatmentUnit))
+        .post(catchError(treatmentUnit.createTreatmentUnit))
+        .put(catchError(treatmentUnit.updateTreatmentUnit))
         
     app.route('/api/treatment-unit/:id')
-        .get(verifyToken,catchError(treatmentUnit.getTreatmentUnit))
-        .delete(verifyToken,catchError(treatmentUnit.deleteTreatmentUnit)) 
-        .post(verifyToken,catchError(treatmentUnit.activateTreatmentUnit))
+        .get(catchError(treatmentUnit.getTreatmentUnit))
+        .delete(catchError(treatmentUnit.deleteTreatmentUnit)) 
+        .post(catchError(treatmentUnit.activateTreatmentUnit))
 
-    app.route('/api/treatment-units').get(verifyToken,catchError(treatmentUnit.listAllTreatmentUnits))
+    app.route('/api/treatment-units').get(catchError(treatmentUnit.listAllTreatmentUnits))
 
 };

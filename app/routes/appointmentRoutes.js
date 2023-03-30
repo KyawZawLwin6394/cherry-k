@@ -8,7 +8,7 @@ module.exports = (app) => {
 
     app.route('/api/appointment')
         .post(catchError(appointment.createAppointment))
-        .put(verifyToken,catchError(appointment.updateAppointment))
+        .put(catchError(appointment.updateAppointment))
         
     app.route('/api/appointment/:id')
         .get(catchError(appointment.getAppointment))
@@ -16,11 +16,11 @@ module.exports = (app) => {
         .post(catchError(appointment.activateAppointment))
 
     app.route('/api/appointments-filter')
-        .get(verifyToken,catchError(appointment.filterAppointments))
+        .get(catchError(appointment.filterAppointments))
 
     app.route('/api/appointments').get(catchError(appointment.listAllAppointments))
     app.route('/api/appointment-search')
-        .post(verifyToken ,catchError(appointment.searchAppointment))
+        .post(catchError(appointment.searchAppointment))
 
     app.route('/api/appointments/today')
         .get(catchError(appointment.getTodaysAppointment))

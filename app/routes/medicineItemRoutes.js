@@ -2,13 +2,13 @@
 
 const medicineItem = require("../controllers/medicineItemController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require("../lib/verifyToken");
+const verifyToken = require("../lib/");
 
 module.exports = (app) => {
 
     app.route('/api/medicine-item')
-        .post(verifyToken,catchError(medicineItem.createMedicineItem))
-        .put(verifyToken,catchError(medicineItem.updateMedicineItem))
+        .post(catchError(medicineItem.createMedicineItem))
+        .put(catchError(medicineItem.updateMedicineItem))
         
     app.route('/api/medicine-item/:id')
         .get(catchError(medicineItem.getMedicineItem))

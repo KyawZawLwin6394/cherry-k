@@ -2,7 +2,7 @@
 
 const medicineSale = require("../controllers/medicineSaleController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require("../lib/verifyToken");
+const verifyToken = require("../lib/");
 
 module.exports = (app) => {
 
@@ -12,9 +12,9 @@ module.exports = (app) => {
 
         
     app.route('/api/medicine-sale/:id')
-        .get(verifyToken,catchError(medicineSale.getMedicineSale))
-        .delete(verifyToken,catchError(medicineSale.deleteMedicineSale)) 
-        .post(verifyToken,catchError(medicineSale.activateMedicineSale))
+        .get(catchError(medicineSale.getMedicineSale))
+        .delete(catchError(medicineSale.deleteMedicineSale)) 
+        .post(catchError(medicineSale.activateMedicineSale))
 
     app.route('/api/medicine-sales').get(catchError(medicineSale.listAllMedicineSales))
 

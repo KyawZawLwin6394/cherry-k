@@ -2,7 +2,7 @@
 
 const repayment = require("../controllers/repaymentController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require('../lib/verifyToken');
+const verifyToken = require('../lib/');
 
 module.exports = (app) => {
 
@@ -11,9 +11,9 @@ module.exports = (app) => {
         .put(catchError(repayment.updateRepayment))
         
     app.route('/api/repayment/:id')
-        .get(catchError(repayment.getRepayment))
+        .get( catchError(repayment.getRepayment))
         .delete(catchError(repayment.deleteRepayment)) 
-        .post(catchError(repayment.activateRepayment))
+        .post( catchError(repayment.activateRepayment))
 
     app.route('/api/repayments').get(catchError(repayment.listAllRepayments))
     app.route('/api/repayments/:relatedPateintTreatmentid').get(catchError(repayment.getRelatedPayment))

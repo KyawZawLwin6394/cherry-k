@@ -2,13 +2,13 @@
 
 const category = require("../controllers/categoryController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require('../lib/verifyToken');
+const  verifyToken= require('../lib/');
 
 module.exports = (app) => {
 
     app.route('/api/category')
         .post(catchError(category.createCategory))
-        .put(catchError(category.updateCategory))
+        .put( catchError(category.updateCategory))
         
     app.route('/api/category/:id')
         .get(catchError(category.getCategory))

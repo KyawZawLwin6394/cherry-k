@@ -2,7 +2,7 @@
 
 const subCategory = require("../controllers/subCategoryController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require("../lib/verifyToken");
+const verifyToken = require("../lib/");
 
 module.exports = (app) => {
 

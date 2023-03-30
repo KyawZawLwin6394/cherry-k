@@ -43,7 +43,15 @@ let ExpenseSchema = new Schema({
     relatedCredit: {
         type:mongoose.Schema.Types.ObjectId,
         ref:'AccountingLists'
-    }
+    },
+    relatedBankAccount: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AccountingLists    '
+    },
+    relatedCashAccount: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AccountingLists'
+    },
 });
 
 module.exports = mongoose.model('Expenses', ExpenseSchema);

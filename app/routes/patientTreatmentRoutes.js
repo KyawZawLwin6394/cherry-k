@@ -2,7 +2,7 @@
 
 const patientTreatment = require("../controllers/patientTreatmentController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require('../lib/verifyToken');
+const verifyToken = require('../lib/');
 
 module.exports = (app) => {
 
@@ -11,9 +11,9 @@ module.exports = (app) => {
         .put(catchError(patientTreatment.updatePatientTreatment))
         
     app.route('/api/patient-treatment/:id')
-        .get(catchError(patientTreatment.getPatientTreatment))
+        .get( catchError(patientTreatment.getPatientTreatment))
         .delete(catchError(patientTreatment.deletePatientTreatment)) 
-        .post(catchError(patientTreatment.activatePatientTreatment))
+        .post( catchError(patientTreatment.activatePatientTreatment))
 
     app.route('/api/patient-treatments').get(catchError(patientTreatment.listAllPatientTreatments))
 

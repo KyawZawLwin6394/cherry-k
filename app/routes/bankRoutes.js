@@ -8,12 +8,12 @@ module.exports = (app) => {
 
     app.route('/api/bank')
         .post(catchError(bank.createBank))
-        .put(verifyToken,catchError(bank.updateBank))
+        .put(catchError(bank.updateBank))
         
     app.route('/api/bank/:id')
-        .get(verifyToken ,catchError(bank.getBank))
-        .delete(verifyToken,catchError(bank.deleteBank)) 
-        .post(verifyToken ,catchError(bank.activateBank))
+        .get(catchError(bank.getBank))
+        .delete(catchError(bank.deleteBank)) 
+        .post(catchError(bank.activateBank))
 
     app.route('/api/banks').get(catchError(bank.listAllBanks))
 };
