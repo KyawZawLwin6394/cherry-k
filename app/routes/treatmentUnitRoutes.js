@@ -2,7 +2,7 @@
 
 const treatmentUnit = require("../controllers/treatmentUnitController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require("../lib/");
+const verifyToken = require("../lib/verifyToken");
 
 module.exports = (app) => {
 
