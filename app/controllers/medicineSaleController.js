@@ -83,6 +83,7 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
       "type": "Credit"
     })
     const fTransResult = await fTransaction.save()
+    //sec transaction
     const secTransaction = new Transaction(
       {
         "amount": req.body.amount,
@@ -99,12 +100,16 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
     let objID = ''
     if (req.body.relatedBank) objID = req.body.relatedBank
     if (req.body.relatedCash) objID = req.body.relatedCash
+    //transaction
     const acc = await Accounting.find({ _id: objID })
     const accResult = await Accounting.findOneAndUpdate(
       { _id: objID },
       { amount: parseInt(req.body.amount) + parseInt(acc[0].amount) },
       { new: true },
     )
+
+    const newMedicineSale = new MedicineSale(req.body)
+    const medicineSaleResult = newMedicineSale.save()
     res.status(200).send({
       message: 'MedicineSale Transaction success',
       success: true,

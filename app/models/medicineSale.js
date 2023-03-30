@@ -50,9 +50,9 @@ let MedicineSaleSchema = new Schema({
     enum:["Cash Down","Bank Transition"],
     required:true
   },
-  bankInfo: {
+  relatedBank: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'Banks',
+    ref:'AccountingLists',
     required:true
   },
   medicineItems: [{
@@ -70,6 +70,16 @@ let MedicineSaleSchema = new Schema({
   },
   seq:{
     type:Number
+  },
+  relatedCash: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'AccountingLists',
+    required:true
+  },
+  relatedAccount: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'AccountingLists',
+    required:true
   }
 });
 
