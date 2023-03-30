@@ -42,7 +42,7 @@ let IncomeSchema = new Schema({
     },
     relatedBankAccount: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'AccountingLists    '
+        ref: 'AccountingLists'
     },
     relatedCashAccount: {
         type: mongoose.Schema.Types.ObjectId,
