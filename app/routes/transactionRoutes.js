@@ -2,7 +2,7 @@
 
 const transaction = require("../controllers/transactionController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require('../lib/verifyToken');
+const verifyToken = require('../lib/');
 
 module.exports = (app) => {
 
@@ -14,9 +14,9 @@ module.exports = (app) => {
         .get (catchError(transaction.getRelatedTransaction))
         
     app.route('/api/transaction/:id')
-        .get(verifyToken ,catchError(transaction.getTransaction))
-        .delete(verifyToken,catchError(transaction.deleteTransaction)) 
-        .post(verifyToken ,catchError(transaction.activateTransaction))
+        .get( catchError(transaction.getTransaction))
+        .delete(catchError(transaction.deleteTransaction)) 
+        .post(catchError(transaction.activateTransaction))
 
     app.route('/api/transactions').get(catchError(transaction.listAllTransactions))
 };

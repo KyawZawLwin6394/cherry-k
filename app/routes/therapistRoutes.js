@@ -2,19 +2,19 @@
 
 const therapist = require("../controllers/therapistController");
 const { catchError } = require("../lib/errorHandler");
-const verifyToken = require("../lib/verifyToken");
+const verifyToken = require("../lib/");
 
 module.exports = (app) => {
 
     app.route('/api/therapist')
-        .post(verifyToken,catchError(therapist.createTherapist))
-        .put(verifyToken,catchError(therapist.updateTherapist))
+        .post(catchError(therapist.createTherapist))
+        .put(catchError(therapist.updateTherapist))
         
     app.route('/api/therapist/:id')
-        .get(verifyToken,catchError(therapist.getTherapist))
-        .delete(verifyToken,catchError(therapist.deleteTherapist)) 
-        .post(verifyToken,catchError(therapist.activateTherapist))
+        .get(catchError(therapist.getTherapist))
+        .delete(catchError(therapist.deleteTherapist)) 
+        .post(catchError(therapist.activateTherapist))
 
-    app.route('/api/therapists').get(verifyToken,catchError(therapist.listAllTherapists))
+    app.route('/api/therapists').get(catchError(therapist.listAllTherapists))
 
 };
