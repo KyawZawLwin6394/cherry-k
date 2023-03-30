@@ -52,8 +52,7 @@ let MedicineSaleSchema = new Schema({
   },
   relatedBank: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists',
-    required:true
+    ref:'AccountingLists'
   },
   medicineItems: [{
     item_id:{
@@ -73,13 +72,11 @@ let MedicineSaleSchema = new Schema({
   },
   relatedCash: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists',
-    required:true
+    ref:'AccountingLists'
   },
   relatedAccount: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists',
-    required:true
+    ref:'AccountingLists'
   }
 });
 
