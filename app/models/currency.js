@@ -8,12 +8,10 @@ const validator = require('validator');
 
 let CurrencySchema = new Schema({
   code: {
-    type: String,
-    required: true //USD
+    type: String
   },
   name: {
-    type: String,
-    required: true, //US Dollar
+    type: String
   },
   exchangeRate: {
     type:String, //3000 (per 1USD)
