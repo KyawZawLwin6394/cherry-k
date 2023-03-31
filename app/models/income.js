@@ -32,8 +32,7 @@ let IncomeSchema = new Schema({
         required: true,
     },
     finalCurrency: {
-        type: String,
-        required: true,
+        type: String
     },
     isDeleted: {
         type: Boolean,
