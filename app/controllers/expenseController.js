@@ -7,7 +7,7 @@ exports.listAllExpenses = async (req, res) => {
     let count = 0;
     let page = 0;
     try {
-        limit = +limit <= 100 ? +limit : 10; //limit
+        limit = +limit <= 100 ? +limit : 30; //limit
         skip = +skip || 0;
         let query = { isDeleted: false },
             regexKeyword;
