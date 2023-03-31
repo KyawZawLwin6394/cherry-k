@@ -19,8 +19,7 @@ let TransactionSchema = new Schema({
     required:true
   },
   remark: {
-    type: String,
-    required:true,
+    type: String
   },
   type: {
     type: String,
