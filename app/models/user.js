@@ -64,6 +64,11 @@ let UserSchema = new Schema({
   },
   
 });
+const reasons = (UserSchema.statics.failedLogin = {
+  NOT_FOUND: 0,
+  PASSWORD_INCORRECT: 1,
+  MAX_ATTEMPTS: 2,
+});
 
 UserSchema.pre('save', function (next) {
   let user = this;
