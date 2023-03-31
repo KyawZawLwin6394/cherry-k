@@ -1,7 +1,7 @@
 'use strict';
-const AccountHeader = require('../models/accountHeader');
+const Supplier = require('../models/supplier');
 
-exports.listAllAccountHeaders = async (req, res) => {
+exports.listAllSuppliers = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
   let count = 0;
   let page = 0;
@@ -15,8 +15,9 @@ exports.listAllAccountHeaders = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await AccountHeader.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedAccountType');
-    count = await AccountHeader.find(query).count();
+    let result = await Supplier.find(query).limit(limit).skip(skip)
+    console.log(result)
+    count = await Supplier.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
 
@@ -36,51 +37,45 @@ exports.listAllAccountHeaders = async (req, res) => {
   }
 };
 
-exports.getAccountHeader = async (req, res) => {
-  const result = await AccountHeader.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedAccounting').populate('relatedAccountType');
+exports.getSupplier = async (req, res) => {
+  const result = await Supplier.find({ _id: req.params.id,isDeleted:false })
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
-exports.getRelatedAccountHeader = async (req, res) => {
-  const result = await AccountHeader.find({ relatedAccountType: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedAccountType');
-  if (!result)
-    return res.status(500).json({ error: true, message: 'No Record Found' });
-  return res.status(200).send({ success: true, data: result });
-};
-
-exports.createAccountHeader = async (req, res, next) => {
+exports.createSupplier = async (req, res, next) => {
   try {
     const newBody = req.body;
-    const newAccountHeader = new AccountHeader(newBody);
-    const result = await newAccountHeader.save();
+    const newSupplier = new Supplier(newBody);
+    const result = await newSupplier.save();
     res.status(200).send({
-      message: 'AccountHeader create success',
+      message: 'Supplier create success',
       success: true,
       data: result
     });
   } catch (error) {
+    console.log(error )
     return res.status(500).send({ "error": true, message: error.message })
   }
 };
 
-exports.updateAccountHeader = async (req, res, next) => {
+exports.updateSupplier = async (req, res, next) => {
   try {
-    const result = await AccountHeader.findOneAndUpdate(
+    const result = await Supplier.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedAccounting');
+    )
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
 
-exports.deleteAccountHeader = async (req, res, next) => {
+exports.deleteSupplier = async (req, res, next) => {
   try {
-    const result = await AccountHeader.findOneAndUpdate(
+    const result = await Supplier.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: true },
       { new: true },
@@ -92,9 +87,9 @@ exports.deleteAccountHeader = async (req, res, next) => {
   }
 }
 
-exports.activateAccountHeader = async (req, res, next) => {
+exports.activateSupplier = async (req, res, next) => {
   try {
-    const result = await AccountHeader.findOneAndUpdate(
+    const result = await Supplier.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: false },
       { new: true },
