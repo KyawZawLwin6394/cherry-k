@@ -39,7 +39,7 @@ exports.listAllIncomes = async (req, res) => {
 };
 
 exports.getIncome = async (req, res) => {
-  const result = await Income.find({ _id: req.params.id, isDeleted: false }).populate('relatedAccounting')
+  const result = await Income.find({ _id: req.params.id, isDeleted: false }).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -50,6 +50,7 @@ exports.createIncome = async (req, res, next) => {
     const newBody = req.body;
     const newIncome = new Income(newBody);
     const result = await newIncome.save();
+    const populatedResult = await Income.find({_id:result._id}).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
     const firstTransaction =
     {
       "initialExchangeRate": newBody.initialExchangeRate,
@@ -104,7 +105,7 @@ exports.createIncome = async (req, res, next) => {
     res.status(200).send({
       message: 'Income create success',
       success: true,
-      data: result,
+      data: populatedResult,
       firstTrans: fTransResult,
       secTrans: secTransResult
     });
@@ -119,7 +120,7 @@ exports.updateIncome = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedAccounting');
+    ).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
