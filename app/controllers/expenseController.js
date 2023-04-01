@@ -50,6 +50,7 @@ exports.createExpense = async (req, res, next) => {
         const newBody = req.body;
         const newExpense = new Expense(newBody);
         const result = await newExpense.save();
+        const populatedResult = await Expense.find({_id:result._id}).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
         const firstTransaction =
         {
             "initialExchangeRate": newBody.initialExchangeRate,
@@ -104,7 +105,7 @@ exports.createExpense = async (req, res, next) => {
         res.status(200).send({
             message: 'Expense create success',
             success: true,
-            data: result,
+            data: populatedResult,
             firstTrans: fTransResult,
             secTrans: secTransResult
         });
