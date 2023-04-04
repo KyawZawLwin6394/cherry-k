@@ -47,6 +47,10 @@ let PatientTreatmentSchema = new Schema({
   },
   status:{
     type:String
+  },
+  date:{
+    type:Date,
+    default:Date.now()
   }
 });
 
