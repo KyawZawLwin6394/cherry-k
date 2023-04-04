@@ -99,6 +99,10 @@ let ProcedureHistorySchema = new Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    relatedPatient:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Patients'
     }
 });
 
