@@ -16,8 +16,7 @@ let PatientSchema = new Schema({
   },
   phone: {
     type:String,
-    required:true,
-    unique:true
+    required:true
   },
   dateOfBirth: {
     type: Date,
@@ -27,7 +26,6 @@ let PatientSchema = new Schema({
   },  
   email: {
     type: String,
-    unique: true,
     lowercase: true,
     trim: true,
     validate: {

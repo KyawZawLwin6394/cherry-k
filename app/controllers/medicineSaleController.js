@@ -17,7 +17,7 @@ exports.listAllMedicineSales = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await MedicineSale.find(query).limit(limit).skip(skip).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment');
+    let result = await MedicineSale.find(query).limit(limit).skip(skip).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy');
     console.log(result)
     count = await MedicineSale.find(query).count();
     const division = count / limit;
@@ -40,7 +40,7 @@ exports.listAllMedicineSales = async (req, res) => {
 };
 
 exports.getMedicineSale = async (req, res) => {
-  const result = await MedicineSale.find({ _id: req.params.id, isDeleted: false }).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems._id');
+  const result = await MedicineSale.find({ _id: req.params.id, isDeleted: false }).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -166,7 +166,7 @@ exports.updateMedicineSale = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    );
+    ).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy');
     if (!result) return res.status(500).send({ error: true, message: 'Query Error!' })
     if (result === 0) return res.status(500).send({ error: true, message: 'No Records!' })
     return res.status(200).send({ success: true, data: result });

@@ -1,12 +1,12 @@
 'use strict';
-const Bank = require('../models/bank');
+const FixedAsset = require('../models/fixedAsset');
 
-exports.listAllBanks = async (req, res) => {
+exports.listAllFixedAssets = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
   let count = 0;
   let page = 0;
   try {
-    limit = +limit <= 100 ? +limit : 10; //limit
+    limit = +limit <= 100 ? +limit : 20; //limit
     skip = +skip || 0;
     let query = {isDeleted:false},
       regexKeyword;
@@ -15,8 +15,9 @@ exports.listAllBanks = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Bank.find(query).limit(limit).skip(skip).populate('relatedAccounting');
-    count = await Bank.find(query).count();
+    let result = await FixedAsset.find(query).limit(limit).skip(skip).populate('relatedAccounting');
+    console.log(result)
+    count = await FixedAsset.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
 
@@ -36,20 +37,20 @@ exports.listAllBanks = async (req, res) => {
   }
 };
 
-exports.getBank = async (req, res) => {
-  const result = await Bank.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting')
+exports.getFixedAsset = async (req, res) => {
+  const result = await FixedAsset.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
-exports.createBank = async (req, res, next) => {
+exports.createFixedAsset = async (req, res, next) => {
   try {
     const newBody = req.body;
-    const newBank = new Bank(newBody);
-    const result = await newBank.save();
+    const newFixedAsset = new FixedAsset(newBody);
+    const result = await newFixedAsset.save();
     res.status(200).send({
-      message: 'Bank create success',
+      message: 'FixedAsset create success',
       success: true,
       data: result
     });
@@ -59,9 +60,9 @@ exports.createBank = async (req, res, next) => {
   }
 };
 
-exports.updateBank = async (req, res, next) => {
+exports.updateFixedAsset = async (req, res, next) => {
   try {
-    const result = await Bank.findOneAndUpdate(
+    const result = await FixedAsset.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
       { new: true },
@@ -72,9 +73,9 @@ exports.updateBank = async (req, res, next) => {
   }
 };
 
-exports.deleteBank = async (req, res, next) => {
+exports.deleteFixedAsset = async (req, res, next) => {
   try {
-    const result = await Bank.findOneAndUpdate(
+    const result = await FixedAsset.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: true },
       { new: true },
@@ -86,9 +87,9 @@ exports.deleteBank = async (req, res, next) => {
   }
 }
 
-exports.activateBank = async (req, res, next) => {
+exports.activateFixedAsset = async (req, res, next) => {
   try {
-    const result = await Bank.findOneAndUpdate(
+    const result = await FixedAsset.findOneAndUpdate(
       { _id: req.params.id },
       { isDeleted: false },
       { new: true },

@@ -77,6 +77,10 @@ let MedicineSaleSchema = new Schema({
   relatedAccount: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'AccountingLists'
+  },
+  createdBy: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Users'
   }
 });
 

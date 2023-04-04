@@ -72,7 +72,7 @@ exports.createPatient = async (req, res, next) => {
       const increment = latestDocument[0].seq+1
       data = {...data, patientID:"CUS-"+increment, seq:increment}
     }
-    console.log(data)
+    console.log(files.img,'files.img')
     if (files.img !== undefined) {
       let imgPath = files.img[0].path.split('cherry-k')[1];
       const attachData = {
