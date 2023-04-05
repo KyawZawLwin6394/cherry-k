@@ -44,6 +44,13 @@ exports.getMedicineItem = async (req, res) => {
   return res.status(200).send({ success: true, data: result });
 };
 
+exports.getRelatedMedicineItem = async (req, res) => {
+  const result = await MedicineItem.find({ name: req.params.id,isDeleted:false }).populate('name');
+  if (!result)
+    return res.status(500).json({ error: true, message: 'No Record Found' });
+  return res.status(200).send({ success: true, data: result });
+};
+
 exports.createMedicineItem = async (req, res, next) => {
   try {
     const newMedicineItem = new MedicineItem(req.body);

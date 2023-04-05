@@ -62,6 +62,10 @@ let UserSchema = new Schema({
     type: Date,
     default: null,
   },
+  role:{
+    type: String,
+    enum: ['Doctor', 'User', 'Admin']
+  }
   
 });
 const reasons = (UserSchema.statics.failedLogin = {
