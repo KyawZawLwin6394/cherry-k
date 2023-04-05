@@ -53,6 +53,9 @@ let procedureItemSchema = new Schema({
     type:Boolean,
     required:true,
     default:false
+  },
+  totalUnit:{
+    type:Number
   }
 });
 
