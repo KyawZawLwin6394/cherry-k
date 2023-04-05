@@ -43,6 +43,9 @@ let MedicineItemSchema = new Schema({
   toUnit: {
     type:String
   },
+  totalUnit: {
+    type:Number
+  },
   updatedAt: {
     type: Date
   },
