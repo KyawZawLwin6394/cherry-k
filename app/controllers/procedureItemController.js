@@ -15,7 +15,7 @@ exports.listAllProcedureItems = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await ProcedureItem.find(query).limit(limit).skip(skip).populate('name','name');
+    let result = await ProcedureItem.find(query).limit(limit).skip(skip).populate('name');
     count = await ProcedureItem.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -38,7 +38,7 @@ exports.listAllProcedureItems = async (req, res) => {
 };
 
 exports.getProcedureItem = async (req, res) => {
-  const result = await ProcedureItem.find({ _id: req.params.id,isDeleted:false }).populate('name','name');
+  const result = await ProcedureItem.find({ _id: req.params.id,isDeleted:false }).populate('name');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
