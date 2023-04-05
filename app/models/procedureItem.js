@@ -11,6 +11,9 @@ let procedureItemSchema = new Schema({
     type: String,
     required: true
   },
+  procedureItemName:{
+    type:String,
+  },
   name: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'MedicineLists',

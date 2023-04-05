@@ -16,5 +16,6 @@ module.exports = (app) => {
         .post(catchError(procedureItem.activateProcedureItem))
 
     app.route('/api/procedure-items').get(catchError(procedureItem.listAllProcedureItems))
+    app.route('/api/procedure-items/:id').get(catchError(procedureItem.getRelatedProcedureItem))
 
 };
