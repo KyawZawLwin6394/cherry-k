@@ -1,5 +1,6 @@
 const cors = require('cors');
 const path = require('path');
+const createIndexs = require('./dbIndexes').createIndexes
 const express = require('express'),
   bodyParser = require('body-parser'),
   mongoose = require('mongoose'),
@@ -36,7 +37,7 @@ app.use('/static', express.static(path.join(__dirname, 'uploads')));
 // Bring in our dependencies
 require('./config/express')(app, config);
 
-
+createIndexs()
 server.listen(port, () => {
   console.log('We are live on port: ', port);
 });
