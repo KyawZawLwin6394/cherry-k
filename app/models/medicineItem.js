@@ -11,6 +11,9 @@ let MedicineItemSchema = new Schema({
     type: String,
     required: true
   },
+  medicineItemName:{
+    type:String
+  },
   name: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'MedicineLists',
