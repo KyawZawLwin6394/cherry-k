@@ -16,7 +16,7 @@ let procedureItemSchema = new Schema({
   },
   name: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'MedicineLists',
+    ref:'ProcedureMedicines',
     required:true,
   },
   currentQuantity: {
