@@ -52,6 +52,7 @@ exports.login = (req, res) => {try {
               isUser:user.isUser,
               isDoctor:user.isDoctor,
               token: token,
+              role:user.role
             };
             if (
               (user.createdBy && !user.lastLoginTime) ||
