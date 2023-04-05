@@ -36,6 +36,18 @@ let SystemSettingSchema = new Schema({
   isDeleted: {
     type:Boolean,
     default:false
+  },
+  mdName:{
+    type:String
+  },
+  startingCapital : {
+    type:Number
+  },
+  netProfitPrevious:{
+    type:Number
+  },
+  netProfitNext: {
+    type:Number
   }
 });
 
