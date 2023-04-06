@@ -103,6 +103,10 @@ let ProcedureHistorySchema = new Schema({
     relatedPatient:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Patients'
+    },
+    date: {
+        type:Date,
+        default:Date.now()
     }
 });
 
