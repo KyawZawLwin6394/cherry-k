@@ -20,6 +20,8 @@ var storage = multer.diskStorage({
             cb(null, './uploads/cherry-k/img');
         } else if (file.fieldname === "history") {
             cb(null, './uploads/cherry-k/history');
+        } else if (file.fieldname === "phistory") {
+            cb(null, './uploads/cherry-k/phistory');
         }
 
     },
@@ -31,6 +33,8 @@ var storage = multer.diskStorage({
             cb(null, name + randomText + Date.now() + "." + ext)
         } else if (file.fieldname === "history") {
             cb(null, "TH-" + name + randomText + Date.now() + "." + ext)
+        } else if (file.fieldname === "phistory") {
+            cb(null, "PH-" + name + randomText + Date.now() + "." + ext)
         }
 
 
@@ -44,7 +48,6 @@ exports.upload = multer({
                 fs.mkdirSync(uri[i], { recursive: true });
             }
         }
-
         let filetypes = /jpeg|jpg|png|pdf/;
         let mimetype = filetypes.test(file.mimetype);
         const randomText = getRandomText();
@@ -69,9 +72,14 @@ exports.upload = multer({
             maxCount: 1
         },
         {
-            name:'history',
-            maxCount:3
+            name: 'history',
+            maxCount: 3
+        },
+        {
+            name: 'phistory',
+            maxCount: 1
         }
+
 
     ]
 );

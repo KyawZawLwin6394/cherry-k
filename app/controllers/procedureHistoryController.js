@@ -1,5 +1,6 @@
 'use strict';
 const ProcedureHistory = require('../models/procedureHistory');
+const Attachment = require('../models/attachment');
 
 exports.listAllProcedureHistorys = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -8,14 +9,14 @@ exports.listAllProcedureHistorys = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await ProcedureHistory.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id')
+    let result = await ProcedureHistory.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id').populate('pHistory')
     count = await ProcedureHistory.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -37,18 +38,45 @@ exports.listAllProcedureHistorys = async (req, res) => {
 };
 
 exports.getProcedureHistory = async (req, res) => {
-  const result = await ProcedureHistory.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id')
+  const result = await ProcedureHistory.find({ _id: req.params.id, isDeleted: false }).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id').populate('pHistory')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.getRelatedProcedureHistory = async (req, res) => {
-  const result = await ProcedureHistory.find({ relatedPatient: req.params.id , isDeleted:false }).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id')
+  const result = await ProcedureHistory.find({ relatedPatient: req.params.id, isDeleted: false }).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id').populate('pHistory')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
+
+exports.uploadImage = async (req, res) => {
+  let data = req.body
+  let files = req.files
+  if (files.phistory.length ==0) return res.status(500).send({error:true, message:'Undefined Image!'})
+  try {
+    console.log(req.files.phistory)
+    let imgPath = files.phistory[0].path.split('cherry-k')[1];
+    const attachData = {
+      fileName: files.phistory[0].originalname,
+      imgUrl: imgPath,
+      image: imgPath.split('\\')[2]
+    };
+    const newAttachment = new Attachment(attachData);
+    const attachResult = await newAttachment.save();
+    const result = await ProcedureHistory.findOneAndUpdate(
+      { _id: data.id },
+      {pHistory:attachResult._id.toString()},
+      { new: true },
+    )
+    return res.status(200).send({success:true,data:result})
+    //prepare img and save it into attachment schema
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({ error: true, mesage: error.message })
+  }
+}
 
 exports.createProcedureHistory = async (req, res, next) => {
   try {
@@ -61,7 +89,7 @@ exports.createProcedureHistory = async (req, res, next) => {
       data: result
     });
   } catch (error) {
-    console.log(error )
+    console.log(error)
     return res.status(500).send({ "error": true, message: error.message })
   }
 };
@@ -72,7 +100,7 @@ exports.updateProcedureHistory = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id')
+    ).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id').populate('pHistory')
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })

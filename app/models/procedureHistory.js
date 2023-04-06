@@ -107,6 +107,10 @@ let ProcedureHistorySchema = new Schema({
     date: {
         type:Date,
         default:Date.now()
+    },
+    pHistory: {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Attachments'
     }
 });
 
