@@ -79,7 +79,7 @@ let ProcedureHistorySchema = new Schema({
     treatmentPackages: [{
         item_id: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'MedicineItems'
+            ref: 'TreatmentUnits'
         },
         qty: Number,
         price: Number,
@@ -88,7 +88,7 @@ let ProcedureHistorySchema = new Schema({
     customTreatmentPackages: {
         item_id:{
             type:mongoose.Schema.Types.ObjectId,
-            ref:'MedicineItems'
+            ref:'TreatmentUnits'
         }
     },
     attachments:{

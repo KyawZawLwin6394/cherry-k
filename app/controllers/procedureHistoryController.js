@@ -15,7 +15,7 @@ exports.listAllProcedureHistorys = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await ProcedureHistory.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedPatient');
+    let result = await ProcedureHistory.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id')
     count = await ProcedureHistory.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -37,14 +37,14 @@ exports.listAllProcedureHistorys = async (req, res) => {
 };
 
 exports.getProcedureHistory = async (req, res) => {
-  const result = await ProcedureHistory.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedPatient')
+  const result = await ProcedureHistory.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.getRelatedProcedureHistory = async (req, res) => {
-  const result = await ProcedureHistory.find({ relatedPatient: req.params.id , isDeleted:false }).populate('relatedAccounting').populate('relatedPatient')
+  const result = await ProcedureHistory.find({ relatedPatient: req.params.id , isDeleted:false }).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -72,7 +72,7 @@ exports.updateProcedureHistory = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedAccounting').populate('relatedPatient');
+    ).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id')
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
