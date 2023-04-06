@@ -101,8 +101,9 @@ exports.createPatient = async (req, res, next) => {
 exports.updatePatient = async (req, res, next) => {
   let data = req.body;
   let files = req.files;
+  console.log(data)
   try {
-    if (files.img !== undefined) {
+    if (files) {
       let imgPath = files.img[0].path.split('cherry-k')[1];
       const attachData = {
         fileName: files.img[0].originalname,
@@ -116,11 +117,12 @@ exports.updatePatient = async (req, res, next) => {
 
     const result = await Patient.findOneAndUpdate(
       { _id: req.body.id },
-      {$set: data},
+      {$set: req.body},
       { new: true },
     ).populate('img');
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
+    console.log(error)
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };

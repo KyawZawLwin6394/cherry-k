@@ -9,7 +9,7 @@ module.exports = (app) => {
 
     app.route('/api/patient')
         .post(upload,catchError(patient.createPatient))
-        .put(catchError(patient.updatePatient))
+        .put(upload, catchError(patient.updatePatient))
     
     app.route('/api/patient/:id')
         .get(catchError(patient.getPatient))
