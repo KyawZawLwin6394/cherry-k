@@ -16,4 +16,6 @@ module.exports = (app) => {
         .post(catchError(procedureHistory.activateProcedureHistory))
 
     app.route('/api/procedure-histories').get(catchError(procedureHistory.listAllProcedureHistorys))
+    
+    app.route('/api/procedure-histories/:id').get(catchError(procedureHistory.getRelatedProcedureHistory))
 };
