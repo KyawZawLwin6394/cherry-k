@@ -73,7 +73,7 @@ exports.createPatient = async (req, res, next) => {
       data = {...data, patientID:"CUS-"+increment, seq:increment}
     }
     console.log(files.img,'files.img')
-    if (files.img !== undefined) {
+    if (files.img) {
       let imgPath = files.img[0].path.split('cherry-k')[1];
       const attachData = {
         fileName: files.img[0].originalname,
@@ -102,7 +102,7 @@ exports.updatePatient = async (req, res, next) => {
   let data = req.body;
   let files = req.files;  
   try {
-    if (files) {
+    if (files.img) {
       console.log(files.img,'files.img')
       let imgPath = files.img[0].path.split('cherry-k')[1];
       const attachData = {
