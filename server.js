@@ -37,7 +37,7 @@ app.use('/static', express.static(path.join(__dirname, 'uploads')));
 // Bring in our dependencies
 require('./config/express')(app, config);
 
-createIndexs()
+//createIndexs()
 server.listen(port, () => {
   console.log('We are live on port: ', port);
 });
