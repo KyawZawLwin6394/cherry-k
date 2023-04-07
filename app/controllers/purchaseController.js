@@ -46,24 +46,33 @@ exports.getPurchase = async (req, res) => {
 };
 
 exports.createPurchase = async (req, res, next) => {
-    let errorMessages = []
     let data = req.body
     try {
-        data.medicineItems.map(async function(element, index) {
-            const result = await MedicineItems.findOne({_id:element.item_id})
-            console.log(result.currentQuantity, element.qty)
-            if (result.currentQuantity < element.qty) errorMessages.push({item:result})
+        data.medicineItems.map(async function (element, index) {
+            const result = await MedicineItems.findOneAndUpdate(
+                { _id: element.item_id },
+                { $inc: { currentQuantity: element.qty  } },
+                { new: true },
+            ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id')
+            console.log(result)
+
         })
-        console.log(errorMessages)
-        // const newPurchase = new Purchase(data);
-        // const result = await newPurchase.save();
+        data.procedureItems.map(async function (element, index) {
+            const result = await ProcedureItems.findOneAndUpdate(
+                { _id: element.item_id },
+                { $inc: { currentQuantity: element.qty  } },
+                { new: true },
+            ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id')
+            console.log(result)
+        })
+        const newPurchase = new Purchase(data);
+        const result = await newPurchase.save();
         res.status(200).send({
             message: 'Purchase create success',
             success: true,
-            data: "result"
+            data: result
         });
     } catch (error) {
-        console.log(error)
         return res.status(500).send({ "error": true, message: error.message })
     }
 };
