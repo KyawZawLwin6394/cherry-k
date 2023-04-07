@@ -73,6 +73,24 @@ exports.updateSupplier = async (req, res, next) => {
   }
 };
 
+exports.paySupplier = async (req, res, next) => {
+  try {
+    let data = req.body
+    let paidStatus = false
+    data.creditAmount = data.creditAmount - data.payAmount
+    if (data.creditAmount == 0) paidStatus = true
+    console.log(paidStatus, data.creditAmount)
+    const result = await Supplier.findOneAndUpdate(
+      { _id: req.body.id },
+      {creditAmount: data.creditAmount, status: paidStatus},
+      { new: true },
+    )
+    return res.status(200).send({ success: true, data: result });
+  } catch (error) {
+    return res.status(500).send({ "error": true, "message": error.message })
+  }
+};
+
 exports.deleteSupplier = async (req, res, next) => {
   try {
     const result = await Supplier.findOneAndUpdate(

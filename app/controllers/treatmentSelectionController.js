@@ -2,8 +2,8 @@
 const TreatmentSelection = require('../models/treatmentSelection');
 const Appointment = require('../models/appointment');
 const Transaction = require('../models/transaction');
-const appointment = require('../models/appointment');
-const Treatment = require('../models/treatment')
+const Treatment = require('../models/treatment');
+const Patient = require('../models/patient');
 
 exports.listAllTreatmentSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -49,8 +49,8 @@ exports.getTreatmentSelection = async (req, res) => {
 exports.createTreatmentSelection = async (req, res, next) => {
     let data = req.body;
     try {
-        
-        const treatmentResult = await Treatment.find({_id:req.body.relatedTreatment})
+
+        const treatmentResult = await Treatment.find({ _id: req.body.relatedTreatment })
         const appointmentConfig = {
             relatedPatient: req.body.relatedPatient,
             relatedDoctor: req.body.relatedDoctor,
@@ -67,20 +67,28 @@ exports.createTreatmentSelection = async (req, res, next) => {
         appointmentResult.map(function (element, index) {
             relatedAppointments.push(element._id)
         })
-        data = {...data, relatedAppointments:relatedAppointments}
+        data = { ...data, relatedAppointments: relatedAppointments }
         if (data.paidAmount) {
             data = { ...data, leftOverAmount: data.totalAmount - data.paidAmount } // leftOverAmount Calculation
         }
         if (data.paidAmount === 0) data = { ...data, leftOverAmount: data.totalAmount }
 
-        
+
         const newTreatmentSelection = new TreatmentSelection(data);
         const result = await newTreatmentSelection.save();
-        const accResult = await appointment.findOneAndUpdate(
+        const accResult = await Appointment.findOneAndUpdate(
             { _id: req.body.appointment },
-            {$addToSet:{relatedTreatmentSelection:result._id}},
+            { $addToSet: { relatedTreatmentSelection: result._id } },
             { new: true },
-          )
+        )
+        if (data.relatedPatient) {
+            const patientResult = await Patient.findOneAndUpdate(
+                { _id: req.body.relatedPatient },
+                { $addToSet: { relatedTreatmentSelection: result._id } },
+                { new: true }
+            )
+            console.log(patientResult)
+        }
         res.status(200).send({
             message: 'Treatment Selection create success',
             success: true,

@@ -16,4 +16,6 @@ module.exports = (app) => {
         .post(catchError(supplier.activateSupplier))
 
     app.route('/api/suppliers').get(catchError(supplier.listAllSuppliers))
+
+    app.route('/api/suppliers/pay').put(catchError(supplier.paySupplier))
 };
