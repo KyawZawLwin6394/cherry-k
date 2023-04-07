@@ -3,6 +3,7 @@
 const mongoose = require('mongoose');
 mongoose.promise = global.Promise;
 const Schema = mongoose.Schema;
+const validator = require('validator');
 
 
 let SupplierSchema = new Schema({
@@ -10,16 +11,36 @@ let SupplierSchema = new Schema({
     type: String,
     required: true
   },
-  phone: {
+  phone:{
     type: String,
-    required: true,
+    unique: true,
+    required: [true, 'Phone Number Required!'],
   },
   address: {
     type:String,
     required:true
   },
+  creditAmount: {
+    type: Number,
+    default:0
+  },
+  purchaseAmount: {
+    type: Number,
+    default:0,
+  },
+  status:{
+    type:Boolean
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date
+  },
   isDeleted: {
     type:Boolean,
+    required:true,
     default:false
   }
 });
