@@ -53,6 +53,21 @@ let MedicineItemSchema = new Schema({
     type:Boolean,
     required:true,
     default:false
+  },
+  relatedCategory: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Categories',
+    required:true
+  },
+  relatedBrand: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Brands',
+    required:true
+  },
+  relatedSubCategory: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'SubCategories',
+    required:true
   }
 });
 
