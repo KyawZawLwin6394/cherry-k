@@ -29,7 +29,8 @@ let SupplierSchema = new Schema({
     default:0,
   },
   status:{
-    type:Boolean
+    type:Boolean,
+    default:false
   },
   createdAt: {
     type: Date,
