@@ -85,6 +85,7 @@ exports.getAppointment = async (req, res) => {
 };
 
 exports.createAppointment = async (req, res, next) => {
+  let data = req.body
   try {
     if (req.body.status == 'New') {
       const newPatient = new Patient({
@@ -93,10 +94,11 @@ exports.createAppointment = async (req, res, next) => {
         phone:req.body.phone
       })
       var pResult = await newPatient.save();
+      data = {...data, relatedPatient:pResult._id}
     }
     // const dateAndTime = formatDateAndTime(req.body.originalDate)
     // const newBody = { ...req.body, date: dateAndTime[0], time: dateAndTime[1] }
-    const newAppointment = new Appointment(req.body);
+    const newAppointment = new Appointment(data);
     const result = await newAppointment.save();
     res.status(200).send({
       message: 'Appointment create success',
