@@ -73,7 +73,7 @@ exports.getTodaysAppointment = async (req, res) => {
 exports.getAppointment = async (req, res) => {
   try {
     const result = await Appointment.find({ _id: req.params.id, isDeleted: false }).populate('relatedPatient').populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection')
-    console.log (result)
+    console.log(result)
     if (!result) return res.status(500).json({ error: true, message: 'No Record Found' });
     //const relateTreatment = await Treatment.find({ _id: result[0].relatedTreatmentSelection[0].relatedTreatment }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine').populate('relatedAppointment')
     //if (relateTreatment.length === 0) return res.status(500).json({ error: true, message: "There's no related treatment id in the database" })
@@ -88,13 +88,21 @@ exports.createAppointment = async (req, res, next) => {
   let data = req.body
   try {
     if (req.body.status == 'New') {
+      const latestDocument = await Patient.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
+      console.log(latestDocument)
+      if (latestDocument.length === 0) data = { ...data, seq: '1', patientID: "CUS-1" } // if seq is undefined set initial patientID and seq
+      console.log(data)
+      if (latestDocument.length) {
+        const increment = latestDocument[0].seq + 1
+        data = { ...data, patientID: "CUS-" + increment, seq: increment }
+      }
       const newPatient = new Patient({
-        name:req.body.name,
-        email:req.body.email,
-        phone:req.body.phone
+        name: req.body.name,
+        email: req.body.email,
+        phone: req.body.phone
       })
       var pResult = await newPatient.save();
-      data = {...data, relatedPatient:pResult._id}
+      data = { ...data, relatedPatient: pResult._id }
     }
     // const dateAndTime = formatDateAndTime(req.body.originalDate)
     // const newBody = { ...req.body, date: dateAndTime[0], time: dateAndTime[1] }
@@ -104,7 +112,7 @@ exports.createAppointment = async (req, res, next) => {
       message: 'Appointment create success',
       success: true,
       data: result,
-      patientResult:pResult
+      patientResult: pResult
     });
   } catch (error) {
     return res.status(500).send({ "error": true, message: error.message })
