@@ -10,8 +10,8 @@ let TreatmentSchema = new Schema({
     required: true
   },
   treatmentName: {
-    type: String,
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"TreatmentLists",
   },
   treatmentTimes: {
     type:Number,
@@ -39,10 +39,18 @@ let TreatmentSchema = new Schema({
     quantity:Number,
     perUsageQTY:Number
   }],
+  medicineLists: [{
+    item_id:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'MedicineItems'
+    },
+    quantity:Number,
+    perUsageQTY:Number
+  }],
   procedureAccessory: [{
     item_id:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'ProcedureAccessories'
+        ref:'AccessoryItems'
     },
     quantity:Number,
     perUsageQTY:Number
@@ -50,7 +58,7 @@ let TreatmentSchema = new Schema({
   machine:[{
     item_id:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Machines'
+        ref:'FixedAssets'
     },
     quantity:Number,
     perUsageQTY:Number
@@ -77,16 +85,14 @@ let TreatmentSchema = new Schema({
   },
   relatedPatient: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'Patients',
-    required:true
+    ref:'Patients'
   },
   relatedAppointment: {
     type:[mongoose.Schema.Types.ObjectId],
-    required:true,
     ref:'Appointments'
   },
   status: {
-    type:String,
+    type:Boolean,
   }
 });
 
