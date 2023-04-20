@@ -10,7 +10,7 @@ let AccessoryItem = new Schema({
   code: {
     type: String
   },
-  procedureItemName:{
+  accessoryItemName:{
     type:String,
   },
   name: {
