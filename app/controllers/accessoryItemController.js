@@ -72,7 +72,7 @@ exports.updateAccessoryItem = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedAccounting');
+    ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
