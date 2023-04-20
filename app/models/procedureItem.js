@@ -51,6 +51,9 @@ let procedureItemSchema = new Schema({
   totalUnit:{
     type:Number
   },
+  perUnitQuantity:{
+    type:Number
+  },
   relatedCategory: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'Categories'

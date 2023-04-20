@@ -51,6 +51,9 @@ let MedicineItemSchema = new Schema({
   reOrderQuantity:{
     type:Number
   },
+  perUnitQuantity:{
+    type:Number
+  },
   relatedCategory: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'Categories'

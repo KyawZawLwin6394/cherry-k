@@ -79,6 +79,27 @@ exports.createIndexes = () => {
       if (err) { console.log(err) } else { console.log('Procedure Items Indexes Created Successfully!') }
     })
 
+    db.collection('procedureaccessories').createIndex({
+      code: 'text',
+      name: 'text'
+    }, function (err, result) {
+      if (err) { console.log(err) } else { console.log('Procedure Accessories Indexes Created Successfully!') }
+    })
+
+    db.collection('proceduremedicines').createIndex({
+      code: 'text',
+      name: 'text'
+    }, function (err, result) {
+      if (err) { console.log(err) } else { console.log('Procedure Medicine Indexes Created Successfully!') }
+    })
+
+    db.collection('medicinelists').createIndex({
+      code: 'text',
+      procedureItemName: 'text'
+    }, function (err, result) {
+      if (err) { console.log(err) } else { console.log('Medicine Lists Indexes Created Successfully!') }
+    })
+
   });
 }
 

@@ -55,6 +55,9 @@ let AccessoryItem = new Schema({
     type:mongoose.Schema.Types.ObjectId,
     ref:'Categories'
   },
+  perUnitQuantity:{
+    type:Number
+  },
   relatedBrand: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'Brands'
