@@ -17,4 +17,6 @@ module.exports = (app) => {
 
     app.route('/api/medicine-lists').get(catchError(medicineList.listAllMedicineLists))
 
+    app.route('/api/medicine-lists-search').post(catchError(medicineList.searchMedicineLists))
+
 };

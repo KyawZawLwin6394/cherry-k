@@ -98,3 +98,13 @@ exports.activateProcedureAccessory = async (req, res, next) => {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
+
+exports.searchProcedureAccessories = async (req, res, next) => {
+  try {
+    const result = await ProcedureAccessory.find({ $text: { $search: req.body.search } })
+    if (result.length===0) return res.status(404).send({error:true, message:'No Record Found!'})
+    return res.status(200).send({ success: true, data: result })
+  } catch (err) {
+    return res.status(500).send({ error: true, message: err.message })
+  }
+}

@@ -16,4 +16,6 @@ module.exports = (app) => {
         .post(catchError(procedureAccessory.activateProcedureAccessory))
 
     app.route('/api/procedure-accessories').get(catchError(procedureAccessory.listAllProcedureAccessorys))
+
+    app.route('/api/procedure-accessories-search').post(catchError(procedureAccessory.searchProcedureAccessories))
 };
