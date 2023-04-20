@@ -17,5 +17,6 @@ module.exports = (app) => {
 
     app.route('/api/procedure-items').get(catchError(procedureItem.listAllProcedureItems))
     app.route('/api/procedure-items/:id').get(catchError(procedureItem.getRelatedProcedureItem))
+    app.route('/api/procedure-items-search').post(catchError(procedureItem.searchProcedureItems))
 
 };

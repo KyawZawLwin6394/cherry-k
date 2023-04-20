@@ -17,4 +17,5 @@ module.exports = (app) => {
 
     app.route('/api/accessory-items').get(catchError(accessoryItem.listAllAccessoryItems))
     app.route('/api/accessory-items/:id').get(catchError(accessoryItem.getRelatedAccessoryItem))
-};
+    app.route('/api/accessory-items-search').post(catchError(accessoryItem.searchAccessoryItems))
+    };

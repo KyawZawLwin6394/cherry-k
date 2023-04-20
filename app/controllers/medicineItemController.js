@@ -38,14 +38,14 @@ exports.listAllMedicineItems = async (req, res) => {
 };
 
 exports.getMedicineItem = async (req, res) => {
-  const result = await MedicineItem.find({ _id: req.params.id,isDeleted:false }).populate('name','name');
+  const result = await MedicineItem.find({ _id: req.params.id,isDeleted:false }).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.getRelatedMedicineItem = async (req, res) => {
-  const result = await MedicineItem.find({ name: req.params.id,isDeleted:false }).populate('name');
+  const result = await MedicineItem.find({ name: req.params.id,isDeleted:false }).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -71,7 +71,7 @@ exports.updateMedicineItem = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('name','name');
+    ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
@@ -123,7 +123,7 @@ exports.filterMedicineItems = async (req, res, next) => {
 
 exports.searchMedicineItems = async (req, res, next) => {
   try {
-    const result = await MedicineItem.find({ $text: { $search: req.body.search } })
+    const result = await MedicineItem.find({ $text: { $search: req.body.search } }).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
     if (result.length===0) return res.status(404).send({error:true, message:'No Record Found!'})
     return res.status(200).send({ success: true, data: result })
   } catch (err) {
