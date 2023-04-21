@@ -35,7 +35,7 @@ exports.listAllAppointments = async (req, res) => {
     regexKeyword ? (query['name'] = regexKeyword) : '';
     let result = await Appointment.find(query).limit(limit).skip(skip).populate('relatedPatient').populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection').populate('relatedTreatmentSelection.relatedAppointments');
     console.log(result)
-    count = await Appointment.find(query).count();
+    count = await Appointment.find(query).limit(limit).skip(skip).count();
     const division = count / limit;
     page = Math.ceil(division);
 
