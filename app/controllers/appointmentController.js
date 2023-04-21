@@ -96,11 +96,8 @@ exports.createAppointment = async (req, res, next) => {
         const increment = latestDocument[0].seq + 1
         data = { ...data, patientID: "CUS-" + increment, seq: increment }
       }
-      const newPatient = new Patient({
-        name: req.body.name,
-        email: req.body.email,
-        phone: req.body.phone
-      })
+      console.log(data)
+      const newPatient = new Patient(data)
       var pResult = await newPatient.save();
       data = { ...data, relatedPatient: pResult._id }
     }

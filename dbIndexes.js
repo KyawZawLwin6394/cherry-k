@@ -100,6 +100,13 @@ exports.createIndexes = () => {
       if (err) { console.log(err) } else { console.log('Medicine Lists Indexes Created Successfully!') }
     })
 
+    db.collection('treatments').createIndex({
+      treatmentCode: 'text',
+      treatmentName: 'text'
+    }, function (err, result) {
+      if (err) { console.log(err) } else { console.log('Treatment Indexes Created Successfully!') }
+    })
+
   });
 }
 
