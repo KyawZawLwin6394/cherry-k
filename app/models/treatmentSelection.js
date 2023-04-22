@@ -49,6 +49,10 @@ let TreatmentSelectionSchema = new Schema({
     type:[mongoose.Schema.Types.ObjectId],
     ref:'Appointments',
     required:true
+  },
+  selectionStatus:{
+    type:String,
+    enum:['Ongoing','Done']
   }
 });
 const patient = mongoose.model('TreatmentSelections',TreatmentSelectionSchema)
