@@ -15,7 +15,7 @@ exports.listAllMedicineItems = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await MedicineItem.find(query).limit(limit).skip(skip).populate('name','name');
+    let result = await MedicineItem.find(query).limit(limit).skip(skip).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory');
     count = await MedicineItem.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -50,6 +50,7 @@ exports.getRelatedMedicineItem = async (req, res) => {
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
+
 
 exports.createMedicineItem = async (req, res, next) => {
   try {
