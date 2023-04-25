@@ -83,7 +83,8 @@ let ProcedureHistorySchema = new Schema({
         },
         qty: Number,
         price: Number,
-        totalPrice: Number
+        totalPrice: Number,
+        SIG: String
     }],
     customTreatmentPackages: {
         item_id:{
