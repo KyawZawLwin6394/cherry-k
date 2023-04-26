@@ -110,7 +110,7 @@ exports.activateTreatment = async (req, res, next) => {
 
 exports.searchTreatments = async (req, res, next) => {
   try {
-    const result = await Treatment.find({ $text: { $search: req.body.search } })
+    const result = await Treatment.find({ $text: { $search: req.body.search } }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('Appointments').populate('machine.item_id').populate('procedureAccessory.item_id').populate('medicineLists.item_id').populate('procedureMedicine.item_id').populate('treatmentName')
     if (result.length===0) return res.status(404).send({error:true, message:'No Record Found!'})
     return res.status(200).send({ success: true, data: result })
   } catch (err) {
