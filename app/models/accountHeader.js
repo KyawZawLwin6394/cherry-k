@@ -7,8 +7,7 @@ const Schema = mongoose.Schema;
 
 let AccountHeaderSchema = new Schema({
     name: {
-        type: String,
-        required: true,
+        type: String
     },
     createdAt: {
         type: Date,

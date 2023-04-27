@@ -7,8 +7,7 @@ const Schema = mongoose.Schema;
 
 let AccountingListSchema = new Schema({
     code: {
-        type: String,
-        required: true
+        type: String
     },
     relatedType: {
         type: mongoose.Schema.Types.ObjectId,
@@ -22,8 +21,7 @@ let AccountingListSchema = new Schema({
         type:String
     },  
     name: {
-        type: String,
-        required: true
+        type: String
     },
     relatedTreatment: {
         type: mongoose.Schema.Types.ObjectId,
