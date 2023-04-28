@@ -45,10 +45,8 @@ exports.getBank = async (req, res) => {
 };
 
 exports.createBank = async (req, res, next) => {
+  let newBody = req.body;
   try {
-    const newBody = req.body;
-    const newBank = new Bank(newBody);
-    const result = await newBank.save();
     const bankAccJSON = {
       code:null,
       relatedType:req.body.relatedType,
@@ -61,10 +59,14 @@ exports.createBank = async (req, res, next) => {
       generalFlag:null,
       relatedCurrency:null,
       carryForWork:null,
-      relatedBank:result._id
+      
     }
     const newBankAcc = new AccountingList(bankAccJSON)
     const bankAccResult = await newBankAcc.save();
+
+    newBody = {...newBody,relatedAccounting:bankAccResult._id }
+    const newBank = new Bank(newBody);
+    const result = await newBank.save();
     res.status(200).send({
       message: 'Bank create success',
       success: true,
