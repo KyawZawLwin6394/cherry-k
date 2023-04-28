@@ -52,7 +52,7 @@ let TransactionSchema = new Schema({
     // required:true,
     default:false
   },
-  relatedMedicineSlae: {
+  relatedMedicineSale: {
     type: mongoose.Schema.Types.ObjectId,
     ref:'MedicineSales',
     default:null

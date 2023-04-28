@@ -37,6 +37,15 @@ let PurchaseSchema = new Schema({
         price:Number,
         subTotal:Number
     }],
+    accessoryItems: [{
+        item_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'AccessoryItems'
+        },
+        qty: Number,
+        price:Number,
+        subTotal:Number
+    }],
     totalQTY: {
         type: Number,
         required: true,
