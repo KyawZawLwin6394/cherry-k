@@ -51,7 +51,7 @@ exports.createBank = async (req, res, next) => {
       code:null,
       relatedType:req.body.relatedType,
       relatedHeader:req.body.relatedHeader,
-      subHeader:req.body.subHeader,
+      subHeader:req.body.subHeading,
       name:req.body.accountName,
       relatedTreatment:null,
       amount:req.body.balance,
@@ -59,7 +59,6 @@ exports.createBank = async (req, res, next) => {
       generalFlag:null,
       relatedCurrency:null,
       carryForWork:null,
-      
     }
     const newBankAcc = new AccountingList(bankAccJSON)
     const bankAccResult = await newBankAcc.save();
