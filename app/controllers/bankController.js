@@ -1,5 +1,6 @@
 'use strict';
 const Bank = require('../models/bank');
+const AccountingList = require('../models/accountingList');
 
 exports.listAllBanks = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -38,7 +39,7 @@ exports.listAllBanks = async (req, res) => {
 
 exports.getBank = async (req, res) => {
   const result = await Bank.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting')
-  if (!result)
+  if (result.length === 0)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
@@ -48,10 +49,27 @@ exports.createBank = async (req, res, next) => {
     const newBody = req.body;
     const newBank = new Bank(newBody);
     const result = await newBank.save();
+    const bankAccJSON = {
+      code:null,
+      relatedType:req.body.relatedType,
+      relatedHeader:req.body.relatedHeader,
+      subHeader:req.body.subHeader,
+      name:req.body.accountName,
+      relatedTreatment:null,
+      amount:req.body.balance,
+      openingBalance:req.body.balance,
+      generalFlag:null,
+      relatedCurrency:null,
+      carryForWork:null,
+      relatedBank:result._id
+    }
+    const newBankAcc = new AccountingList(bankAccJSON)
+    const bankAccResult = await newBankAcc.save();
     res.status(200).send({
       message: 'Bank create success',
       success: true,
-      data: result
+      data: result,
+      bank:bankAccResult
     });
   } catch (error) {
     console.log(error )

@@ -35,8 +35,7 @@ let AccountingListSchema = new Schema({
         type: Number
     },
     generalFlag: {
-        type: Boolean,
-        required: true,
+        type: Boolean
     },
     isDeleted: {
         type: Boolean,
@@ -44,12 +43,10 @@ let AccountingListSchema = new Schema({
         default: false
     },
     relatedCurrency: {
-        type:String,
-        required:true
+        type:String
       },
     carryForWork: {
-        type:Boolean,
-        required: true
+        type:Boolean
     },
     relatedBank: {
         type:mongoose.Schema.Types.ObjectId,
