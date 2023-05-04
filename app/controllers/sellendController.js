@@ -1,5 +1,6 @@
 'use strict';
 const SellEnd = require('../models/sellend');
+const Transaction = require('../models/transaction');
 
 exports.listAllSellEnds = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -8,7 +9,7 @@ exports.listAllSellEnds = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 20; //limit
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -38,7 +39,7 @@ exports.listAllSellEnds = async (req, res) => {
 };
 
 exports.getSellEnd = async (req, res) => {
-  const result = await SellEnd.find({ _id: req.params.id,isDeleted:false })
+  const result = await SellEnd.find({ _id: req.params.id, isDeleted: false })
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -49,13 +50,37 @@ exports.createSellEnd = async (req, res, next) => {
     const newBody = req.body;
     const newSellEnd = new SellEnd(newBody);
     const result = await newSellEnd.save();
+    const firstTransaction =
+    {
+      "amount": newBody.profitAndLoss,
+      "date": newBody.sellDate || newBody.endDate,
+      "remark": newBody.remark,
+      "type": "Credit",
+      "relatedTransaction": null,
+      "relatedAccounting": newBody.relatedAccounting
+    }
+    const fTransaction = new Transaction(firstTransaction)
+    const fTransResult = await fTransaction.save();
+    const secondTransaction = {
+      "amount": newBody.profitAndLoss,
+      "date": newBody.sellDate || newBody.endDate,
+      "remark": newBody.remark,
+      "type": "Debit",
+      "relatedTransaction": fTransResult._id,
+      "relatedAccounting": newBody.relatedAccounting,
+    }
+    const secTrans = new Transaction(secondTransaction)
+    var secTransResult = await secTrans.save();
     res.status(200).send({
       message: 'SellEnd create success',
       success: true,
-      data: result
+      data: result,
+      fTransaction:fTransaction,
+      secondTransaction:secTransResult
     });
+
   } catch (error) {
-    console.log(error )
+    console.log(error)
     return res.status(500).send({ "error": true, message: error.message })
   }
 };

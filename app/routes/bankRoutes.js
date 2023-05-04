@@ -16,4 +16,5 @@ module.exports = (app) => {
         .post(catchError(bank.activateBank))
 
     app.route('/api/banks').get(catchError(bank.listAllBanks))
+    app.route('/api/banks/transfer')
 };
