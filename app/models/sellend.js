@@ -42,6 +42,10 @@ let SellEndSchema = new Schema({
     type:Boolean,
     required:true,
     default:false
+  },
+  relatedAccounting: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:'AccountingLists'
   }
 });
 
