@@ -1,7 +1,7 @@
 'use strict';
 const Income = require('../models/income');
 const Transaction = require('../models/transaction')
-
+const Bank = require('../models/bank');
 exports.listAllIncomes = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
   let count = 0;
@@ -51,6 +51,11 @@ exports.createIncome = async (req, res, next) => {
     const newIncome = new Income(newBody);
     const result = await newIncome.save();
     const populatedResult = await Income.find({_id:result._id}).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
+    const bankResult = await Bank.findOneAndUpdate(
+      { _id: req.body.id },
+      { $inc: { balance: 50 } },
+      { new: true },
+    ).populate('relatedAccounting');
     const firstTransaction =
     {
       "initialExchangeRate": newBody.initialExchangeRate,
