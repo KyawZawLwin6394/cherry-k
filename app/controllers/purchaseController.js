@@ -2,6 +2,7 @@
 const Purchase = require('../models/purchase');
 const MedicineItems = require('../models/medicineItem');
 const ProcedureItems = require('../models/procedureItem');
+const AccessoryItems = require('../models/accessoryItem')
 
 exports.listAllPurchases = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -62,7 +63,15 @@ exports.createPurchase = async (req, res, next) => {
                 { _id: element.item_id },
                 { $inc: { currentQuantity: element.qty  } },
                 { new: true },
-            ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id')
+            ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
+            console.log(result)
+        })
+        data.accessoryItems.map(async function (element, index) {
+            const result = await AccessoryItems.findOneAndUpdate(
+                { _id: element.item_id },
+                { $inc: { currentQuantity: element.qty  } },
+                { new: true },
+            ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
             console.log(result)
         })
         const newPurchase = new Purchase(data);
