@@ -8,11 +8,7 @@ const Schema = mongoose.Schema;
 let TreatmentSelectionSchema = new Schema({
   paymentMethod: {
     type:String,
-    enum:['Credit','Bank','Cash']
-  },
-  relatedBank: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists'
+    enum:['Credit','Cash Down']
   },
   paidAmount: {
     type: Number,
@@ -41,10 +37,6 @@ let TreatmentSelectionSchema = new Schema({
     required:true,
     ref:'Treatments'
   },
-  relatedCash: {
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists'
-  },
   relatedAppointments : {
     type:[mongoose.Schema.Types.ObjectId],
     ref:'Appointments',
@@ -53,6 +45,19 @@ let TreatmentSelectionSchema = new Schema({
   selectionStatus:{
     type:String,
     enum:['Ongoing','Done']
+  },
+  relatedPatient: {
+    type:mongoose.Schema.Types.ObjectId,
+    required:true,
+    ref:'Patients'
+  },
+  finishedAppointments: {
+    type:[mongoose.Schema.Types.ObjectId],
+    ref:'Appointments',
+  },
+  remainingAppointments: {
+    type:[mongoose.Schema.Types.ObjectId],
+    ref:'Appointments',
   }
 });
 const patient = mongoose.model('TreatmentSelections',TreatmentSelectionSchema)

@@ -202,3 +202,23 @@ exports.activateMedicineSale = async (req, res, next) => {
   }
 };
 
+exports.createCode = async (req,res,next) => {
+  let data = {}
+  try{
+    const latestDocument = await MedicineSale.find({},{seq:1}).sort({ _id: -1 }).limit(1).exec();
+    if (latestDocument.length == 0) data = { ...data, seq: 1, voucherCode: "MVC-1" } // if seq is undefined set initial patientID and seq
+    if (latestDocument.length) {
+      const increment = latestDocument[0].seq + 1
+      data = { ...data, voucherCode: "MVC-" + increment, seq: increment }
+    }
+    return res.status(200).send({
+      success:true,
+      data:data
+    })
+  } catch(err){
+    return res.status(500).send({
+      error:true,
+      message:err
+    })
+  }
+}

@@ -62,6 +62,13 @@ let PurchaseSchema = new Schema({
     date:{
         type:Date,
         default:Date.now()
+    },
+    purchaseType:{
+        type:String,
+        enum:['Cash Down','Credit']
+    },
+    creditAmount:{
+        type:Number
     }
 });
 

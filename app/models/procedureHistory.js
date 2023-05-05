@@ -112,6 +112,14 @@ let ProcedureHistorySchema = new Schema({
     pHistory: {
         type:mongoose.Schema.Types.ObjectId,
         ref:'Attachments'
+    },
+    relatedAppointment:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Appointments'
+    },
+    relatedTreatment:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Treatments'
     }
 });
 
