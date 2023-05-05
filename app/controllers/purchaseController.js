@@ -56,7 +56,6 @@ exports.createPurchase = async (req, res, next) => {
                 { new: true },
             ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id')
             console.log(result)
-
         })
         data.procedureItems.map(async function (element, index) {
             const result = await ProcedureItems.findOneAndUpdate(
