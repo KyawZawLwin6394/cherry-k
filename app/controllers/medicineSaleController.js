@@ -17,7 +17,19 @@ exports.listAllMedicineSales = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await MedicineSale.find(query).limit(limit).skip(skip).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy');
+    let result = await MedicineSale.find(query).limit(limit).skip(skip).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy').populate({
+      path: 'relatedTransaction',
+      populate: [{
+        path: 'relatedAccounting',
+        model: 'AccountingLists'
+      }, {
+        path: 'relatedBank',
+        model: 'AccountingLists'
+      }, {
+        path: 'relatedCash',
+        model: 'AccountingLists'
+      }]
+    });
     console.log(result)
     count = await MedicineSale.find(query).count();
     const division = count / limit;

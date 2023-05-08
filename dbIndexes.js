@@ -23,7 +23,7 @@ exports.createIndexes = () => {
     });
 
     db.collection('appointments').createIndex({
-      doctor: 'text',
+      status: 'text',
       phone: 'text'
     }, function (err, result) {
       if (err) {
