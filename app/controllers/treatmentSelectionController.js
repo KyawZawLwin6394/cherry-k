@@ -90,7 +90,25 @@ exports.createTreatmentSelection = async (req, res, next) => {
         }
         if (data.paidAmount === 0) data = { ...data, leftOverAmount: data.totalAmount }
 
-
+        //first transaction 
+        const fTransResult = await Transaction.create({
+            "amount": req.body.paidAmount,
+            "date": Date.now(),
+            "remark": null,
+            "relatedAccounting": "6458a7ede6bbaf516d2f0da7", //Treatment Sale Revenue
+            "type": "Credit"
+        }) 
+        //sec transaction
+        const secTransResult = await Transaction.create({
+            "amount": req.body.paidAmount,
+            "date": Date.now(),
+            "remark":null,
+            "relatedBank": req.body.relatedBank,
+            "relatedCash": req.body.relatedCash,
+            "type": "Debit",
+            "relatedTransaction": fTransResult._id
+        });
+        data = {...data, relatedTransaction:[fTransResult._id, secTransResult]} //adding relatedTransactions to treatmentSelection model
         const newTreatmentSelection = new TreatmentSelection(data);
         const result = await newTreatmentSelection.save();
         const accResult = await Appointment.findOneAndUpdate(
@@ -110,7 +128,9 @@ exports.createTreatmentSelection = async (req, res, next) => {
             message: 'Treatment Selection create success',
             success: true,
             data: result,
-            appointmentAutoGenerate: appointmentResult
+            appointmentAutoGenerate: appointmentResult,
+            fTransResult:fTransResult,
+            secTransResult:secTransResult
         });
     } catch (error) {
         return res.status(500).send({ "error": true, message: error.message })
@@ -139,8 +159,8 @@ exports.treatmentPayment = async (req, res, next) => {
     let data = req.body;
     try {
         let { paidAmount, totalAmount } = data;
-        const treatmentSelectionQuery = await TreatmentSelection.find({_id:req.body.id, isDeleted:false}).populate('relatedTreatment').populate('relatedAppointments');
-        if (treatmentSelectionQuery[0].leftOverAmount<=0) return res.status(500).send({error:true, message:'Fully Paid!'})
+        const treatmentSelectionQuery = await TreatmentSelection.find({ _id: req.body.id, isDeleted: false }).populate('relatedTreatment').populate('relatedAppointments');
+        if (treatmentSelectionQuery[0].leftOverAmount <= 0) return res.status(500).send({ error: true, message: 'Fully Paid!' })
         const result = await TreatmentSelection.findOneAndUpdate(
             { _id: req.body.id },
             { $inc: { leftOverAmount: -paidAmount, paidAmount: paidAmount } },

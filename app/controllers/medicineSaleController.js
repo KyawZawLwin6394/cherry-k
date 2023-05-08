@@ -17,7 +17,7 @@ exports.listAllMedicineSales = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await MedicineSale.find(query).limit(limit).skip(skip).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy');
+    let result = await MedicineSale.find(query).limit(limit).skip(skip).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy');
     console.log(result)
     count = await MedicineSale.find(query).count();
     const division = count / limit;
@@ -40,7 +40,7 @@ exports.listAllMedicineSales = async (req, res) => {
 };
 
 exports.getMedicineSale = async (req, res) => {
-  const result = await MedicineSale.find({ _id: req.params.id, isDeleted: false }).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy')
+  const result = await MedicineSale.find({ _id: req.params.id, isDeleted: false }).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -50,7 +50,7 @@ exports.createMedicineSale = async (req, res, next) => {
   let data = req.body;
   try {
     //prepare CUS-ID
-    const latestDocument = await MedicineSale.find({},{seq:1}).sort({ _id: -1 }).limit(1).exec();
+    const latestDocument = await MedicineSale.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
     if (latestDocument.length == 0) data = { ...data, seq: 1, voucherCode: "MVC-1" } // if seq is undefined set initial patientID and seq
     if (latestDocument.length) {
       const increment = latestDocument[0].seq + 1
@@ -89,16 +89,16 @@ exports.createMedicineSale = async (req, res, next) => {
       { amount: parseInt(req.body.payAmount) + parseInt(acc[0].amount) },
       { new: true },
     )
-
+    data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] }
     const newMedicineSale = new MedicineSale(data)
-    const medicineSaleResult =await newMedicineSale.save()
+    const medicineSaleResult = await newMedicineSale.save()
     res.status(200).send({
       message: 'MedicineSale Transaction success',
       success: true,
       fTrans: fTransResult,
       sTrans: secTransResult,
       accResult: accResult,
-      data:medicineSaleResult
+      data: medicineSaleResult
     });
 
   } catch (error) {
@@ -150,7 +150,7 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
       fTrans: fTransResult,
       sTrans: secTransResult,
       accResult: accResult,
-      data:medicineSaleResult
+      data: medicineSaleResult
     });
 
 
@@ -166,7 +166,7 @@ exports.updateMedicineSale = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy');
+    ).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy');
     if (!result) return res.status(500).send({ error: true, message: 'Query Error!' })
     if (result === 0) return res.status(500).send({ error: true, message: 'No Records!' })
     return res.status(200).send({ success: true, data: result });
@@ -202,23 +202,23 @@ exports.activateMedicineSale = async (req, res, next) => {
   }
 };
 
-exports.createCode = async (req,res,next) => {
+exports.createCode = async (req, res, next) => {
   let data = {}
-  try{
-    const latestDocument = await MedicineSale.find({},{seq:1}).sort({ _id: -1 }).limit(1).exec();
+  try {
+    const latestDocument = await MedicineSale.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
     if (latestDocument.length == 0) data = { ...data, seq: 1, voucherCode: "MVC-1" } // if seq is undefined set initial patientID and seq
     if (latestDocument.length) {
       const increment = latestDocument[0].seq + 1
       data = { ...data, voucherCode: "MVC-" + increment, seq: increment }
     }
     return res.status(200).send({
-      success:true,
-      data:data
+      success: true,
+      data: data
     })
-  } catch(err){
+  } catch (err) {
     return res.status(500).send({
-      error:true,
-      message:err
+      error: true,
+      message: err
     })
   }
 }

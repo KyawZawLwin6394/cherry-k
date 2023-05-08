@@ -83,7 +83,7 @@ let MedicineSaleSchema = new Schema({
     ref:'Users'
   },
   relatedTransaction:{
-    type:mongoose.Schema.Types.ObjectId,
+    type:[mongoose.Schema.Types.ObjectId],
     ref:'Transactions'
   }
 });

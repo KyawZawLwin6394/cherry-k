@@ -60,7 +60,7 @@ let TreatmentSelectionSchema = new Schema({
     ref:'Appointments',
   },
   relatedTransaction:{
-    type:mongoose.Schema.Types.ObjectId,
+    type:[mongoose.Schema.Types.ObjectId],
     ref:'Transactions'
   },
   betweenDuration:{
