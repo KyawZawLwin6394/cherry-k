@@ -75,19 +75,27 @@ exports.updateSupplier = async (req, res, next) => {
 };
 
 exports.paySupplier = async (req, res, next) => {
+  let isPaid = false
   try {
-    const { id, creditAmount, payAmount } = req.body;
-
-    const newCreditAmount = creditAmount - payAmount;
-    const isPaid = newCreditAmount === 0;
-
+    const { id, payAmount } = req.body;
+    const creditResult = await Supplier.find({_id:req.body.id})
+    let newCreditAmount = parseInt(creditResult[0].creditAmount) - parseInt(payAmount);
+    if (newCreditAmount === 0) isPaid = true
+    
     const updatedSupplier = await Supplier.findOneAndUpdate(
       { _id: id },
-      { creditAmount: newCreditAmount, status: isPaid },
+      { $inc: { creditAmount: -payAmount }, status:isPaid },
       { new: true }
     );
 
-    return res.status(200).json({ success: true, data: updatedSupplier });
+    const createSupplierPaidCredit = await PaidCredit.create({
+      relatedSupplier:req.body.relatedSupplier,
+      relatedPurchase:req.body.relatedPurchase,
+      paidAmount:payAmount,
+      leftAmount:updatedSupplier.creditAmount,
+      remark:req.body.remark
+    })
+    return res.status(200).json({ success: true, data: updatedSupplier, paidCredit:createSupplierPaidCredit });
   } catch (error) {
     return res.status(500).json({ error: true, message: error.message });
   }
