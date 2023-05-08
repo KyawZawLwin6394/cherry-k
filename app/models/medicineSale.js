@@ -81,6 +81,10 @@ let MedicineSaleSchema = new Schema({
   createdBy: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'Users'
+  },
+  relatedTransaction:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Transactions'
   }
 });
 

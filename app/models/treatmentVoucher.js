@@ -29,7 +29,7 @@ let TreatmentVoucherSchema = new Schema({
     },
     paymentMethod:{
         type:String,
-        enum:['by Appointment','Lapsum','Total','Advanced']
+        enum:['by Appointment','Lumpsum','Total','Advanced']
     },
     amount:{
         type:Number
@@ -51,6 +51,10 @@ let TreatmentVoucherSchema = new Schema({
     },
     seq:{
         type:Number
+    },
+    relatedTreatmentSelection: {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'TreatmentSelections'
     }
 });
 

@@ -58,6 +58,13 @@ let TreatmentSelectionSchema = new Schema({
   remainingAppointments: {
     type:[mongoose.Schema.Types.ObjectId],
     ref:'Appointments',
+  },
+  relatedTransaction:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Transactions'
+  },
+  betweenDuration:{
+    type:Number
   }
 });
 const patient = mongoose.model('TreatmentSelections',TreatmentSelectionSchema)
