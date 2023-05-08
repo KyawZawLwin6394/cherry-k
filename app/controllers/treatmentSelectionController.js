@@ -4,6 +4,9 @@ const Appointment = require('../models/appointment');
 const Transaction = require('../models/transaction');
 const Treatment = require('../models/treatment');
 const Patient = require('../models/patient');
+const TreatmentVoucher = require('../models/treatmentVoucher');
+const treatment = require('../models/treatment');
+const treatmentVoucher = require('../models/treatmentVoucher');
 
 exports.listAllTreatmentSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -48,6 +51,13 @@ exports.listAllTreatmentSelections = async (req, res) => {
 
 exports.getTreatmentSelection = async (req, res) => {
     const result = await TreatmentSelection.find({ _id: req.params.id, isDeleted: false }).populate('relatedTreatment').populate('relatedAppointments');
+    if (!result)
+        return res.status(500).json({ error: true, message: 'No Record Found' });
+    return res.status(200).send({ success: true, data: result });
+};
+
+exports.getTreatementSelectionByTreatmentID = async (req, res) => {
+    const result = await TreatmentSelection.find({ relatedTreatment: req.params.id, isDeleted: false }).populate('relatedTreatment').populate('relatedAppointments');
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -120,6 +130,38 @@ exports.updateTreatmentSelection = async (req, res, next) => {
             { new: true },
         ).populate('relatedTreatment');
         return res.status(200).send({ success: true, data: result });
+    } catch (error) {
+        return res.status(500).send({ "error": true, "message": error.message })
+    }
+};
+
+exports.treatmentPayment = async (req, res, next) => {
+    let data = req.body;
+    try {
+        let { paidAmount, totalAmount } = data;
+        const treatmentSelectionQuery = await TreatmentSelection.find({_id:req.body.id, isDeleted:false}).populate('relatedTreatment').populate('relatedAppointments');
+        if (treatmentSelectionQuery[0].leftOverAmount<=0) return res.status(500).send({error:true, message:'Fully Paid!'})
+        const result = await TreatmentSelection.findOneAndUpdate(
+            { _id: req.body.id },
+            { $inc: { leftOverAmount: -paidAmount, paidAmount: paidAmount } },
+            { new: true },
+        ).populate('relatedTreatment');
+        const treatmentVoucherResult = await TreatmentVoucher.create(
+            {
+                "relatedTreatment": req.body.relatedTreatment,
+                "relatedAppointment": req.body.relatedAppointment,
+                "relatedPatient": req.body.relatedPatient,
+                "paymentMethod": req.body.paymentMethod, //enum: ['by Appointment','Lapsum','Total','Advanced']
+                "amount": paidAmount,
+                "relatedBank": req.body.relatedBank, //must be bank acc from accounting accs
+                "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
+                "relatedCash": req.body.relatedCash //must be cash acc from accounting accs
+            }
+        )
+        return res.status(200).send({
+            success: true, data: result,
+            treatmentVoucherResult: treatmentVoucherResult
+        });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
     }

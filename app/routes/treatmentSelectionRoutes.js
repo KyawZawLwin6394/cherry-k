@@ -18,5 +18,7 @@ module.exports = (app) => {
     app.route('/api/treatment-selections').get( catchError(treatmentSelection.listAllTreatmentSelections))
 
     app.route('/api/treatment-selections/transaction').post(catchError(treatmentSelection.createTreatmentTransaction))
+    app.route('/api/treatment-selections/treatment/:id').get(catchError(treatmentSelection.getTreatementSelectionByTreatmentID))
+    app.route('/api/treatment-selections/payment').put(catchError(treatmentSelection.treatmentPayment))
 
 };
