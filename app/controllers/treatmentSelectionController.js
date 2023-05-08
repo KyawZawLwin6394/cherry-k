@@ -109,6 +109,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
             "relatedTransaction": fTransResult._id
         });
         data = {...data, relatedTransaction:[fTransResult._id, secTransResult]} //adding relatedTransactions to treatmentSelection model
+        
         const newTreatmentSelection = new TreatmentSelection(data);
         const result = await newTreatmentSelection.save();
         const accResult = await Appointment.findOneAndUpdate(
