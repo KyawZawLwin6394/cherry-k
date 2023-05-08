@@ -30,7 +30,7 @@ exports.listAllPatients = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     console.log(limit)
-    let result = await Patient.find(query).limit(limit).skip(skip).populate('img');
+    let result = await Patient.find(query).skip(skip).populate('img');
     count = await Patient.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
