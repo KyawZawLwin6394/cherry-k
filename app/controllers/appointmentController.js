@@ -159,11 +159,8 @@ exports.activateAppointment = async (req, res, next) => {
 exports.filterAppointments = async (req, res, next) => {
   try {
     let query = {}
-    const { today, token, phone } = req.query
-    var start = new Date();
-    start.setHours(0, 0, 0, 0); // set start date
-    var end = new Date();
-    end.setHours(23, 59, 59, 999) //set end date to be 24 hours
+    const { start, end, token, phone } = req.query
+    console.log(start, end)
     if (start && end) query.createdAt = { $gte: start, $lte: end }
     if (token) query.token = token
     if (phone) query.phone = phone
