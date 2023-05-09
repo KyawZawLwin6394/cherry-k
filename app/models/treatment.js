@@ -9,6 +9,9 @@ let TreatmentSchema = new Schema({
     type: String,
     required: true
   },
+  name: {
+    type:String,
+  },
   treatmentName: {
     type: mongoose.Schema.Types.ObjectId,
     ref:"TreatmentLists",
