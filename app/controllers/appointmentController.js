@@ -164,7 +164,7 @@ exports.filterAppointments = async (req, res, next) => {
     start.setHours(0, 0, 0, 0); // set start date
     var end = new Date();
     end.setHours(23, 59, 59, 999) //set end date to be 24 hours
-    if (today) query.createdAt = { $gte: start, $lte: end }
+    if (start && end) query.createdAt = { $gte: start, $lte: end }
     if (token) query.token = token
     if (phone) query.phone = phone
     if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
