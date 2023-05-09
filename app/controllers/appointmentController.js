@@ -158,7 +158,7 @@ exports.activateAppointment = async (req, res, next) => {
 
 exports.filterAppointments = async (req, res, next) => {
   try {
-    let query = {}
+    let query = {isDeleted:false}
     const { start, end, token, phone } = req.query
     console.log(start, end)
     if (start && end) query.createdAt = { $gte: start, $lte: end }
@@ -176,7 +176,7 @@ exports.filterAppointments = async (req, res, next) => {
 exports.searchAppointment = async (req, res, next) => {
   try {
     console.log(req.body.search)
-    const result = await Appointment.find({ $text: { $search: req.body.search } })
+    const result = await Appointment.find({ $text: { $search: req.body.search }, isDeleted:false })
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (err) {
