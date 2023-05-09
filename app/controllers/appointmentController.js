@@ -72,7 +72,13 @@ exports.getTodaysAppointment = async (req, res) => {
 
 exports.getAppointment = async (req, res) => {
   try {
-    const result = await Appointment.find({ _id: req.params.id, isDeleted: false }).populate('relatedPatient').populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection')
+    const result = await Appointment.find({ _id: req.params.id, isDeleted: false }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection').populate({
+      path: 'relatedPatient',
+      populate: [{
+        path: 'img',
+        model: 'Attachments'
+      }]
+    });
     console.log(result)
     if (!result) return res.status(500).json({ error: true, message: 'No Record Found' });
     //const relateTreatment = await Treatment.find({ _id: result[0].relatedTreatmentSelection[0].relatedTreatment }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine').populate('relatedAppointment')
