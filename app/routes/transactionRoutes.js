@@ -19,4 +19,5 @@ module.exports = (app) => {
         .post(catchError(transaction.activateTransaction))
 
     app.route('/api/transactions').get(catchError(transaction.listAllTransactions))
+    app.route('/api/transactions/trial-balance/:id').get(catchError(transaction.trialBalance))
 };

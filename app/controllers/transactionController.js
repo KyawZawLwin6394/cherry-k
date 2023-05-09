@@ -105,3 +105,14 @@ exports.activateTransaction = async (req, res, next) => {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
+
+exports.trialBalance = async (req,res) => {
+  try{
+    const result = await Transaction.find({relatedAccounting:req.params.relatedAccounting, type:'Debit'}).populate('relatedAccounting relatedTreatment relatedBank relatedCash relatedTransaction relatedMedicineSale');
+    if (result.length === 0) return res.status(500).send({error:true, message:'Data Not Found!'})
+    return res.status(200).send({success:true, debit:result})
+  } catch (err) {
+    return res.status(500).send({error:true, message:err.message})
+  }
+  
+}

@@ -67,7 +67,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
     let data = req.body;
     let relatedAppointments = []
     try {
-
+        if (req.body.originalDate === undefined) return res.status(500).send({error:true, message:'Original Date is required'})
         const appointmentConfig = {
             relatedPatient: req.body.relatedPatient,
             relatedDoctor: req.body.relatedDoctor,
@@ -80,10 +80,12 @@ exports.createTreatmentSelection = async (req, res, next) => {
 
         for (let i = 0; i < numTreatments; i++) {
             const date = new Date(appointmentConfig.originalDate);
-            date.setDate(date.getDate() + i * req.body.inBetweenDuration); // Add 7 days for each iteration
+            console.log(date,'date')
+            date.setDate(date.getDate() + (i * req.body.inBetweenDuration)); // Add 7 days for each iteration
             const config = { ...appointmentConfig, originalDate: date };
             dataconfigs.push(config);
         }
+        console.log(dataconfigs)
         const appointmentResult = await Appointment.insertMany(dataconfigs)
         appointmentResult.map(function (element, index) {
             relatedAppointments.push(element._id)
