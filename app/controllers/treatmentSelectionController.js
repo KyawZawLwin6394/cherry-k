@@ -138,6 +138,14 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 path: 'relatedDoctor',
                 model: 'Doctors'
             }
+        })    
+        .populate({
+            path: 'relatedAppointments',
+            model: 'Appointments',
+            populate: {
+                path: 'relatedDoctor',
+                model: 'Doctors'
+            }
         })
         const accResult = await Appointment.findOneAndUpdate(
             { _id: req.body.appointment },
