@@ -78,7 +78,18 @@ exports.getAppointment = async (req, res) => {
         path: 'img',
         model: 'Attachments'
       }]
-    });
+    }).populate({
+      path: 'relatedTreatmentSelection',
+      model: 'TreatmentSelections',
+      populate: {
+          path: 'relatedAppointments',
+          model: 'Appointments',
+          populate:{
+            path:'relatedDoctor',
+            model:'Doctors'
+          }
+      }
+  })
     console.log(result)
     if (!result) return res.status(500).json({ error: true, message: 'No Record Found' });
     //const relateTreatment = await Treatment.find({ _id: result[0].relatedTreatmentSelection[0].relatedTreatment }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine').populate('relatedAppointment')
