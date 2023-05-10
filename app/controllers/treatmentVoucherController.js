@@ -43,6 +43,33 @@ exports.getTreatmentVoucher = async (req, res) => {
     return res.status(200).send({ success: true, data: result });
 };
 
+exports.getRelatedTreatmentVoucher = async (req, res) => {
+    try {
+        let query = {isDeleted:false};
+        let {relatedPatient, relatedTreatment, start, end } = req.body
+        if (start && end) query.createdAt = { $gte: start, $lte: end }
+        if (relatedPatient) query.relatedPatient = relatedPatient
+        if (relatedTreatment) query.relatedTreatment = relatedTreatment
+        const result = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
+        if (!result)
+            return res.status(404).json({ error: true, message: 'No Record Found' });
+        return res.status(200).send({ success: true, data: result });
+    } catch (error) {
+        return res.status(500).send({error:true, message:'An Error Occured While Fetching Related Treatment Vouchers'})
+    }
+};
+
+exports.searchTreatmentVoucher = async (req, res, next) => {
+    try {
+      let {search, relatedPatient} = req.body
+      const result = await TreatmentVoucher.find({ $text: { $search: search }, isDeleted:false, relatedPatient:relatedPatient })
+      if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
+      return res.status(200).send({ success: true, data: result })
+    } catch (err) {
+      return res.status(500).send({ error: true, message: err.message })
+    }
+  }
+
 exports.createTreatmentVoucher = async (req, res, next) => {
     let data = req.body;
     try {

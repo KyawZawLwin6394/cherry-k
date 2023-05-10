@@ -16,4 +16,8 @@ module.exports = (app) => {
         .post(catchError(treatmentVoucher.activateTreatmentVoucher))
 
     app.route('/api/treatment-vouchers').get( catchError(treatmentVoucher.listAllTreatmentVouchers))
+    app.route('/api/treatment-vouchers/search')
+        .post(catchError(treatmentVoucher.searchTreatmentVoucher))
+    app.route('/api/treatment-vouchers/filter')
+        .post(catchError(treatmentVoucher.getRelatedTreatmentVoucher))
 };
