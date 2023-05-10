@@ -107,6 +107,12 @@ exports.createIndexes = () => {
       if (err) { console.log(err) } else { console.log('Treatment Indexes Created Successfully!') }
     })
 
+    db.collection('treatmentselections').createIndex({
+      code: 'text',
+      selectionStatus: 'text'
+    }, function (err, result) {
+      if (err) { console.log(err) } else { console.log('Treatment Indexes Created Successfully!') }
+    })
   });
 }
 

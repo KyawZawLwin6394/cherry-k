@@ -129,7 +129,13 @@ exports.createTreatmentSelection = async (req, res, next) => {
             "relatedTransaction": fTransResult._id
         });
         data = { ...data, relatedTransaction: [fTransResult._id, secTransResult] } //adding relatedTransactions to treatmentSelection model
-
+        //prepare TS-ID
+        const latestDocument = await TreatmentSelection.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
+        if (latestDocument[0].seq === undefined) data = { ...data, seq: 1, patientID: "TS-1" } // if seq is undefined set initial patientID and seq
+        if (latestDocument[0].seq) {
+            const increment = latestDocument[0].seq + 1
+            data = { ...data, patientID: "TS-" + increment, seq: increment }
+        }
         const result = await TreatmentSelection.create(data)
         const populatedResult = await TreatmentSelection.find({ _id: result._id }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentUnit').populate({
             path: 'relatedTreatment',
@@ -138,15 +144,15 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 path: 'relatedDoctor',
                 model: 'Doctors'
             }
-        })    
-        .populate({
-            path: 'relatedAppointments',
-            model: 'Appointments',
-            populate: {
-                path: 'relatedDoctor',
-                model: 'Doctors'
-            }
         })
+            .populate({
+                path: 'relatedAppointments',
+                model: 'Appointments',
+                populate: {
+                    path: 'relatedDoctor',
+                    model: 'Doctors'
+                }
+            })
         const accResult = await Appointment.findOneAndUpdate(
             { _id: req.body.appointment },
             { $addToSet: { relatedTreatmentSelection: result._id } },
@@ -158,7 +164,6 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 { $addToSet: { relatedTreatmentSelection: result._id } },
                 { new: true }
             )
-            console.log(patientResult)
         }
         res.status(200).send({
             message: 'Treatment Selection create success',
@@ -169,6 +174,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
             secTransResult: secTransResult
         });
     } catch (error) {
+        // console.log(error)
         return res.status(500).send({ "error": true, message: error.message })
     }
 };
@@ -285,8 +291,8 @@ exports.createTreatmentTransaction = async (req, res) => {
 
 exports.getRelatedTreatmentSelections = async (req, res) => {
     try {
-        let query = {isDeleted:false};
-        let {relatedPatient, start, end } = req.body
+        let query = { isDeleted: false };
+        let { relatedPatient, start, end } = req.body
         if (start && end) query.createdAt = { $gte: start, $lte: end }
         if (relatedPatient) query.relatedPatient = relatedPatient
         const result = await TreatmentSelection.find(query).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentUnit').populate({
@@ -301,6 +307,6 @@ exports.getRelatedTreatmentSelections = async (req, res) => {
             return res.status(404).json({ error: true, message: 'No Record Found' });
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
-        return res.status(500).send({error:true, message:'An Error Occured While Fetching Related Treatment Selections'})
+        return res.status(500).send({ error: true, message: 'An Error Occured While Fetching Related Treatment Selections' })
     }
 };

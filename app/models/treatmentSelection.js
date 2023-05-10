@@ -6,6 +6,9 @@ const Schema = mongoose.Schema;
 
 
 let TreatmentSelectionSchema = new Schema({
+  code : {
+    type:String
+  },
   paymentMethod: {
     type: String,
     enum: ['Credit','Cash Down','Bank']
@@ -77,6 +80,9 @@ let TreatmentSelectionSchema = new Schema({
     required: true,
   },
   treatmentTimes: {
+    type:Number
+  },
+  seq:{
     type:Number
   }
 
