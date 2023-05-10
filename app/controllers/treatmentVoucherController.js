@@ -15,7 +15,7 @@ exports.listAllTreatmentVouchers = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await TreatmentVoucher.find(query).limit(limit).skip(skip);
+        let result = await TreatmentVoucher.find(query).limit(limit).skip(skip).populate('relatedTreatment relatedAppointment relatedPatient')
         count = await TreatmentVoucher.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
@@ -37,7 +37,7 @@ exports.listAllTreatmentVouchers = async (req, res) => {
 };
 
 exports.getTreatmentVoucher = async (req, res) => {
-    const result = await TreatmentVoucher.find({ _id: req.params.id, isDeleted: false })
+    const result = await TreatmentVoucher.find({ _id: req.params.id, isDeleted: false }).populate('relatedTreatment relatedAppointment relatedPatient')
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -71,7 +71,7 @@ exports.updateTreatmentVoucher = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        )
+        ).populate('relatedTreatment relatedAppointment relatedPatient');
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
