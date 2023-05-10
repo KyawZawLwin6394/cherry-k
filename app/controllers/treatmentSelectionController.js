@@ -22,7 +22,7 @@ exports.listAllTreatmentSelections = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await TreatmentSelection.find(query).limit(limit).skip(skip).populate('relatedTreatment').populate({
+        let result = await TreatmentSelection.find(query).limit(limit).skip(skip).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentUnit').populate({
             path: 'relatedTreatment',
             model: 'Treatments',
             populate: {
@@ -50,14 +50,28 @@ exports.listAllTreatmentSelections = async (req, res) => {
 };
 
 exports.getTreatmentSelection = async (req, res) => {
-    const result = await TreatmentSelection.find({ _id: req.params.id, isDeleted: false }).populate('relatedTreatment').populate('relatedAppointments');
+    const result = await TreatmentSelection.find({ _id: req.params.id, isDeleted: false }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentUnit').populate({
+        path: 'relatedTreatment',
+        model: 'Treatments',
+        populate: {
+            path: 'relatedDoctor',
+            model: 'Doctors'
+        }
+    })
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
 };
 
 exports.getTreatementSelectionByTreatmentID = async (req, res) => {
-    const result = await TreatmentSelection.find({ relatedTreatment: req.params.id, isDeleted: false }).populate('relatedTreatment').populate('relatedAppointments');
+    const result = await TreatmentSelection.find({ relatedTreatment: req.params.id, isDeleted: false }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentUnit').populate({
+        path: 'relatedTreatment',
+        model: 'Treatments',
+        populate: {
+            path: 'relatedDoctor',
+            model: 'Doctors'
+        }
+    })
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -67,7 +81,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
     let data = req.body;
     let relatedAppointments = []
     try {
-        if (req.body.originalDate === undefined) return res.status(500).send({error:true, message:'Original Date is required'})
+        if (req.body.originalDate === undefined) return res.status(500).send({ error: true, message: 'Original Date is required' })
         const appointmentConfig = {
             relatedPatient: req.body.relatedPatient,
             relatedDoctor: req.body.relatedDoctor,
@@ -80,7 +94,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
 
         for (let i = 0; i < numTreatments; i++) {
             const date = new Date(appointmentConfig.originalDate);
-            console.log(date,'date')
+            console.log(date, 'date')
             date.setDate(date.getDate() + (i * req.body.inBetweenDuration)); // Add 7 days for each iteration
             const config = { ...appointmentConfig, originalDate: date };
             dataconfigs.push(config);
@@ -116,8 +130,15 @@ exports.createTreatmentSelection = async (req, res, next) => {
         });
         data = { ...data, relatedTransaction: [fTransResult._id, secTransResult] } //adding relatedTransactions to treatmentSelection model
 
-        const newTreatmentSelection = new TreatmentSelection(data);
-        const result = await newTreatmentSelection.save();
+        const result = await TreatmentSelection.create(data)
+        const populatedResult = await TreatmentSelection.find({ _id: result._id }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentUnit').populate({
+            path: 'relatedTreatment',
+            model: 'Treatments',
+            populate: {
+                path: 'relatedDoctor',
+                model: 'Doctors'
+            }
+        })
         const accResult = await Appointment.findOneAndUpdate(
             { _id: req.body.appointment },
             { $addToSet: { relatedTreatmentSelection: result._id } },
@@ -134,7 +155,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
         res.status(200).send({
             message: 'Treatment Selection create success',
             success: true,
-            data: result,
+            data: populatedResult,
             appointmentAutoGenerate: appointmentResult,
             fTransResult: fTransResult,
             secTransResult: secTransResult
