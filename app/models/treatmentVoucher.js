@@ -55,6 +55,9 @@ let TreatmentVoucherSchema = new Schema({
     relatedTreatmentSelection: {
         type:mongoose.Schema.Types.ObjectId,
         ref:'TreatmentSelections'
+    },
+    remark:{
+        type:String 
     }
 });
 
