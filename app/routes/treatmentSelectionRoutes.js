@@ -21,5 +21,6 @@ module.exports = (app) => {
     app.route('/api/treatment-selections/treatment/:id').get(catchError(treatmentSelection.getTreatementSelectionByTreatmentID))
     app.route('/api/treatment-selections/payment').put(catchError(treatmentSelection.treatmentPayment))
     app.route('/api/treatment-selections/filter').post(catchError(treatmentSelection.getRelatedTreatmentSelections))
+    app.route('/api/treatment-selections/search').post(catchError(treatmentSelection.searchTreatmentSelections))
 
 };

@@ -310,3 +310,15 @@ exports.getRelatedTreatmentSelections = async (req, res) => {
         return res.status(500).send({ error: true, message: 'An Error Occured While Fetching Related Treatment Selections' })
     }
 };
+
+
+exports.searchTreatmentSelections = async (req, res, next) => {
+    try {
+      let {search, relatedPatient} = req.body
+      const result = await TreatmentSelection.find({ $text: { $search: search }, isDeleted:false, relatedPatient:relatedPatient })
+      if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
+      return res.status(200).send({ success: true, data: result })
+    } catch (err) {
+      return res.status(500).send({ error: true, message: err.message })
+    }
+  }
