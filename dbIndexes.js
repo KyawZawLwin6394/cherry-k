@@ -12,7 +12,7 @@ exports.createIndexes = () => {
     const db = client.db(config.dbName);
 
     // Create indexes
-    db.collection('patients').createIndex({ name: 'text', phone: 'text', email: 'text', patientID: 'text' }, function (err, result) {
+    db.collection('patients').createIndexes({ name: 'text', phone: 'text', email: 'text', patientID: 'text' }, function (err, result) {
       if (err) {
         console.log(err);
       } else {
@@ -22,7 +22,7 @@ exports.createIndexes = () => {
       client.close();
     });
 
-    db.collection('appointments').createIndex({
+    db.collection('appointments').createIndexes({
       status: 'text',
       phone: 'text'
     }, function (err, result) {
@@ -33,7 +33,7 @@ exports.createIndexes = () => {
       }
     })
 
-    db.collection('brands').createIndex({
+    db.collection('brands').createIndexes({
       code: 'text',
       name: 'text'
     }, function (err, result) {
@@ -44,70 +44,70 @@ exports.createIndexes = () => {
       }
     })
 
-    db.collection('treatmentlists').createIndex({
+    db.collection('treatmentlists').createIndexes({
       code: 'text',
       name: 'text'
     }, function (err, result) {
       if (err) { console.log(err) } else { console.log('Treatment List Indexes Created Successfully!') }
     })
 
-    db.collection('currencies').createIndex({
+    db.collection('currencies').createIndexes({
       code: 'text',
       name: 'text'
     }, function (err, result) {
       if (err) { console.log(err) } else { console.log('Currency Indexes Created Successfully!') }
     })
     
-    db.collection('medicineitems').createIndex({
+    db.collection('medicineitems').createIndexes({
       code: 'text',
       medicineItemName: 'text'
     }, function (err, result) {
       if (err) { console.log(err) } else { console.log('medicineItems Indexes Created Successfully!') }
     })
 
-    db.collection('accessoryitems').createIndex({
+    db.collection('accessoryitems').createIndexes({
       code: 'text',
       accessoryItemName: 'text'
     }, function (err, result) {
       if (err) { console.log(err) } else { console.log('Accessory Items Indexes Created Successfully!') }
     })
 
-    db.collection('procedureitems').createIndex({
+    db.collection('procedureitems').createIndexes({
       code: 'text',
       procedureItemName: 'text'
     }, function (err, result) {
       if (err) { console.log(err) } else { console.log('Procedure Items Indexes Created Successfully!') }
     })
 
-    db.collection('procedureaccessories').createIndex({
+    db.collection('procedureaccessories').createIndexes({
       code: 'text',
       name: 'text'
     }, function (err, result) {
       if (err) { console.log(err) } else { console.log('Procedure Accessories Indexes Created Successfully!') }
     })
 
-    db.collection('proceduremedicines').createIndex({
+    db.collection('proceduremedicines').createIndexes({
       code: 'text',
       name: 'text'
     }, function (err, result) {
       if (err) { console.log(err) } else { console.log('Procedure Medicine Indexes Created Successfully!') }
     })
 
-    db.collection('medicinelists').createIndex({
+    db.collection('medicinelists').createIndexes({
       code: 'text',
       procedureItemName: 'text'
     }, function (err, result) {
       if (err) { console.log(err) } else { console.log('Medicine Lists Indexes Created Successfully!') }
     })
 
-    db.collection('treatments').createIndex({
+    db.collection('treatments').createIndexes({
       treatmentCode: 'text',
       treatmentName: 'text'
     }, function (err, result) {
       if (err) { console.log(err) } else { console.log('Treatment Indexes Created Successfully!') }
     })
 
-    db.collection('treatmentselections').createIndex({
+    db.collection('treatmentselections').createIndexes({
       code: 'text',
       selectionStatus: 'text'
     }, function (err, result) {

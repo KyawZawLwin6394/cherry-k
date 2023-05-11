@@ -200,12 +200,12 @@ exports.updateTreatmentSelection = async (req, res, next) => {
 exports.treatmentPayment = async (req, res, next) => {
     let data = req.body;
     try {
-        let { paidAmount, totalAmount } = data;
+        let { paidAmount } = data;
         const treatmentSelectionQuery = await TreatmentSelection.find({ _id: req.body.id, isDeleted: false }).populate('relatedTreatment').populate('relatedAppointments');
         if (treatmentSelectionQuery[0].leftOverAmount <= 0) return res.status(500).send({ error: true, message: 'Fully Paid!' })
         const result = await TreatmentSelection.findOneAndUpdate(
             { _id: req.body.id },
-            { $inc: { leftOverAmount: -paidAmount, paidAmount: paidAmount } },
+            { $inc: { leftOverAmount: -paidAmount }, paidAmount: paidAmount },
             { new: true },
         ).populate('relatedTreatment');
         const treatmentVoucherResult = await TreatmentVoucher.create(

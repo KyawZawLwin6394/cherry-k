@@ -10,7 +10,7 @@ const express = require('express'),
   port = 9000;
 app.use(cors({ origin: '*'}));
 
-mongoose.set('useCreateIndex', true) // to remove -> DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
+//mongoose.set('useCreateIndex', true) // to remove -> DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
 
 // mongoose instance connection url connection
 if (mongoose.connection.readyState != 1) {
