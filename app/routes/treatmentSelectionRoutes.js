@@ -3,6 +3,7 @@
 const treatmentSelection = require("../controllers/treatmentSelectionController");
 const { catchError } = require("../lib/errorHandler");
 const verifyToken = require('../lib/verifyToken');
+const treatment = require("../models/treatment");
 
 module.exports = (app) => {
 
@@ -22,5 +23,6 @@ module.exports = (app) => {
     app.route('/api/treatment-selections/payment').put(catchError(treatmentSelection.treatmentPayment))
     app.route('/api/treatment-selections/filter').post(catchError(treatmentSelection.getRelatedTreatmentSelections))
     app.route('/api/treatment-selections/search').post(catchError(treatmentSelection.searchTreatmentSelections))
+    app.route('/api/treatment-selections/code').get(catchError(treatmentSelection.createTreatmentSelectionCode))
 
 };
