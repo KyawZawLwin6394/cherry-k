@@ -68,11 +68,16 @@ exports.listAllPatients = async (req, res) => {
 exports.getPatient = async (req, res) => {
   const result = await Patient.find({ _id: req.params.id, isDeleted: false }).populate('img').populate({
     path: 'relatedTreatmentSelection',
-    populate: [{
+    model: 'TreatmentSelections',
+    populate: {
       path: 'relatedAppointments',
-      model: 'Appointments'
-    }]
-  });;
+      model: 'Appointments',
+      populate: {
+        path: 'relatedDoctor',
+        model: 'Doctors'
+      }
+    }
+  });
   if (!result)
     return res.status(500).json({ error: true, message: 'Query Failed!' });
   if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
