@@ -2,7 +2,7 @@
 const Patient = require('../models/patient');
 const Attachment = require('../models/attachment');
 const Physical = require('../models/physicalExamination');
-const History = require('../models/history');
+const History = require('../models/history')
 
 function formatDateAndTime(dateString) { // format mongodb ISO 8601 date format into two readable var {date, time}.
   const date = new Date(dateString);
@@ -19,11 +19,11 @@ function formatDateAndTime(dateString) { // format mongodb ISO 8601 date format 
 }
 
 exports.getHistoryAndPhysicalExamination = async (req, res) => {
-  const { relatedPatient } = req.params;
+  const { id } = req.params;
   try {
-    const PhysicalResult = await Physical.find({ relatedPatient: relatedPatient, isDeleted: false }).populate('relatedPatient');
-    const HistoryResult = await History.find({ relatedPatient: relatedPatient, isDeleted: false }).populate('relatedPatient');
-    return res.status(200).send({ success: true, PhysicalResult: PhysicalResult, HistoryResult: HistoryResult })
+    const PhysicalResult = await Physical.find({ relatedPatient: id, isDeleted: false }).populate('relatedPatient');
+    const result = await History.find({ relatedPatient: req.params.id,isDeleted:false }).populate('relatedPatient')
+    return res.status(200).send({ success: true, PhysicalResult: PhysicalResult, HistoryResult: result })
   } catch (error) {
     return res.status(500).send({ error: true, message: error.message })
   }
