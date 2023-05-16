@@ -1,6 +1,5 @@
 const cors = require('cors');
 const path = require('path');
-const createIndexs = require('./dbIndexes').createIndex
 const express = require('express'),
   bodyParser = require('body-parser'),
   mongoose = require('mongoose'),
