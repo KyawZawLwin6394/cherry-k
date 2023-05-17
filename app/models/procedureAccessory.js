@@ -1,0 +1,45 @@
+'use strict';
+
+const mongoose = require('mongoose');
+mongoose.promise = global.Promise;
+const Schema = mongoose.Schema;
+
+
+let ProcedureAccessory = new Schema({
+  code: {
+    type: String,
+    required: true
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type:String,
+    required:true,
+  },
+  updatedAt: {
+    type: Date
+  },
+  isDeleted: {
+    type:Boolean,
+    required:true,
+    default:false
+  },
+  relatedCategory: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Categories'
+  },
+  relatedBrand: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Brands'
+  },
+  relatedSubCategory: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'SubCategories'
+  }
+});
+
+module.exports = mongoose.model('ProcedureAccessories', ProcedureAccessory);
+
+//Author: Kyaw Zaw Lwin

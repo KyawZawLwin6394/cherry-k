@@ -7,7 +7,7 @@ exports.listAllExpenses = async (req, res) => {
     let count = 0;
     let page = 0;
     try {
-        limit = +limit <= 100 ? +limit : 10; //limit
+        limit = +limit <= 100 ? +limit : 30; //limit
         skip = +skip || 0;
         let query = { isDeleted: false },
             regexKeyword;
@@ -16,7 +16,7 @@ exports.listAllExpenses = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await Expense.find(query).limit(limit).skip(skip).populate('initialCurrency').populate('finalCurrency').populate('relatedAccounting');
+        let result = await Expense.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
         console.log(result)
         count = await Expense.find(query).count();
         const division = count / limit;
@@ -39,7 +39,7 @@ exports.listAllExpenses = async (req, res) => {
 };
 
 exports.getExpense = async (req, res) => {
-    const result = await Expense.find({ _id: req.params.id, isDeleted: false }).populate('initialCurrency').populate('finalCurrency').populate('relatedAccounting')
+    const result = await Expense.find({ _id: req.params.id, isDeleted: false }).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -50,9 +50,10 @@ exports.createExpense = async (req, res, next) => {
         const newBody = req.body;
         const newExpense = new Expense(newBody);
         const result = await newExpense.save();
+        const populatedResult = await Expense.find({_id:result._id}).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
         const firstTransaction =
         {
-            "initialExchangeRate":newBody.initialExchangeRate,
+            "initialExchangeRate": newBody.initialExchangeRate,
             "amount": newBody.finalAmount,
             "date": newBody.date,
             "remark": newBody.remark,
@@ -60,34 +61,59 @@ exports.createExpense = async (req, res, next) => {
             "relatedTreatment": newBody.relatedTreatment,
             "treatmentFlag": false,
             "relatedTransaction": null,
-            "relatedAccounting": newBody.relatedAccounting
+            "relatedAccounting": newBody.relatedAccounting,
+            "relatedExpense" : result._id
         }
         const newTrans = new Transaction(firstTransaction)
         const fTransResult = await newTrans.save();
         console.log(fTransResult)
-        const secondTransaction = {
-            "initialExchangeRate":newBody.initialExchangeRate,
-            "amount": newBody.finalAmount,
-            "date": newBody.date,
-            "remark": newBody.remark,
-            "type": "Debit",
-            "relatedTreatment": newBody.relatedTreatment,
-            "treatmentFlag": false,
-            "relatedTransaction": fTransResult._id,
-            "relatedAccounting": newBody.relatedAccounting,
-            "relatedBank": newBody.relatedBank,
-            "relatedCash": newBody.relatedCash
-        }
-        const secTrans = new Transaction(secondTransaction)
-        const secTransResult = await secTrans.save();
-        console.log(secTransResult)
+        if (req.body.relatedCredit) {
+            //credit
+            const secondTransaction = {
+                "initialExchangeRate": newBody.initialExchangeRate,
+                "amount": newBody.finalAmount,
+                "date": newBody.date,
+                "remark": newBody.remark,
+                "type": "Credit",
+                "relatedTreatment": newBody.relatedTreatment,
+                "treatmentFlag": false,
+                "relatedTransaction": fTransResult._id,
+                "relatedAccounting": newBody.relatedAccounting,
+                "relatedExpense" : result._id,
+                "relatedCredit":newBody.relatedCredit
+            }
+            const secTrans = new Transaction(secondTransaction)
+            var secTransResult = await secTrans.save();
+            console.log(secTransResult)
+        } else {
+            //bank or cash
+            
+                const secondTransaction = {
+                    "initialExchangeRate": newBody.initialExchangeRate,
+                    "amount": newBody.finalAmount,
+                    "date": newBody.date,
+                    "remark": newBody.remark,
+                    "type": "Credit",
+                    "relatedTreatment": newBody.relatedTreatment,
+                    "treatmentFlag": false,
+                    "relatedTransaction": fTransResult._id,
+                    "relatedAccounting": (newBody.relatedBankAccount) ? newBody.relatedBankAccount : newBody.relatedCashAccount,
+                    "relatedExpense" : result._id,
+                    "relatedBank": newBody.relatedBankAccount,
+                    "relatedCash": newBody.relatedCashAccount
+                }
+            
 
+            const secTrans = new Transaction(secondTransaction)
+            var secTransResult = await secTrans.save();
+            console.log(secTransResult)
+        }
         res.status(200).send({
             message: 'Expense create success',
             success: true,
-            data: result,
+            data: populatedResult,
             firstTrans: fTransResult,
-            secTrans : secTransResult
+            secTrans: secTransResult
         });
     } catch (error) {
         return res.status(500).send({ "error": true, message: error.message })
@@ -100,7 +126,7 @@ exports.updateExpense = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        ).populate('relatedAccounting').populate('initialCurrency').populate('finalCurrency');
+        ).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })

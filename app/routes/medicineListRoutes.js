@@ -7,14 +7,16 @@ const verifyToken = require("../lib/verifyToken");
 module.exports = (app) => {
 
     app.route('/api/medicine-list')
-        .post(verifyToken ,catchError(medicineList.createMedicineList))
-        .put(verifyToken,catchError(medicineList.updateMedicineList))
+        .post( catchError(medicineList.createMedicineList))
+        .put(catchError(medicineList.updateMedicineList))
         
     app.route('/api/medicine-list/:id')
-        .get(verifyToken,catchError(medicineList.getMedicineList))
-        .delete(verifyToken,catchError(medicineList.deleteMedicineList)) 
-        .post(verifyToken,catchError(medicineList.activateMedicineList))
+        .get(catchError(medicineList.getMedicineList))
+        .delete(catchError(medicineList.deleteMedicineList)) 
+        .post(catchError(medicineList.activateMedicineList))
 
-    app.route('/api/medicine-lists').get(verifyToken,catchError(medicineList.listAllMedicineLists))
+    app.route('/api/medicine-lists').get(catchError(medicineList.listAllMedicineLists))
+
+    app.route('/api/medicine-lists-search').post(catchError(medicineList.searchMedicineLists))
 
 };

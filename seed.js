@@ -4,7 +4,7 @@ const config = require("./config/db"); //get your mongoose string
 //create your array
 const userAdmin = User({
     givenName:"admin",
-    email: "testAdmin@gmail.com",
+    email: "testadmin@gmail.com",
     address:"Yangon",
     password: "Root123",
     phone:"0951423678",
@@ -12,7 +12,8 @@ const userAdmin = User({
     position:"Something",
     isAdmin:true,
     isUser:false,
-    isDoctor:false
+    isDoctor:false,
+    role:'Admin'
   })
 
 //connect mongoose

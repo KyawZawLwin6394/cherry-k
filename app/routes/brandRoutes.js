@@ -8,19 +8,19 @@ const verifyToken = require('../lib/verifyToken');
 module.exports = (app) => {
 
     app.route('/api/brand')
-        .post(verifyToken,catchError(brand.createBrand))
-        .put(verifyToken,catchError(brand.updateBrand))
+        .post(catchError(brand.createBrand))
+        .put(catchError(brand.updateBrand))
 
     app.route('/api/brand/:id')
-        .get(verifyToken,catchError(brand.getBrand))
-        .delete(verifyToken,catchError(brand.deleteBrand))
-        .post(verifyToken ,catchError(brand.activateBrand))
+        .get(catchError(brand.getBrand))
+        .delete(catchError(brand.deleteBrand))
+        .post(catchError(brand.activateBrand))
 
-    app.route('/api/brands').get(verifyToken ,catchError(brand.listAllBrands))
+    app.route('/api/brands').get(catchError(brand.listAllBrands))
 
     app.route('/api/brands-filter')
-        .get(verifyToken ,catchError(brand.filterBrands))
+        .get(catchError(brand.filterBrands))
 
     app.route('/api/brands-search')
-        .post(verifyToken, catchError(brand.searchBrands))
+        .post(catchError(brand.searchBrands))
 };

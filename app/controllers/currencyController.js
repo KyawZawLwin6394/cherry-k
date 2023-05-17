@@ -6,7 +6,7 @@ exports.listAllCurrencys = async (req, res) => {
   let count = 0;
   let page = 0;
   try {
-    limit = +limit <= 100 ? +limit : 10; //limit
+    limit = +limit <= 100 ? +limit : 20; //limit
     skip = +skip || 0;
     let query = { isDeleted: false },
       regexKeyword;

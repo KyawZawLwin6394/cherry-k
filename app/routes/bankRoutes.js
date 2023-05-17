@@ -7,13 +7,13 @@ const verifyToken = require('../lib/verifyToken');
 module.exports = (app) => {
 
     app.route('/api/bank')
-        .post(verifyToken ,catchError(bank.createBank))
-        .put(verifyToken,catchError(bank.updateBank))
+        .post(catchError(bank.createBank))
+        .put(catchError(bank.updateBank))
         
     app.route('/api/bank/:id')
-        .get(verifyToken ,catchError(bank.getBank))
-        .delete(verifyToken,catchError(bank.deleteBank)) 
-        .post(verifyToken ,catchError(bank.activateBank))
+        .get(catchError(bank.getBank))
+        .delete(catchError(bank.deleteBank)) 
+        .post(catchError(bank.activateBank))
 
-    app.route('/api/banks').get(verifyToken, catchError(bank.listAllBanks))
+    app.route('/api/banks').get(catchError(bank.listAllBanks))
 };

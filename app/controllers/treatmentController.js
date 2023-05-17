@@ -16,7 +16,9 @@ exports.listAllTreatments = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Treatment.find(query).limit(limit).skip(skip).populate('relatedAppointment').populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id');
+
+    let result = await Treatment.find(query).limit(limit).skip(skip).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('machine.item_id').populate('procedureAccessory.item_id').populate('medicineLists.item_id').populate('procedureMedicine.item_id').populate('treatmentName')
+
     console.log(result)
     count = await Treatment.find(query).count();
     const division = count / limit;
@@ -40,39 +42,26 @@ exports.listAllTreatments = async (req, res) => {
 };
 
 exports.getTreatment = async (req, res) => {
-  const result = await Treatment.find({ _id: req.params.id, isDeleted: false }).populate('relatedAppointment').populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id')
+  const result = await Treatment.find({ _id: req.params.id, isDeleted: false }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('Appointments').populate('machine.item_id').populate('procedureAccessory.item_id').populate('medicineLists.item_id').populate('procedureMedicine.item_id').populate('treatmentName')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.createTreatment = async (req, res, next) => {
-  var appointments = []
-  var population = []
   let data = req.body;
   try {
-    const appointmentConfig = {
-      relatedPatient: req.body.relatedPatient,
-      relatedDoctor: req.body.relatedDoctor,
-      relatedTherapist: req.body.relatedTherapist
-    }
-    for (let i = 0; i < req.body.treatmentTimes; i++) {
-      appointments.push(appointmentConfig) //perparing for insertMany
-    }
-    const appointmentResult = await Appointment.insertMany(appointments)
-    appointmentResult.map (function(element,index) {
-      population.push(element._id)
-    })
-    data = {...data,   relatedAppointment: population }
+    // need to add 
     console.log(data)
     const newBody = data;
+
     const newTreatment = new Treatment(newBody);
     const result = await newTreatment.save();
     res.status(200).send({
       message: 'Treatment create success',
       success: true,
-      data: result,
-      appointmentAutoGenerate: appointmentResult
+
+      data: result
     });
   } catch (error) {
     return res.status(500).send({ "error": true, message: error.message })
@@ -85,7 +74,7 @@ exports.updateTreatment = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedAppointment').populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine.item_id')
+    ).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('Appointments').populate('machine.item_id').populate('procedureAccessory.item_id').populate('medicineLists.item_id').populate('procedureMedicine.item_id').populate('treatmentName')
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
@@ -118,3 +107,13 @@ exports.activateTreatment = async (req, res, next) => {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
+
+exports.searchTreatments = async (req, res, next) => {
+  try {
+    const result = await Treatment.find({ $text: { $search: req.body.search } }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('Appointments').populate('machine.item_id').populate('procedureAccessory.item_id').populate('medicineLists.item_id').populate('procedureMedicine.item_id').populate('treatmentName')
+    if (result.length===0) return res.status(404).send({error:true, message:'No Record Found!'})
+    return res.status(200).send({ success: true, data: result })
+  } catch (err) {
+    return res.status(500).send({ error: true, message: err.message })
+  }
+}

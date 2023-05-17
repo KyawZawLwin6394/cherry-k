@@ -62,7 +62,16 @@ let UserSchema = new Schema({
     type: Date,
     default: null,
   },
+  role:{
+    type: String,
+    enum: ['Doctor', 'User', 'Admin']
+  }
   
+});
+const reasons = (UserSchema.statics.failedLogin = {
+  NOT_FOUND: 0,
+  PASSWORD_INCORRECT: 1,
+  MAX_ATTEMPTS: 2,
 });
 
 UserSchema.pre('save', function (next) {

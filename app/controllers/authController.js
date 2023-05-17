@@ -5,36 +5,38 @@ const jwt = require('jsonwebtoken');
 const CONFIG = require('../../config/db');
 
 exports.login = (req, res) => {
-  User.findOne({ email: req.body.email }, function(err, user) {
-    if (err) {
-      return res.status(500).send(
-        {
-            error: true,
-            message:'Error on the server'
-        })
-      
-    }
+  try {
 
-    if (!user) {
-      return res.status(404).send(
-        {
+    User.findOne({ email: req.body.email }, function (err, user) {
+      if (err) {
+        return res.status(500).send(
+          {
             error: true,
-            message:'No user found'
-        })
-    
-    }
+            message: 'Error on the server'
+          })
 
-    user.comparePassword(req.body.password, function(err, user, reason) {
+      }
+
+      if (!user) {
+        return res.status(404).send(
+          {
+            error: true,
+            message: 'No user found'
+          })
+
+      }
+
+      user.comparePassword(req.body.password, function (err, user, reason) {
         if (user && user.isDeleted === true) {
           return res.status(403).send({
-            error:true,
-            message:"This account is deactivated. Pls contact an admin to activate it again"
+            error: true,
+            message: "This account is deactivated. Pls contact an admin to activate it again"
           })
-        } 
+        }
         if (user && user.emailVerify === false) {
           return res.status(403).send({
-            error:true,
-            message:"Your email is not confirmed yet.Please confirm from your email."
+            error: true,
+            message: "Your email is not confirmed yet.Please confirm from your email."
           })
         }
         if (user && user.isDeleted === false) {
@@ -45,12 +47,17 @@ exports.login = (req, res) => {
           );
           const credentials = {
             id: user._id,
-            name: user.givenName,
-            email: user.email,
-            isAdmin:user.isAdmin,
-            isUser:user.isUser,
-            isDoctor:user.isDoctor,
+
+            isAdmin: user.isAdmin,
+            isUser: user.isUser,
+            isDoctor: user.isDoctor,
             token: token,
+            user: {
+              role: user.role,
+              name: user.givenName,
+              email: user.email,
+              phone: user.phone
+            }
           };
           if (
             (user.createdBy && !user.lastLoginTime) ||
@@ -62,15 +69,15 @@ exports.login = (req, res) => {
           user.save();
           return res.status(200).send(credentials);
         }
- 
+
         // otherwise we can determine why we failed
         var reasons = User.failedLogin;
         switch (reason) {
           case reasons.NOT_FOUND:
             return res.status(404).send(
               {
-                  error: true,
-                  message:'No user found'
+                error: true,
+                message: 'No user found'
               })
             break;
           case reasons.PASSWORD_INCORRECT:
@@ -78,8 +85,8 @@ exports.login = (req, res) => {
             // the user *why* the login failed, only that it did
             return res.status(401).send(
               {
-                  error: true,
-                  message:'Wrong Password.'
+                error: true,
+                message: 'Wrong Password.'
               })
             break;
           case reasons.MAX_ATTEMPTS:
@@ -87,14 +94,17 @@ exports.login = (req, res) => {
             // temporarily locked
             return res.status(429).send(
               {
-                  error: true,
-                  message:'Too Many Request. Your account is locked. Please try again after 30 minutes.'
+                error: true,
+                message: 'Too Many Request. Your account is locked. Please try again after 30 minutes.'
               })
             break;
         }
       });
-    
-  });
+
+    });
+  } catch (error) {
+    console.log(error)
+  }
 };
 
 exports.logout = async (req, res) => {

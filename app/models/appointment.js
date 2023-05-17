@@ -9,8 +9,7 @@ const validator = require('validator');
 let AppointmentSchema = new Schema({
   relatedPatient: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'Patients',
-    required:true
+    ref:'Patients'
   },
   phone: {
     type:String
@@ -54,6 +53,13 @@ let AppointmentSchema = new Schema({
     default:false
   },
   token: {
+    type:String
+  },
+  relatedTreatmentSelection: {
+    type:[mongoose.Schema.Types.ObjectId],
+    ref:'TreatmentSelections'
+  },
+  status: {
     type:String
   }
 });

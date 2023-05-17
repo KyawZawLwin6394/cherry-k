@@ -16,8 +16,7 @@ let PatientSchema = new Schema({
   },
   phone: {
     type:String,
-    required:true,
-    unique:true
+    required:true
   },
   dateOfBirth: {
     type: Date,
@@ -27,7 +26,6 @@ let PatientSchema = new Schema({
   },  
   email: {
     type: String,
-    unique: true,
     lowercase: true,
     trim: true,
     validate: {
@@ -62,7 +60,9 @@ let PatientSchema = new Schema({
   patientStatus: {
     type:String,
     enum:['New','Old'],
+
     default:'New',
+
   },
   patientID: {
     type:String,
@@ -73,6 +73,10 @@ let PatientSchema = new Schema({
   img:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'Attachments',
+  },
+  relatedTreatmentSelection: {
+    type:[mongoose.Schema.Types.ObjectId],
+    ref:'TreatmentSelections'
   },
 });
 const patient = mongoose.model('Patients',PatientSchema)

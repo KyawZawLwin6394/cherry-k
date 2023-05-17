@@ -8,8 +8,7 @@ const Schema = mongoose.Schema;
 let TransactionSchema = new Schema({
   relatedAccounting: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'AccountingLists',
-    required: true
+    ref:'AccountingLists'
   },
   amount: {
     type: String,
@@ -20,13 +19,12 @@ let TransactionSchema = new Schema({
     required:true
   },
   remark: {
-    type: String,
-    required:true,
+    type: String
   },
   type: {
     type: String,
     enum:['Debit','Credit'],
-    required:true,
+    // required:true,
   },
   relatedTreatment: {
     type:mongoose.Schema.Types.ObjectId,
@@ -42,7 +40,7 @@ let TransactionSchema = new Schema({
   },
   treatmentFlag: {
     type:Boolean, 
-    required:true
+    // required:true
   },
   relatedTransaction: {
     type: mongoose.Schema.Types.ObjectId,
@@ -51,8 +49,13 @@ let TransactionSchema = new Schema({
   },
   isDeleted: {
     type:Boolean,
-    required:true,
+    // required:true,
     default:false
+  },
+  relatedMedicineSale: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:'MedicineSales',
+    default:null
   }
 });
 

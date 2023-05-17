@@ -6,10 +6,16 @@ const Schema = mongoose.Schema;
 
 
 let MedicineSaleSchema = new Schema({
+  voucherCode: {
+    type:String
+  },
+  createdAt: {
+    type:Date,
+    default:Date.now()
+  },
   relatedTreatment: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'Treatments',
-    required: true
+    ref:'Treatments'
   },
   relatedPatient: {
     type: mongoose.Schema.Types.ObjectId,
@@ -18,8 +24,7 @@ let MedicineSaleSchema = new Schema({
   },
   relatedAppointment: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'Appointments',
-    required: true,
+    ref:'Appointments'
   },
   remark: {
     type:String,
@@ -45,10 +50,9 @@ let MedicineSaleSchema = new Schema({
     enum:["Cash Down","Bank Transition"],
     required:true
   },
-  bankInfo: {
+  relatedBank: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'Banks',
-    required:true
+    ref:'AccountingLists'
   },
   medicineItems: [{
     item_id:{
@@ -63,6 +67,25 @@ let MedicineSaleSchema = new Schema({
     required:true,
     default:false
   },
+  seq:{
+    type:Number
+  },
+  relatedCash: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'AccountingLists'
+  },
+  relatedAccount: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'AccountingLists'
+  },
+  createdBy: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Users'
+  },
+  relatedTransaction:{
+    type:[mongoose.Schema.Types.ObjectId],
+    ref:'Transactions'
+  }
 });
 
 module.exports = mongoose.model('MedicineSales', MedicineSaleSchema);

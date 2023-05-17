@@ -8,28 +8,26 @@ const validator = require('validator');
 
 let procedureItemSchema = new Schema({
   code: {
-    type: String,
-    required: true
+    type: String
+  },
+  procedureItemName:{
+    type:String,
   },
   name: {
     type:mongoose.Schema.Types.ObjectId,
-    ref:'MedicineLists',
-    required:true,
+    ref:'ProcedureMedicines'
   },
   currentQuantity: {
-    type:Number,
-    required:true,
+    type:Number
   },
   reOrderQuantity: {
     type:Number,
   },
   purchasePrice: {
-    type:Number,
-    required:true,
+    type:Number
   },
   sellingPrice: {
-    type:Number,
-    required:true,
+    type:Number
   },
   description: {
     type:String,
@@ -48,8 +46,13 @@ let procedureItemSchema = new Schema({
   },
   isDeleted: {
     type:Boolean,
-    required:true,
     default:false
+  },
+  totalUnit:{
+    type:Number
+  },
+  perUnitQuantity:{
+    type:Number
   }
 });
 
