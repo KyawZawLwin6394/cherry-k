@@ -15,7 +15,7 @@ exports.listAllMedicineItems = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await MedicineItem.find(query).limit(limit).skip(skip).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory');
+    let result = await MedicineItem.find(query).limit(limit).skip(skip).populate('name')
     count = await MedicineItem.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -72,7 +72,7 @@ exports.updateMedicineItem = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
+    ).populate('name')
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
@@ -114,7 +114,7 @@ exports.filterMedicineItems = async (req, res, next) => {
     if (status) query.patientStatus = status
     if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate }
     if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
-    const result = await MedicineItem.find(query)
+    const result = await MedicineItem.find(query).populate('name')
     if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
     res.status(200).send({ success: true, data: result })
   } catch (err) {
@@ -124,7 +124,7 @@ exports.filterMedicineItems = async (req, res, next) => {
 
 exports.searchMedicineItems = async (req, res, next) => {
   try {
-    const result = await MedicineItem.find({ $text: { $search: req.body.search } }).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
+    const result = await MedicineItem.find({ $text: { $search: req.body.search } }).populate('name')
     if (result.length===0) return res.status(404).send({error:true, message:'No Record Found!'})
     return res.status(200).send({ success: true, data: result })
   } catch (err) {
