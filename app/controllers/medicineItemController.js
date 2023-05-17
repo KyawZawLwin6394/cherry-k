@@ -38,14 +38,14 @@ exports.listAllMedicineItems = async (req, res) => {
 };
 
 exports.getMedicineItem = async (req, res) => {
-  const result = await MedicineItem.find({ _id: req.params.id,isDeleted:false }).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory');
+  const result = await MedicineItem.find({ _id: req.params.id,isDeleted:false }).populate('name');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.getRelatedMedicineItem = async (req, res) => {
-  const result = await MedicineItem.find({ name: req.params.id,isDeleted:false }).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory');
+  const result = await MedicineItem.find({ name: req.params.id,isDeleted:false }).populate('name');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
