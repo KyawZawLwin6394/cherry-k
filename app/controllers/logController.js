@@ -5,7 +5,7 @@ exports.listAllLog = async (req, res) => {
   try {
     let result = await Log.find({ isDeleted: false }).populate('relatedTreatmentSelection relatedAppointment');
     let count = await Log.find({ isDeleted: false }).count();
-    console.log(result)
+    if (result.length === 0) return res.status(404).send({error:true, message:'No Record Found!'});
     res.status(200).send({
       success: true,
       count: count,
