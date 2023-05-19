@@ -96,7 +96,7 @@ exports.createProcedureHistory = async (req, res, next) => {
       }
     }
     console.log(data)
-    // const result = await procedureHistory.create(data);
+    const result = await procedureHistory.create(data);
 
     res.status(200).send({
       message: 'ProcedureHistory create success',

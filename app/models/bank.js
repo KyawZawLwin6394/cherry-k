@@ -10,7 +10,7 @@ let BankSchema = new Schema({
     type: String
   },
   accountNumber: {
-    type: SVGAnimatedNumberList
+    type: String
   },
   accountHolderName: {
     type:String
