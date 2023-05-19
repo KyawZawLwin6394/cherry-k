@@ -64,7 +64,8 @@ let TreatmentSchema = new Schema({
         ref:'FixedAssets'
     },
     quantity:Number,
-    perUsageQTY:Number
+    perUsageQTY:Number,
+    unit:String
   }],
   estimateTotalPrice:{
     type: Number,
