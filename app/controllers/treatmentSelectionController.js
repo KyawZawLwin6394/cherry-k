@@ -52,13 +52,6 @@ exports.listAllTreatmentSelections = async (req, res) => {
 exports.getTreatmentSelection = async (req, res) => {
     const result = await TreatmentSelection.find({ _id: req.params.id, isDeleted: false }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentUnit').populate({
         path: 'relatedTreatment',
-        model: 'Treatments',
-        populate: {
-            path: 'relatedDoctor',
-            model: 'Doctors'
-        }
-    }).populate({
-        path: 'relatedTreatment',
         populate: [{
             path: 'relatedDoctor',
             model: 'Doctors'
