@@ -95,12 +95,13 @@ exports.createProcedureHistory = async (req, res, next) => {
         data.pHistory.push(attachResult._id.toString());
       }
     }
-    const result = await procedureHistory.create(data);
+    console.log(data)
+    // const result = await procedureHistory.create(data);
 
     res.status(200).send({
       message: 'ProcedureHistory create success',
       success: true,
-      data: result
+      // data: result
     });
   } catch (error) {
     console.log(error);
