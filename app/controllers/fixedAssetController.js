@@ -15,7 +15,7 @@ exports.listAllFixedAssets = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await FixedAsset.find(query).limit(limit).skip(skip).populate('relatedAccount');
+    let result = await FixedAsset.find(query).populate('relatedAccount');
     console.log(result)
     count = await FixedAsset.find(query).count();
     const division = count / limit;
