@@ -2,6 +2,7 @@
 const ProcedureHistory = require('../models/procedureHistory');
 const Attachment = require('../models/attachment');
 const procedureHistory = require('../models/procedureHistory');
+const MedicineItems = require('../models/medicineItem');
 
 exports.listAllProcedureHistorys = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -98,10 +99,11 @@ exports.createProcedureHistory = async (req, res, next) => {
     console.log(data)
     const result = await procedureHistory.create(data);
 
+
     res.status(200).send({
       message: 'ProcedureHistory create success',
       success: true,
-      // data: result
+      data: result
     });
   } catch (error) {
     console.log(error);
