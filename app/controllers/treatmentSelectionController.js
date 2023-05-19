@@ -57,7 +57,24 @@ exports.getTreatmentSelection = async (req, res) => {
             path: 'relatedDoctor',
             model: 'Doctors'
         }
-    })
+    }).populate({
+        path: 'relatedTreatment',
+        populate: [{
+            path: 'relatedDoctor',
+            model: 'Doctors'
+        }, {
+            path: 'procedureMedicine.item_id',
+            model: 'ProcedureItems'
+        },
+        {
+            path: 'procedureAccessory.item_id',
+            model: 'AccessoryItems'
+        },
+        {
+            path: 'machine.item_id',
+            model: 'FixedAssets'
+        }]
+    });
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -88,8 +105,8 @@ exports.createTreatmentSelectionCode = async (req, res) => {
             data = { ...data, code: "TS-" + increment, seq: increment }
         }
         return res.status(200).send({
-            success:true,
-            data:data
+            success: true,
+            data: data
         })
     } catch (error) {
         return res.status(500).send({ error: true, message: error.message })
