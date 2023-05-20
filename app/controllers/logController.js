@@ -1,11 +1,15 @@
 'use strict';
 const Log = require('../models/log');
+const ProcedureItem = require('../models/procedureItem');
+const AccessoryItem = require('../models/accessoryItem');
+const Machine = require('../models/fixedAsset');
+const procedureItem = require('../models/procedureItem');
 
 exports.listAllLog = async (req, res) => {
   try {
     let result = await Log.find({ isDeleted: false }).populate('relatedTreatmentSelection relatedAppointment');
     let count = await Log.find({ isDeleted: false }).count();
-    if (result.length === 0) return res.status(404).send({error:true, message:'No Record Found!'});
+    if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' });
     res.status(200).send({
       success: true,
       count: count,
@@ -28,5 +32,100 @@ exports.filterLogs = async (req, res, next) => {
     res.status(200).send({ success: true, data: result })
   } catch (err) {
     return res.status(500).send({ error: true, message: err.message })
+  }
+}
+
+exports.createUsage = async (req, res) => {
+  let { relatedTreatmentSelection, relatedAppointment, procedureMedicine, procedureAccessory, machine } = req.body;
+  let machineError = []
+  let procedureItemsError = []
+  let accessoryItemsError = []
+  try {
+
+    //procedureMedicine
+
+    if (procedureMedicine !== undefined) {
+      procedureMedicine.map(async (e, i) => {
+        if (e.stock < e.actual) {
+          procedureItemsError.push(e)
+        } else {
+          let min = e.stock - e.actual
+          const result = await ProcedureItem.findOneAndUpdate(
+            { _id: e.item_id },
+            { currentQuantity: min },
+            { new: true },
+          )
+          const logResult = await Log.create({
+            "relatedTreatmentSelection": relatedTreatmentSelection,
+            "relatedAppointment": relatedAppointment,
+            "relatedProcedureItems": e.item_id,
+            "currentQty": e.stock,
+            "actualQty": e.actual,
+            "finalQty": min
+          })
+          console.log(logResult)
+        }
+      })
+    }
+
+    //procedureAccessory
+
+    if (procedureAccessory !== undefined) {
+      procedureAccessory.map(async (e, i) => {
+        if (e.stock < e.actual) {
+          accessoryItemsError.push(e)
+        } else {
+          let min = e.stock - e.actual
+          const result = await AccessoryItem.findOneAndUpdate(
+            { _id: e.item_id },
+            { currentQuantity: min },
+            { new: true },
+          )
+          const logResult = await Log.create({
+            "relatedTreatmentSelection": relatedTreatmentSelection,
+            "relatedAppointment": relatedAppointment,
+            "relatedAccessoryItems": e.item_id,
+            "currentQty": e.stock,
+            "actualQty": e.actual,
+            "finalQty": min
+          })
+        }
+      })
+    }
+
+    //machine
+
+    if (machine !== undefined) {
+      machine.map(async (e, i) => {
+        if (e.stock < e.actual) {
+          machineError.push(e)
+        } else {
+          let min = e.stock - e.actual
+          const result = await Machine.findOneAndUpdate(
+            { _id: e.item_id },
+            { currentQuantity: min },
+            { new: true },
+          )
+          const logResult = await Log.create({
+            "relatedTreatmentSelection": relatedTreatmentSelection,
+            "relatedAppointment": relatedAppointment,
+            "relatedMachine": e.item_id,
+            "currentQty": e.stock,
+            "actualQty": e.actual,
+            "finalQty": min
+          })
+        }
+      })
+    }
+    //error handling
+    let response = { success: true }
+    if (machineError.length > 0) response.machineError = machineError
+    if (procedureItemsError.length > 0) response.procedureItemsError = procedureItemsError
+    if (machineError.length > 0) response.machineError = machineError
+
+    return res.status(200).send(response)
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({ error: true, message: error.message })
   }
 }

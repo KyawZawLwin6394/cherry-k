@@ -29,6 +29,18 @@ let LogSchema = new Schema({
     finalQty: {
         type: Number,
     },
+    relatedProcedureItems:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'ProcedureItems'
+    },
+    relatedAccessoryItems:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'AccessoryItems'
+    },
+    relatedMachine:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'FixedAssets'
+    },
     isDeleted: {
         type: Boolean,
         required: true,
