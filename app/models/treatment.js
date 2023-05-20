@@ -97,6 +97,10 @@ let TreatmentSchema = new Schema({
   },
   status: {
     type:Boolean,
+  },
+  relatedAccount:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'AccountingLists'
   }
 });
 

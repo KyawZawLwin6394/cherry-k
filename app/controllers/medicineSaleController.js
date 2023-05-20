@@ -74,7 +74,7 @@ exports.createMedicineSale = async (req, res, next) => {
       "amount": data.payAmount,
       "date": Date.now(),
       "remark": req.body.remark,
-      "relatedAccounting": "6423eb395fb841d5566db36d",
+      "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines)
       "type": "Credit"
     })
     const fTransResult = await fTransaction.save()

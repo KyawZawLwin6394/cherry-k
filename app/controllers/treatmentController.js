@@ -1,6 +1,6 @@
 'use strict';
 const Treatment = require('../models/treatment');
-const Appointment = require('../models/appointment');
+const Accounting = require('../models/accountingList');
 
 exports.listAllTreatments = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -49,18 +49,22 @@ exports.getTreatment = async (req, res) => {
 };
 
 exports.createTreatment = async (req, res, next) => {
-  let data = req.body;
+  let {name} = req.body;
+  let data = req.body
   try {
-    // need to add 
-    console.log(data)
-    const newBody = data;
-
-    const newTreatment = new Treatment(newBody);
-    const result = await newTreatment.save();
+    const accResult = await Accounting.create({
+      name:name + 'income',
+      subHeader:name + 'income',
+      relatedType:"6467310959a9bc811d97e9c9", //Profit and Loss
+      relatedHeader:"646731e059a9bc811d97eab9",//Revenue
+    })
+    data = {...data, relatedAccount: accResult._id} //putting it back into treatment.js
+    const result = await Treatment.create(data);
+    
     res.status(200).send({
       message: 'Treatment create success',
       success: true,
-
+      accResult:accResult,
       data: result
     });
   } catch (error) {
