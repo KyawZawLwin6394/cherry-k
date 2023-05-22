@@ -98,12 +98,11 @@ exports.createProcedureHistory = async (req, res, next) => {
     }
     console.log(data)
     const result = await procedureHistory.create(data);
-
-
+    const populate = await procedureHistory.find({_id:result._id}).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id').populate('pHistory');
     res.status(200).send({
       message: 'ProcedureHistory create success',
       success: true,
-      data: result
+      data: populate
     });
   } catch (error) {
     console.log(error);

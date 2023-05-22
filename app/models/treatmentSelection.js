@@ -38,9 +38,9 @@ let TreatmentSelectionSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Treatments'
   },
-  relatedTreatmentUnit:{
+  relatedTreatmentList:{
     type:mongoose.Schema.Types.ObjectId,
-    ref:'TreatmentUnits'
+    ref:'TreatmentLists'
   },
   relatedAppointments: {
     type: [mongoose.Schema.Types.ObjectId],
