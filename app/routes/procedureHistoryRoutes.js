@@ -21,5 +21,5 @@ module.exports = (app) => {
 
     app.route('/api/procedure-histories').get(catchError(procedureHistory.listAllProcedureHistorys))
 
-    app.route('/api/procedure-histories/:id').get(catchError(procedureHistory.getRelatedProcedureHistory))
+    app.route('/api/procedure-histories').get(catchError(procedureHistory.getRelatedProcedureHistory))
 };
