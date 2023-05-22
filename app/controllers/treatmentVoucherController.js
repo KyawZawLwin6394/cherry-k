@@ -148,7 +148,14 @@ exports.getTodaysTreatmentVoucher = async (req, res) => {
     var end = new Date();
     start.setHours(0, 0, 0, 0);
     end.setHours(23, 59, 59, 999);
-    const result = await TreatmentVoucher.find({ originalDate: { $gte: start, $lt: end } })
+    const result = await TreatmentVoucher.find({ originalDate: { $gte: start, $lt: end } }).populate('relatedAppointment relatedPatient').populate({
+        path: 'relatedTreatment',
+        model: 'Treatments',
+        populate: {
+            path: 'treatmentName',
+            model: 'TreatmentLists'
+        }
+    })
     if (result.length === 0) return res.status(404).json({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (error) {

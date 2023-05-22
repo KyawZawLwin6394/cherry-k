@@ -272,7 +272,7 @@ exports.treatmentPayment = async (req, res, next) => {
             }
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
             //transaction
-            const fTransResult = await Transaction.create({
+            var fTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
                 "remark": null,
@@ -280,7 +280,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 "type": "Credit"
             })
             //sec transaction
-            const secTransResult = await Transaction.create({
+            var secTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
                 "remark": null,
@@ -300,7 +300,7 @@ exports.treatmentPayment = async (req, res, next) => {
             //     }
             // )
             //transaction
-            const fTransResult = await Transaction.create({
+            var fTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
                 "remark": null,
@@ -308,7 +308,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 "type": "Debit"
             })
             //sec transaction
-            const secTransResult = await Transaction.create({
+            var secTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
                 "remark": null,
