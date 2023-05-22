@@ -176,7 +176,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 const increment = latestDocument[0].seq + 1
                 dataTVC = { ...dataTVC, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-" + increment, seq: increment }
             }
-            const treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
+            var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
         data = { ...data, relatedTransaction: [fTransResult._id, secTransResult] } //adding relatedTransactions to treatmentSelection model
         const result = await TreatmentSelection.create(data)
@@ -214,7 +214,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
             data: populatedResult,
             appointmentAutoGenerate: appointmentResult,
             fTransResult: fTransResult,
-            secTransResult: secTransResult
+            secTransResult: secTransResult,
+            treatmentVoucherResult:treatmentVoucherResult
         });
     } catch (error) {
         // console.log(error)
@@ -269,7 +270,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 const increment = latestDocument[0].seq + 1
                 dataTVC = { ...dataTVC, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-" + increment, seq: increment }
             }
-            const treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
+            var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
             //transaction
             const fTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
@@ -318,7 +319,7 @@ exports.treatmentPayment = async (req, res, next) => {
         }
 
         return res.status(200).send({
-            success: true, data: result
+            success: true, data: result, treatmentVoucherResult:treatmentVoucherResult
         });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
