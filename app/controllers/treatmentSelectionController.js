@@ -50,7 +50,7 @@ exports.listAllTreatmentSelections = async (req, res) => {
 };
 
 exports.getTreatmentSelection = async (req, res) => {
-    const result = await TreatmentSelection.find({ _id: req.params.id, isDeleted: false }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentUnit').populate({
+    const result = await TreatmentSelection.find({ _id: req.params.id, isDeleted: false }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
         path: 'relatedTreatment',
         populate: [{
             path: 'relatedDoctor',
@@ -74,7 +74,7 @@ exports.getTreatmentSelection = async (req, res) => {
 };
 
 exports.getTreatementSelectionByTreatmentID = async (req, res) => {
-    const result = await TreatmentSelection.find({ relatedTreatment: req.params.id, isDeleted: false }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentUnit').populate({
+    const result = await TreatmentSelection.find({ relatedTreatment: req.params.id, isDeleted: false }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
         path: 'relatedTreatment',
         model: 'Treatments',
         populate: {
@@ -248,7 +248,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
                 "remark": null,
-                "relatedAccounting": result.relatedTreatment.relatedAccount, 
+                "relatedAccounting": result.relatedTreatment.relatedAccount,
                 "type": "Credit"
             })
             //sec transaction
@@ -276,7 +276,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
                 "remark": null,
-                "relatedAccounting": result.relatedTreatment.relatedAccount, 
+                "relatedAccounting": result.relatedTreatment.relatedAccount,
                 "type": "Debit"
             })
             //sec transaction
@@ -365,7 +365,7 @@ exports.getRelatedTreatmentSelections = async (req, res) => {
         let { relatedPatient, start, end } = req.body
         if (start && end) query.createdAt = { $gte: start, $lte: end }
         if (relatedPatient) query.relatedPatient = relatedPatient
-        const result = await TreatmentSelection.find(query).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentUnit').populate({
+        const result = await TreatmentSelection.find(query).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
             path: 'relatedTreatment',
             model: 'Treatments',
             populate: {
