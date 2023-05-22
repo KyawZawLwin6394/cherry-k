@@ -18,7 +18,7 @@ exports.listAllProcedureHistorys = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await ProcedureHistory.find(query).limit(limit).skip(skip).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id').populate('pHistory')
+    let result = await ProcedureHistory.find(query).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id').populate('pHistory')
     count = await ProcedureHistory.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
