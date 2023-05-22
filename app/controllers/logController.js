@@ -3,7 +3,7 @@ const Log = require('../models/log');
 const ProcedureItem = require('../models/procedureItem');
 const AccessoryItem = require('../models/accessoryItem');
 const Machine = require('../models/fixedAsset');
-const procedureItem = require('../models/procedureItem');
+const Usage = require('../models/usage');
 
 exports.listAllLog = async (req, res) => {
   try {
@@ -117,11 +117,15 @@ exports.createUsage = async (req, res) => {
         }
       })
     }
+
+    //usage create
+    let usageResult = await Usage.create(req.body);
     //error handling
     let response = { success: true }
     if (machineError.length > 0) response.machineError = machineError
     if (procedureItemsError.length > 0) response.procedureItemsError = procedureItemsError
     if (machineError.length > 0) response.machineError = machineError
+    if (usageResult !== undefined) response.usageResult = usageResult
 
     return res.status(200).send(response)
   } catch (error) {
