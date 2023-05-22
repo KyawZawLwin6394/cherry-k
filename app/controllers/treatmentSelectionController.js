@@ -140,7 +140,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
         if (data.paidAmount === 0) data = { ...data, leftOverAmount: data.totalAmount }
 
         //first transaction 
-        if (req.body.paymentMethod === 'Cashdown') {
+        if (req.body.paymentMethod === 'Cash Down') {
             var fTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
@@ -215,8 +215,9 @@ exports.createTreatmentSelection = async (req, res, next) => {
             appointmentAutoGenerate: appointmentResult,
             // fTransResult: fTransResult,
             // secTransResult: secTransResult,
-            treatmentVoucherResult:treatmentVoucherResult
+            // treatmentVoucherResult:treatmentVoucherResult
         }
+        if (treatmentVoucherResult) response.treatmentVoucherResult = treatmentVoucherResult
         if (fTransResult) response.fTransResult = fTransResult
         if (fTransResult) response.secTransResult = secTransResult
         res.status(200).send(response);
