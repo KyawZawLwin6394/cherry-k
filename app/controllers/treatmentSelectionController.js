@@ -179,6 +179,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
         if (fTransResult && secTransResult){data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] }} //adding relatedTransactions to treatmentSelection model
+        if (treatmentVoucherResult) { data = {...data, relatedTreatmentVoucher: treatmentVoucherResult._id}}
         const result = await TreatmentSelection.create(data)
         const populatedResult = await TreatmentSelection.find({ _id: result._id }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
             path: 'relatedTreatment',
