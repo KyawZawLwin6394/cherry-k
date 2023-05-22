@@ -141,7 +141,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
 
         //first transaction 
         if (req.body.paymentMethod === 'Cashdown') {
-            const fTransResult = await Transaction.create({
+            var fTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
                 "remark": null,
@@ -149,7 +149,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "type": "Credit"
             })
             //sec transaction
-            const secTransResult = await Transaction.create({
+            var secTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
                 "remark": null,
