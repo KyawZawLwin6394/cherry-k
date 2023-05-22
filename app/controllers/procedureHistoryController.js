@@ -47,9 +47,10 @@ exports.getProcedureHistory = async (req, res) => {
 };
 
 exports.getRelatedProcedureHistory = async (req, res) => {
-  const result = await ProcedureHistory.find({ relatedPatient: req.params.id, isDeleted: false }).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id').populate('pHistory')
-  if (!result)
-    return res.status(500).json({ error: true, message: 'No Record Found' });
+  let { relatedAppointment, relatedTreatmentSelection } = req.query
+  const result = await ProcedureHistory.find({ relatedTreatmentSelection: relatedTreatmentSelection, relatedAppointment: relatedAppointment, isDeleted: false }).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id').populate('pHistory')
+  if (result.length===0)
+    return res.status(404).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
@@ -98,7 +99,7 @@ exports.createProcedureHistory = async (req, res, next) => {
     }
     console.log(data)
     const result = await procedureHistory.create(data);
-    const populate = await procedureHistory.find({_id:result._id}).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id').populate('pHistory');
+    const populate = await procedureHistory.find({ _id: result._id }).populate('relatedAccounting').populate('relatedPatient').populate('treatmentPackages.item_id').populate('medicineItems.item_id').populate('pHistory');
     res.status(200).send({
       message: 'ProcedureHistory create success',
       success: true,
