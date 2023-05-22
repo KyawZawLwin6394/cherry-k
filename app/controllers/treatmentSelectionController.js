@@ -208,15 +208,18 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 { new: true }
             )
         }
-        res.status(200).send({
+        let response = {
             message: 'Treatment Selection create success',
             success: true,
             data: populatedResult,
             appointmentAutoGenerate: appointmentResult,
-            fTransResult: fTransResult,
-            secTransResult: secTransResult,
+            // fTransResult: fTransResult,
+            // secTransResult: secTransResult,
             treatmentVoucherResult:treatmentVoucherResult
-        });
+        }
+        if (fTransResult) response.fTransResult = fTransResult
+        if (fTransResult) response.secTransResult = secTransResult
+        res.status(200).send(response);
     } catch (error) {
         // console.log(error)
         return res.status(500).send({ "error": true, message: error.message })
