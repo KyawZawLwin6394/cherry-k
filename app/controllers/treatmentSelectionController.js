@@ -178,7 +178,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
             }
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
-        data = { ...data, relatedTransaction: [fTransResult._id, secTransResult] } //adding relatedTransactions to treatmentSelection model
+        if (fTransResult && secTransResult){data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] }} //adding relatedTransactions to treatmentSelection model
         const result = await TreatmentSelection.create(data)
         const populatedResult = await TreatmentSelection.find({ _id: result._id }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
             path: 'relatedTreatment',
@@ -221,7 +221,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
         if (fTransResult) response.secTransResult = secTransResult
         res.status(200).send(response);
     } catch (error) {
-        // console.log(error)
+         console.log(error)
         return res.status(500).send({ "error": true, message: error.message })
     }
 };
