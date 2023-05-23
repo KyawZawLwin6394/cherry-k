@@ -7,7 +7,13 @@ const Usage = require('../models/usage');
 
 exports.listAllLog = async (req, res) => {
   try {
-    let result = await Log.find({ isDeleted: false }).populate('relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine');
+    let result = await Log.find({ isDeleted: false }).populate('relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine').populate({
+      path: 'relatedTreatmentSelection',
+      populate: [{
+        path: 'relatedTreatment',
+        model: 'Treatments'
+      }]
+    });
     let count = await Log.find({ isDeleted: false }).count();
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' });
     res.status(200).send({
