@@ -109,6 +109,7 @@ exports.createTreatmentSelectionCode = async (req, res) => {
 exports.createTreatmentSelection = async (req, res, next) => {
     let data = req.body;
     let relatedAppointments = []
+    let tvcCreate = false;
     try {
         if (req.body.originalDate === undefined) return res.status(500).send({ error: true, message: 'Original Date is required' })
         const appointmentConfig = {
@@ -158,8 +159,15 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "type": "Debit",
                 "relatedTransaction": fTransResult._id
             });
+            tvcCreate = true;
+        }
+        if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
+        if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
+        const result = await TreatmentSelection.create(data)
+        if (tvcCreate === true) {
             //--> treatment voucher create
             let dataTVC = {
+                "relatedTreatmentSelection": result._id,
                 "relatedTreatment": req.body.relatedTreatment,
                 "relatedAppointment": req.body.relatedAppointment,
                 "relatedPatient": req.body.relatedPatient,
@@ -178,9 +186,6 @@ exports.createTreatmentSelection = async (req, res, next) => {
             }
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
-        if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
-        if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
-        const result = await TreatmentSelection.create(data)
         const populatedResult = await TreatmentSelection.find({ _id: result._id }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
             path: 'relatedTreatment',
             model: 'Treatments',
@@ -259,6 +264,7 @@ exports.treatmentPayment = async (req, res, next) => {
         ).populate('relatedTreatment');
         if (result.paymentMethod === 'Credit') { //
             let dataTVC = {
+                "relatedTreatmentSelection": result._id,
                 "relatedTreatment": req.body.relatedTreatment,
                 "relatedAppointment": req.body.relatedAppointment,
                 "relatedPatient": req.body.relatedPatient,
