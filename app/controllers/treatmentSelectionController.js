@@ -262,7 +262,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 "relatedTreatment": req.body.relatedTreatment,
                 "relatedAppointment": req.body.relatedAppointment,
                 "relatedPatient": req.body.relatedPatient,
-                "paymentMethod": req.body.paymentMethod, //enum: ['by Appointment','Lapsum','Total','Advanced']
+                "paymentMethod": 'by Appointment', //enum: ['by Appointment','Lapsum','Total','Advanced']
                 "amount": paidAmount,
                 "relatedBank": req.body.relatedBank, //must be bank acc from accounting accs
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
@@ -333,7 +333,8 @@ exports.treatmentPayment = async (req, res, next) => {
         if (treatmentVoucherResult) response.treatmentVoucherResult = treatmentVoucherResult;
         return res.status(200).send(response);
     } catch (error) {
-        return res.status(500).send({ "error": true, "message": error.message })
+        console.log(error)
+        // return res.status(500).send({ "error": true, "message": error.message })
     }
 };
 
