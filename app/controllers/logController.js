@@ -7,7 +7,7 @@ const Usage = require('../models/usage');
 
 exports.listAllLog = async (req, res) => {
   try {
-    let result = await Log.find({ isDeleted: false }).populate('relatedTreatmentSelection relatedAppointment');
+    let result = await Log.find({ isDeleted: false }).populate('relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine');
     let count = await Log.find({ isDeleted: false }).count();
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' });
     res.status(200).send({
@@ -40,9 +40,9 @@ exports.filterLogs = async (req, res, next) => {
     let query = { isDeleted: false }
     const { start, end } = req.query
     console.log(start, end)
-    if (start && end) query.createdAt = { $gte: start, $lte: end }
+    if (start && end) query.date = { $gte: start, $lte: end }
     if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
-    const result = await Log.find(query).populate('relatedTreatmentSelection relatedAppointment');
+    const result = await Log.find(query).populate('relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine');
     if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
     res.status(200).send({ success: true, data: result })
   } catch (err) {

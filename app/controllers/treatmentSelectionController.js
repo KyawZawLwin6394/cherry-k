@@ -178,8 +178,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
             }
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
-        if (fTransResult && secTransResult){data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] }} //adding relatedTransactions to treatmentSelection model
-        if (treatmentVoucherResult) { data = {...data, relatedTreatmentVoucher: treatmentVoucherResult._id}}
+        if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
+        if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
         const result = await TreatmentSelection.create(data)
         const populatedResult = await TreatmentSelection.find({ _id: result._id }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
             path: 'relatedTreatment',
@@ -223,7 +223,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
         if (fTransResult) response.secTransResult = secTransResult
         res.status(200).send(response);
     } catch (error) {
-         console.log(error)
+        console.log(error)
         return res.status(500).send({ "error": true, message: error.message })
     }
 };
@@ -322,10 +322,16 @@ exports.treatmentPayment = async (req, res, next) => {
                 "relatedTransaction": fTransResult._id
             })
         }
-
-        return res.status(200).send({
-            success: true, data: result, treatmentVoucherResult:treatmentVoucherResult
-        });
+        let response = {
+            success: true,
+            data: result,
+            //appointmentAutoGenerate: appointmentResult,
+            // fTransResult: fTransResult,
+            // secTransResult: secTransResult,
+            // treatmentVoucherResult:treatmentVoucherResult
+        }
+        if (treatmentVoucherResult) response.treatmentVoucherResult = treatmentVoucherResult;
+        return res.status(200).send(response);
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
     }
