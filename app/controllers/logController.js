@@ -43,8 +43,8 @@ exports.filterLogs = async (req, res, next) => {
     if (start && end) query.date = { $gte: start, $lte: end }
     if (id) {
       query.$or = []
-      query.$or.push(...[{relatedProcedureItems:id},{relatedAccessoryItems:id},{relatedMachine:id}])
-    }    
+      query.$or.push(...[{ relatedProcedureItems: id }, { relatedAccessoryItems: id }, { relatedMachine: id }])
+    }
     console.log(query)
     if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
     const result = await Log.find(query).populate('relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine');
