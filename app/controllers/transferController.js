@@ -58,7 +58,7 @@ exports.createTransfer = async (req, res, next) => {
       "remark": newBody.remark,
       "type": "Credit",
       "relatedTransaction": null,
-      "relatedAccounting": newBody.toAcc
+      "relatedAccounting": newBody.fromAcc
     }
     const fTransaction = new Transaction(firstTransaction)
     const fTransResult = await fTransaction.save();
