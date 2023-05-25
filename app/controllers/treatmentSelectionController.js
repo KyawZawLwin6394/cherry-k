@@ -406,9 +406,10 @@ exports.createTreatmentTransaction = async (req, res) => {
 exports.getRelatedTreatmentSelections = async (req, res) => {
     try {
         let query = { isDeleted: false };
-        let { relatedPatient, start, end } = req.body
+        let { relatedPatient, start, end, relatedAppointments } = req.body
         if (start && end) query.createdAt = { $gte: start, $lte: end }
         if (relatedPatient) query.relatedPatient = relatedPatient
+        if (relatedAppointments) query.relatedAppointments = {$in:relatedAppointments}
         const result = await TreatmentSelection.find(query).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
             path: 'relatedTreatment',
             model: 'Treatments',
@@ -417,10 +418,11 @@ exports.getRelatedTreatmentSelections = async (req, res) => {
                 model: 'Doctors'
             }
         })
-        if (!result)
+        if (result.length===0)
             return res.status(404).json({ error: true, message: 'No Record Found' });
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
+
         return res.status(500).send({ error: true, message: 'An Error Occured While Fetching Related Treatment Selections' })
     }
 };
