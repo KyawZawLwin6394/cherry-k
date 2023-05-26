@@ -37,13 +37,13 @@ exports.getTotal = async (req, res) => {
                 }
             }
         ])
-        return res.status({
+        return res.status(200).send({
             success: true,
             data: {
                 MSTotal: MSTotal[0].totalAmount,
                 TVTotal: TVTotal[0].totalAmount,
                 expenseTotal: expenseTotal[0].totalAmount,
-                profit:(MSTotal[0].totalAmount + TVTotal[0].totalAmount)-expenseTotal[0].totalAmount
+                profit: (MSTotal[0].totalAmount + TVTotal[0].totalAmount) - expenseTotal[0].totalAmount
             }
         })
     } catch (error) {
