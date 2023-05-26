@@ -4,6 +4,54 @@ const MedicineSale = require('../models/medicineSale');
 const TreatmentVoucher = require('../models/treatmentVoucher');
 const Expense = require('../models/expense');
 
+exports.getTotal = async (req, res) => {
+    try {
+        const MSTotal = await MedicineSale.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: {
+                        $sum: '$totalAmount' // Replace 'amount' with the desired field name
+                    }
+                }
+            }
+        ])
+        const TVTotal = await TreatmentVoucher.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: {
+                        $sum: '$amount' // Replace 'amount' with the desired field name
+                    }
+                }
+            }
+        ])
+
+        const expenseTotal = await Expense.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: {
+                        $sum: '$finalAmount' // Replace 'amount' with the desired field name
+                    }
+                }
+            }
+        ])
+        return res.status({
+            success: true,
+            data: {
+                MSTotal: MSTotal[0].totalAmount,
+                TVTotal: TVTotal[0].totalAmount,
+                expenseTotal: expenseTotal[0].totalAmount,
+                profit:(MSTotal[0].totalAmount + TVTotal[0].totalAmount)-expenseTotal[0].totalAmount
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send({ error: true, message: 'Internal Server Error!' })
+    }
+}
+
 exports.listAllLog = async (req, res) => {
     try {
         let result = await Log.find({ isDeleted: false }).populate('relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine').populate({
