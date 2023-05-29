@@ -1,5 +1,7 @@
 'use strict';
-const MedicineItem = require('../models/medicineItem')
+const MedicineItem = require('../models/medicineItem');
+const Branch = require('../models/branch');
+const Stock = require('../models/stock');
 
 exports.listAllMedicineItems = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -8,7 +10,7 @@ exports.listAllMedicineItems = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -38,14 +40,14 @@ exports.listAllMedicineItems = async (req, res) => {
 };
 
 exports.getMedicineItem = async (req, res) => {
-  const result = await MedicineItem.find({ _id: req.params.id,isDeleted:false }).populate('name');
+  const result = await MedicineItem.find({ _id: req.params.id, isDeleted: false }).populate('name');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.getRelatedMedicineItem = async (req, res) => {
-  const result = await MedicineItem.find({ name: req.params.id,isDeleted:false }).populate('name');
+  const result = await MedicineItem.find({ name: req.params.id, isDeleted: false }).populate('name');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -56,6 +58,18 @@ exports.createMedicineItem = async (req, res, next) => {
   try {
     const newMedicineItem = new MedicineItem(req.body);
     const result = await newMedicineItem.save();
+    const getAllBranches = await Branch.find();
+    for (let i = 0; i < getAllBranches.length; i++) {
+      console.log('here')
+      const stockResult = await Stock.create({
+        "relatedProcedureItems": result._id,
+        "currentQty": 0,
+        "fromUnit": 0,
+        "toUnit": 0,
+        "reorderQty": 0,
+        "relatedBranch": getAllBranches[i]._id //branch_id
+      })
+    }
     res.status(200).send({
       message: 'MedicineItem create success',
       success: true,
@@ -125,7 +139,7 @@ exports.filterMedicineItems = async (req, res, next) => {
 exports.searchMedicineItems = async (req, res, next) => {
   try {
     const result = await MedicineItem.find({ $text: { $search: req.body.search } }).populate('name')
-    if (result.length===0) return res.status(404).send({error:true, message:'No Record Found!'})
+    if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (err) {
     return res.status(500).send({ error: true, message: err.message })

@@ -1,5 +1,7 @@
 'use strict';
 const FixedAsset = require('../models/fixedAsset');
+const Branch = require('../models/branch');
+const Stock = require('../models/stock');
 
 exports.listAllFixedAssets = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -8,7 +10,7 @@ exports.listAllFixedAssets = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 20; //limit
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -38,7 +40,7 @@ exports.listAllFixedAssets = async (req, res) => {
 };
 
 exports.getFixedAsset = async (req, res) => {
-  const result = await FixedAsset.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccount')
+  const result = await FixedAsset.find({ _id: req.params.id, isDeleted: false }).populate('relatedAccount')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -49,13 +51,24 @@ exports.createFixedAsset = async (req, res, next) => {
     const newBody = req.body;
     const newFixedAsset = new FixedAsset(newBody);
     const result = await newFixedAsset.save();
+    const getAllBranches = await Branch.find();
+    for (let i = 0; i < getAllBranches.length; i++) {
+      const stockResult = await Stock.create({
+        "relatedProcedureItems": result._id,
+        "currentQty": 0,
+        "fromUnit": 0,
+        "toUnit": 0,
+        "reorderQty": 0,
+        "relatedBranch": getAllBranches[i]._id //branch_id
+      })
+    }
     res.status(200).send({
       message: 'FixedAsset create success',
       success: true,
       data: result
     });
   } catch (error) {
-    console.log(error )
+    console.log(error)
     return res.status(500).send({ "error": true, message: error.message })
   }
 };

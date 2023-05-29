@@ -9,6 +9,8 @@ const express = require('express'),
   port = 9000;
 app.use(cors({ origin: '*' }));
 
+const { relatedBranchMiddleware } = require('./app/middleware/relatedBranch');
+
 //mongoose.set('useCreateIndex', true) // to remove -> DeprecationWarning: collection.ensureIndex is deprecated. Use createIndex instead.
 
 // mongoose instance connection url connection
@@ -134,6 +136,7 @@ mongoose.plugin((schema) => {
 
 //static files
 app.use('/static', express.static(path.join(__dirname, 'uploads')));
+app.use(relatedBranchMiddleware);
 
 // Bring in our dependencies
 require('./config/express')(app, config);
