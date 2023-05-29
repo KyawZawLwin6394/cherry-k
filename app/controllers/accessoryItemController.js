@@ -59,7 +59,6 @@ exports.createAccessoryItem = async (req, res, next) => {
     const result = await newAccessoryItem.save();
     const getAllBranches = await Branch.find();
     for (let i = 0; i < getAllBranches.length; i++) {
-      console.log('here')
       const stockResult = await Stock.create({
         "relatedProcedureItems": result._id,
         "currentQty": 0,
@@ -75,7 +74,7 @@ exports.createAccessoryItem = async (req, res, next) => {
       data: result
     });
   } catch (error) {
-    console.log(error)
+    // console.log(error)
     return res.status(500).send({ "error": true, message: error.message })
   }
 };

@@ -16,7 +16,6 @@ exports.listAllTransactions = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     let result = await Transaction.find(query).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
-    console.log(result)
     count = await Transaction.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);

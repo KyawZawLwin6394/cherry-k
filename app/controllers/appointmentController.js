@@ -34,7 +34,6 @@ exports.listAllAppointments = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     let result = await Appointment.find(query).populate('relatedPatient').populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection').populate('relatedTreatmentSelection.relatedAppointments');
-    console.log(result)
     count = await Appointment.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -79,7 +78,6 @@ exports.getTodaysAppointment = async (req, res) => {
         }
       }
     })
-    console.log(result)
     if (result.length === 0) return res.status(404).json({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (error) {
@@ -107,14 +105,13 @@ exports.getAppointment = async (req, res) => {
         }
       }
     })
-    console.log(result)
     if (!result) return res.status(500).json({ error: true, message: 'No Record Found' });
     //const relateTreatment = await Treatment.find({ _id: result[0].relatedTreatmentSelection[0].relatedTreatment }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('procedureMedicine').populate('relatedAppointment')
     //if (relateTreatment.length === 0) return res.status(500).json({ error: true, message: "There's no related treatment id in the database" })
     return res.status(200).send({ success: true, data: result, treatment: "relateTreatment" });
   } catch (error) {
-    console.log(error)
-    //return res.status(500).send({ error: true, message: error.message })
+    // console.log(error)
+    return res.status(500).send({ error: true, message: error.message })
   }
 };
 
@@ -194,7 +191,6 @@ exports.filterAppointments = async (req, res, next) => {
   try {
     let query = { isDeleted: false }
     const { start, end, token, phone } = req.query
-    console.log(start, end)
     if (start && end) query.originalDate = { $gte: start, $lte: end }
     if (token) query.token = token
     if (phone) query.phone = phone
@@ -209,7 +205,6 @@ exports.filterAppointments = async (req, res, next) => {
 
 exports.searchAppointment = async (req, res, next) => {
   try {
-    console.log(req.body.search)
     const result = await Appointment.find({ $text: { $search: req.body.search }, isDeleted: false })
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })

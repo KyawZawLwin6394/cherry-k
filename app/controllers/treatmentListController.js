@@ -17,7 +17,6 @@ exports.listAllTreatmentLists = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     let result = await TreatmentList.find(query)
-    console.log(result)
     count = await TreatmentList.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -34,7 +33,7 @@ exports.listAllTreatmentLists = async (req, res) => {
       list: result,
     });
   } catch (e) {
-    console.log(e)
+    //console.log(e)
     return res.status(500).send({ error: true, message: e.message });
   }
 };
@@ -48,7 +47,6 @@ exports.getTreatmentList = async (req, res) => {
 
 exports.getRelatedTreatments = async (req, res) => {
   // .populate('treatmentName relatedDoctor relatedTherapist procedureMedicine.item_id medicineLists.item_id procedureAccessory.item_id machine.item_id relatedPatient relatedAppointment')
-  console.log(req.params.id)  
   const result = await Treatment.find({ treatmentName: req.params.id })
   if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found" });
   return res.status(200).send({ success: true, data: result });
@@ -125,7 +123,6 @@ exports.filterTreatmentLists = async (req, res, next) => {
 
 exports.searchTreatmentLists = async (req, res, next) => {
   try {
-    console.log(req.body.search)
     const result = await TreatmentList.find({ $text: { $search: req.query.search } })
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })

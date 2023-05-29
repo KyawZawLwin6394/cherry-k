@@ -74,7 +74,7 @@ exports.uploadImage = async (req, res) => {
     return res.status(200).send({ success: true, data: result })
     //prepare img and save it into attachment schema
   } catch (error) {
-    console.log(error)
+    //console.log(error)
     return res.status(500).send({ error: true, mesage: error.message })
   }
 }
@@ -93,11 +93,9 @@ exports.createProcedureHistory = async (req, res, next) => {
           image: imgPath.split('\\')[2]
         };
         const attachResult = await Attachment.create(attachData);
-        console.log('attach', attachResult._id.toString());
         data.pHistory.push(attachResult._id.toString());
       }
     }
-    console.log(data)
     const result = await procedureHistory.create(data);
     const populate = await procedureHistory.find({ _id: result._id }).populate('medicineItems.item_id customTreatmentPackages.item_id pHistory relatedAppointment relatedTreatmentSelection')
     res.status(200).send({
@@ -106,7 +104,7 @@ exports.createProcedureHistory = async (req, res, next) => {
       data: populate
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res.status(500).send({ "error": true, message: error.message });
   }
 };

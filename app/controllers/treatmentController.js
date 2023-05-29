@@ -18,8 +18,6 @@ exports.listAllTreatments = async (req, res) => {
     regexKeyword ? (query['name'] = regexKeyword) : '';
 
     let result = await Treatment.find(query).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('machine.item_id').populate('procedureAccessory.item_id').populate('medicineLists.item_id').populate('procedureMedicine.item_id').populate('treatmentName')
-
-    console.log(result)
     count = await Treatment.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -36,7 +34,7 @@ exports.listAllTreatments = async (req, res) => {
       list: result,
     });
   } catch (e) {
-    console.log(e)
+    //console.log(e)
     //return res.status(500).send({ error: true, message: e.message });
   }
 };

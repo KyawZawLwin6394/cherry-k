@@ -15,9 +15,7 @@ exports.listAllSystemSettings = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    console.log(query)
     let result = await SystemSetting.find(query);
-    console.log(result)
     count = await SystemSetting.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -56,7 +54,7 @@ exports.createSystemSetting = async (req, res, next) => {
       data: result
     });
   } catch (error) {
-    console.log(error )
+    //console.log(error )
     return res.status(500).send({ "error": true, message: error.message })
   }
 };

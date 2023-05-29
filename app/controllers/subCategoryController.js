@@ -5,7 +5,6 @@ exports.listAllSubCategories = async (req, res) => {
   try {
     let result = await SubCategory.find({isDeleted:false}).populate('relatedCategory','name');
     let count = await SubCategory.find({isDeleted:false}).count();
-    console.log(result)
     res.status(200).send({
       success: true,
       count: count,

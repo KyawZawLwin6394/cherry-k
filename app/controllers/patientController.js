@@ -43,7 +43,6 @@ exports.listAllPatients = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    console.log(limit)
     let result = await Patient.find(query).skip(skip).populate('img');
     count = await Patient.find(query).count();
     const division = count / limit;
@@ -90,14 +89,11 @@ exports.createPatient = async (req, res, next) => {
   try {
     //prepare CUS-ID
     const latestDocument = await Patient.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
-    console.log(latestDocument)
     if (latestDocument.length === 0) data = { ...data, seq: '1', patientID: "CUS-1" } // if seq is undefined set initial patientID and seq
-    console.log(data)
     if (latestDocument.length) {
       const increment = latestDocument[0].seq + 1
       data = { ...data, patientID: "CUS-" + increment, seq: increment }
     }
-    console.log(files.img, 'files.img')
     if (files.img) {
       let imgPath = files.img[0].path.split('cherry-k')[1];
       const attachData = {
@@ -128,7 +124,6 @@ exports.updatePatient = async (req, res, next) => {
   let files = req.files;
   try {
     if (files.img) {
-      console.log(files.img, 'files.img')
       let imgPath = files.img[0].path.split('cherry-k')[1];
       const attachData = {
         fileName: files.img[0].originalname,
@@ -147,7 +142,7 @@ exports.updatePatient = async (req, res, next) => {
     ).populate('img');
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
-    console.log(error)
+    //console.log(error)
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };

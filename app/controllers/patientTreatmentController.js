@@ -16,9 +16,7 @@ exports.listAllPatientTreatments = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    console.log(query)
     let result = await PatientTreatment.find(query).populate('relatedPatient').populate('relatedTreatment');
-    console.log(result)
     count = await PatientTreatment.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -96,7 +94,7 @@ exports.createPatientTreatment = async (req, res, next) => {
       sTrans:secTransResult
     });
   } catch (error) {
-    console.log(error )
+    //console.log(error )
     return res.status(500).send({ "error": true, message: error.message })
   }
 };

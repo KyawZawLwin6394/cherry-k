@@ -47,7 +47,7 @@ exports.getTotal = async (req, res) => {
             }
         })
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         return res.status(500).send({ error: true, message: 'Internal Server Error!' })
     }
 }
@@ -74,7 +74,6 @@ exports.listAllLog = async (req, res) => {
 };
 
 exports.getDay = async (req, res) => {
-    console.log('day')
     let { startDate, endDate } = req.body
     try {
         let query = { isDeleted: false }
@@ -103,7 +102,7 @@ exports.getDay = async (req, res) => {
             }
         })
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(500).json({ error: true, message: 'Internal Server Error!' });
     }
 }

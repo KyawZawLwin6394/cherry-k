@@ -93,7 +93,6 @@ exports.filterPhysicalExaminations = async (req, res, next) => {
 
 exports.searchPhysicalExaminations = async (req, res, next) => {
   try {
-    console.log(req.body.search)
     const result = await PhysicalExamination.find({ $text: { $search: req.query.search } }).populate('relatedPatient')
     if (result.length===0) return res.status(404).send({error:true, message:'No Record Found!'})
     return res.status(200).send({ success: true, data: result })

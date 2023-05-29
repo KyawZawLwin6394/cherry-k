@@ -124,12 +124,10 @@ exports.createTreatmentSelection = async (req, res, next) => {
 
         for (let i = 0; i < numTreatments; i++) {
             const date = new Date(appointmentConfig.originalDate);
-            console.log(date, 'date')
             date.setDate(date.getDate() + (i * req.body.inBetweenDuration)); // Add 7 days for each iteration
             const config = { ...appointmentConfig, originalDate: date };
             dataconfigs.push(config);
         }
-        console.log(dataconfigs)
         const appointmentResult = await Appointment.insertMany(dataconfigs)
         appointmentResult.map(function (element, index) {
             relatedAppointments.push(element._id)
@@ -228,7 +226,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
         if (fTransResult) response.secTransResult = secTransResult
         res.status(200).send(response);
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         return res.status(500).send({ "error": true, message: error.message })
     }
 };
@@ -338,8 +336,8 @@ exports.treatmentPayment = async (req, res, next) => {
         if (treatmentVoucherResult) response.treatmentVoucherResult = treatmentVoucherResult;
         return res.status(200).send(response);
     } catch (error) {
-        console.log(error)
-        // return res.status(500).send({ "error": true, "message": error.message })
+        //console.log(error)
+        return res.status(500).send({ "error": true, "message": error.message })
     }
 };
 
@@ -409,7 +407,7 @@ exports.getRelatedTreatmentSelections = async (req, res) => {
         let { relatedPatient, start, end, relatedAppointments } = req.body
         if (start && end) query.createdAt = { $gte: start, $lte: end }
         if (relatedPatient) query.relatedPatient = relatedPatient
-        if (relatedAppointments) query.relatedAppointments = {$in:relatedAppointments}
+        if (relatedAppointments) query.relatedAppointments = { $in: relatedAppointments }
         const result = await TreatmentSelection.find(query).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
             path: 'relatedTreatment',
             model: 'Treatments',
@@ -418,7 +416,7 @@ exports.getRelatedTreatmentSelections = async (req, res) => {
                 model: 'Doctors'
             }
         })
-        if (result.length===0)
+        if (result.length === 0)
             return res.status(404).json({ error: true, message: 'No Record Found' });
         return res.status(200).send({ success: true, data: result });
     } catch (error) {

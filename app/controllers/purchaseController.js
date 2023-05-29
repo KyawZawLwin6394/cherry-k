@@ -55,7 +55,6 @@ exports.createPurchase = async (req, res, next) => {
                 { $inc: { currentQuantity: element.qty  } },
                 { new: true },
             ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id')
-            console.log(result)
         })
         data.procedureItems.map(async function (element, index) {
             const result = await ProcedureItems.findOneAndUpdate(
@@ -63,7 +62,6 @@ exports.createPurchase = async (req, res, next) => {
                 { $inc: { currentQuantity: element.qty  } },
                 { new: true },
             ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
-            console.log(result)
         })
         data.accessoryItems.map(async function (element, index) {
             const result = await AccessoryItems.findOneAndUpdate(
@@ -71,7 +69,6 @@ exports.createPurchase = async (req, res, next) => {
                 { $inc: { currentQuantity: element.qty  } },
                 { new: true },
             ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
-            console.log(result)
         })
         const newPurchase = new Purchase(data);
         const result = await newPurchase.save();

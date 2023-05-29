@@ -30,7 +30,6 @@ exports.listAllMedicineSales = async (req, res) => {
         model: 'AccountingLists'
       }]
     });
-    console.log(result)
     count = await MedicineSale.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -46,7 +45,7 @@ exports.listAllMedicineSales = async (req, res) => {
       list: result,
     });
   } catch (e) {
-    console.log(e)
+    //console.log(e)
     return res.status(500).send({ error: true, message: e.message });
   }
 };
@@ -68,7 +67,6 @@ exports.createMedicineSale = async (req, res, next) => {
       const increment = latestDocument[0].seq + 1
       data = { ...data, voucherCode: "MVC-" + increment, seq: increment }
     }
-    console.log(data)
     //first transaction 
     const fTransaction = new Transaction({
       "amount": data.payAmount,

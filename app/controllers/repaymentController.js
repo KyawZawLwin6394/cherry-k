@@ -18,7 +18,6 @@ exports.listAllRepayments = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     let result = await Repayment.find(query).populate('relatedPateintTreatment');
-    console.log(result)
     count = await Repayment.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -47,7 +46,6 @@ exports.getRepayment = async (req, res) => {
 };
 
 exports.getRelatedPayment = async (req, res) => {
-  console.log(req.params.relatedPateintTreatmentid)
   const result = await Repayment.find({ relatedPateintTreatment: req.params.relatedPateintTreatmentid,isDeleted:false }).populate('relatedPateintTreatment')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
@@ -102,7 +100,7 @@ exports.createRepayment = async (req, res, next) => {
       sTrans:secTransResult
     });
   } catch (error) {
-    console.log(error )
+   // console.log(error )
     return res.status(500).send({ "error": true, message: error.message })
   }
 };

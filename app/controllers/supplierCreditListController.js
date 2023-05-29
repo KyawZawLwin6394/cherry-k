@@ -16,7 +16,6 @@ exports.listAllSupplierCreditLists = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     let result = await SupplierCreditList.find(query).populate('relatedAccounting');
-    console.log(result)
     count = await SupplierCreditList.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -55,7 +54,7 @@ exports.createSupplierCreditList = async (req, res, next) => {
       data: result
     });
   } catch (error) {
-    console.log(error )
+    //console.log(error )
     return res.status(500).send({ "error": true, message: error.message })
   }
 };

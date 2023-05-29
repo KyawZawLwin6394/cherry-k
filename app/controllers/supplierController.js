@@ -17,7 +17,6 @@ exports.listAllSuppliers = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     let result = await Supplier.find(query)
-    console.log(result)
     count = await Supplier.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -56,7 +55,7 @@ exports.createSupplier = async (req, res, next) => {
       data: result
     });
   } catch (error) {
-    console.log(error )
+    //console.log(error )
     return res.status(500).send({ "error": true, message: error.message })
   }
 };

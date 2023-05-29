@@ -16,7 +16,6 @@ exports.listAllMedicineLists = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     let result = await MedicineList.find(query).populate('relatedCategory relatedBrand relatedSubCategory');
-    console.log(result)
     count = await MedicineList.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -33,7 +32,7 @@ exports.listAllMedicineLists = async (req, res) => {
       list: result,
     });
   } catch (e) {
-    console.log(e)
+    //console.log(e)
     return res.status(500).send({ error: true, message: e.message });
   }
 };

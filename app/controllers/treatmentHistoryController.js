@@ -16,7 +16,6 @@ exports.listAllTreatmentHistorys = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    console.log(limit)
     let result = await TreatmentHistory.find(query).populate('attachments').populate('relatedAppointment');
     count = await TreatmentHistory.find(query).count();
     const division = count / limit;
@@ -48,7 +47,6 @@ exports.getTreatmentHistory = async (req, res) => {
 exports.createTreatmentHistory = async (req, res, next) => {
   let data = req.body;
   let files = req.files;
-  console.log(data,files)
   try {
     if (files.history !== undefined) {
       let arr = [];
@@ -62,7 +60,6 @@ exports.createTreatmentHistory = async (req, res, next) => {
         preparation.push(i._id);
       });
       data = { ...data, attachments: preparation };
-      console.log(data)
     } //prepare img and save it into attachment schema\
 
     const newTreatmentHistory = new TreatmentHistory(data);
@@ -73,7 +70,7 @@ exports.createTreatmentHistory = async (req, res, next) => {
       data: result
     });
   } catch (error) {
-    console.log(error)
+    //console.log(error)
     //return res.status(500).send({ "error": true, message: error.message })
   }
 };
@@ -94,7 +91,6 @@ exports.updateTreatmentHistory = async (req, res, next) => {
         preparation.push(i._id);
       });
       data = { ...data, attachments: preparation };
-      console.log(data)
     } //prepare img and save it into attachment schema\
 
     const result = await TreatmentHistory.findOneAndUpdate(

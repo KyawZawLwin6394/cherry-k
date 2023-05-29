@@ -33,7 +33,8 @@ exports.listAllProcedureItems = async (req, res) => {
       list: result,
     });
   } catch (e) {
-    console.log(e)
+    //console.log(e)
+
     return res.status(500).send({ error: true, message: e.message });
   }
 };
@@ -61,7 +62,6 @@ exports.createProcedureItem = async (req, res, next) => {
 
     const getAllBranches = await Branch.find();
     for (let i = 0; i < getAllBranches.length; i++) {
-      console.log('here')
       const stockResult = await Stock.create({
         "relatedProcedureItems": result._id,
         "currentQty": 0,

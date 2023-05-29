@@ -17,7 +17,6 @@ exports.listAllSellEnds = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     let result = await SellEnd.find(query)
-    console.log(result)
     count = await SellEnd.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -80,7 +79,7 @@ exports.createSellEnd = async (req, res, next) => {
     });
 
   } catch (error) {
-    console.log(error)
+    //console.log(error)
     return res.status(500).send({ "error": true, message: error.message })
   }
 };

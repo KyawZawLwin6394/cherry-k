@@ -73,7 +73,7 @@ exports.createBank = async (req, res, next) => {
       bank:bankAccResult
     });
   } catch (error) {
-    console.log(error )
+    // console.log(error )
     return res.status(500).send({ "error": true, message: error.message })
   }
 };

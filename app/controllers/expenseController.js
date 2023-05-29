@@ -17,7 +17,6 @@ exports.listAllExpenses = async (req, res) => {
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
         let result = await Expense.find(query).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
-        console.log(result)
         count = await Expense.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
@@ -66,7 +65,6 @@ exports.createExpense = async (req, res, next) => {
         }
         const newTrans = new Transaction(firstTransaction)
         const fTransResult = await newTrans.save();
-        console.log(fTransResult)
         if (req.body.relatedCredit) {
             //credit
             const secondTransaction = {
@@ -84,7 +82,6 @@ exports.createExpense = async (req, res, next) => {
             }
             const secTrans = new Transaction(secondTransaction)
             var secTransResult = await secTrans.save();
-            console.log(secTransResult)
         } else {
             //bank or cash
             
@@ -106,7 +103,6 @@ exports.createExpense = async (req, res, next) => {
 
             const secTrans = new Transaction(secondTransaction)
             var secTransResult = await secTrans.save();
-            console.log(secTransResult)
         }
         res.status(200).send({
             message: 'Expense create success',

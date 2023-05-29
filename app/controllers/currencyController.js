@@ -16,7 +16,6 @@ exports.listAllCurrencys = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     let result = await Currency.find(query);
-    console.log(result)
     count = await Currency.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
