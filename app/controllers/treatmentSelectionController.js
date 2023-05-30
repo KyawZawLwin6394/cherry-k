@@ -353,7 +353,7 @@ exports.treatmentPayment = async (req, res, next) => {
         if (rpRecordPopulated) response.rpRecordPopulated = rpRecordPopulated
         return res.status(200).send(response);
     } catch (error) {
-        //console.log(error)
+        console.log(error)
         return res.status(500).send({ "error": true, "message": error.message })
     }
 };
