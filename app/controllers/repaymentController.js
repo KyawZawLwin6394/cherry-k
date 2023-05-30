@@ -148,7 +148,7 @@ exports.activateRepayment = async (req, res, next) => {
 
 exports.getRepayRecord = async (req, res) => {
   try {
-    const result = await RepayRecord.find({ relatedTreatmentSelection: req.params.id }).populate('relatedTreatmentSelection relatedAppointment relatedBranch').populate({
+    const result = await RepayRecord.find({ relatedTreatmentSelection: req.params.id }).populate(' relatedAppointment relatedBranch').populate({
       path: 'relatedTreatmentSelection',
       model: 'TreatmentSelections',
       populate: {
