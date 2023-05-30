@@ -87,6 +87,9 @@ let TreatmentSelectionSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
   },
+  paymentStatus:{
+    type:Boolean
+  }
 
 });
 const patient = mongoose.model('TreatmentSelections', TreatmentSelectionSchema)

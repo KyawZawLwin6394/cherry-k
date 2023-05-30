@@ -264,6 +264,7 @@ exports.treatmentPayment = async (req, res, next) => {
         ).populate('relatedTreatment');
         if (result.paymentMethod === 'Credit') { //
             let dataTVC = {
+                "relatedBranch": req.body.relatedBranch,
                 "relatedTreatmentSelection": result._id,
                 "relatedTreatment": req.body.relatedTreatment,
                 "relatedAppointment": req.body.relatedAppointment,
@@ -285,6 +286,7 @@ exports.treatmentPayment = async (req, res, next) => {
             //transaction
             var fTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
+                "relatedBranch": req.body.relatedBranch,
                 "date": Date.now(),
                 "remark": null,
                 "relatedAccounting": result.relatedTreatment.relatedAccount,
@@ -293,6 +295,7 @@ exports.treatmentPayment = async (req, res, next) => {
             //sec transaction
             var secTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
+                "relatedBranch": req.body.relatedBranch,
                 "date": Date.now(),
                 "remark": null,
                 "relatedBank": req.body.relatedBank,
@@ -314,13 +317,15 @@ exports.treatmentPayment = async (req, res, next) => {
             var repayRecord = await Repay.create({
                 relatedAppointment: req.body.relatedAppointment,
                 relatedTreatmentSelection: req.body.id,
-                paidAmount: req.body.paidAmount
+                paidAmount: req.body.paidAmount,
+                relatedBranch: req.body.relatedBranch
             })
             //transaction
             var fTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
                 "remark": null,
+                "relatedBranch": req.body.relatedBranch,
                 "relatedAccounting": "6467379159a9bc811d97f4d2", //Advance received from customer
                 "type": "Debit"
             })
@@ -329,6 +334,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
                 "remark": null,
+                "relatedBranch": req.body.relatedBranch,
                 "relatedAccounting": result.relatedTreatment.relatedAccount,
                 "type": "Credit",
                 "relatedTransaction": fTransResult._id
@@ -343,6 +349,7 @@ exports.treatmentPayment = async (req, res, next) => {
             // treatmentVoucherResult:treatmentVoucherResult
         }
         if (treatmentVoucherResult) response.treatmentVoucherResult = treatmentVoucherResult;
+        if (repayRecord) response.repayRecord = repayRecord
         return res.status(200).send(response);
     } catch (error) {
         //console.log(error)
@@ -383,6 +390,7 @@ exports.createTreatmentTransaction = async (req, res) => {
         const fTransaction = new Transaction({
             "amount": req.body.amount,
             "date": req.body.date,
+            "relatedBranch": req.body.relatedBranch,
             "remark": req.body.remark,
             "relatedAccounting": req.body.firstAccount,
             "type": "Credit"
@@ -392,6 +400,7 @@ exports.createTreatmentTransaction = async (req, res) => {
             {
                 "amount": req.body.amount,
                 "date": req.body.date,
+                "relatedBranch": req.body.relatedBranch,
                 "remark": req.body.remark,
                 "relatedAccounting": req.body.secondAccount,
                 "type": "Debit",
@@ -412,7 +421,7 @@ exports.createTreatmentTransaction = async (req, res) => {
 
 exports.getRelatedTreatmentSelections = async (req, res) => {
     try {
-        let query = { isDeleted: false };
+        let query = req.mongoQuery;
         let { relatedPatient, start, end, relatedAppointments } = req.body
         if (start && end) query.createdAt = { $gte: start, $lte: end }
         if (relatedPatient) query.relatedPatient = relatedPatient
@@ -437,8 +446,11 @@ exports.getRelatedTreatmentSelections = async (req, res) => {
 
 exports.searchTreatmentSelections = async (req, res, next) => {
     try {
+        let query = req.mongoQuery
         let { search, relatedPatient } = req.body
-        const result = await TreatmentSelection.find({ $text: { $search: search }, isDeleted: false, relatedPatient: relatedPatient })
+        if (relatedPatient) query.relatedPatient = relatedPatient
+        if (search) query.$text = { $search: search }
+        const result = await TreatmentSelection.find(query)
         if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
         return res.status(200).send({ success: true, data: result })
     } catch (err) {

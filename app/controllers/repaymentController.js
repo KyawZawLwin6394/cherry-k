@@ -148,7 +148,14 @@ exports.activateRepayment = async (req, res, next) => {
 
 exports.getRepayRecord = async (req, res) => {
   try {
-    const result = await RepayRecord.find({ relatedTreatmentSelection: req.params.id })
+    const result = await RepayRecord.find({ relatedTreatmentSelection: req.params.id }).populate('relatedTreatmentSelection relatedAppointment relatedBranch').populate({
+      path: 'relatedTreatmentSelection',
+      model: 'TreatmentSelections',
+      populate: {
+          path: 'relatedTreatment',
+          model: 'Treatments'
+      }
+  })
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Records Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (error) {

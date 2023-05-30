@@ -82,10 +82,10 @@ exports.getPatient = async (req, res) => {
     path: 'relatedTreatmentSelection',
     model: 'TreatmentSelections',
     populate: {
-        path: 'relatedTreatment',
-        model: 'Treatments'
+      path: 'relatedTreatment',
+      model: 'Treatments'
     }
-})
+  })
   if (!result)
     return res.status(500).json({ error: true, message: 'Query Failed!' });
   if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
@@ -201,7 +201,10 @@ exports.filterPatients = async (req, res, next) => {
 
 exports.searchPatients = async (req, res, next) => {
   try {
-    const result = await Patient.find({ $text: { $search: req.body.search }, relatedBranch:req.mongoQuery.relatedBranch })
+    let query = req.mongoQuery
+    let { search } = req.body
+    if (search) query.$text = { $search: search }
+    const result = await Patient.find(query)
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (err) {

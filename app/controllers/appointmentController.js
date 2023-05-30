@@ -26,7 +26,7 @@ exports.listAllAppointments = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = { isDeleted: false },
+    let query = req.mongoQuery,
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -60,7 +60,9 @@ exports.getTodaysAppointment = async (req, res) => {
     var end = new Date();
     start.setHours(0, 0, 0, 0);
     end.setHours(23, 59, 59, 999);
-    const result = await Appointment.find({ originalDate: { $gte: start, $lt: end } }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection').populate({
+    let query = req.mongoQuery
+    if (start && end) query.originalDate = { $gte: start, $lt: end }
+    const result = await Appointment.find(query).populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection').populate({
       path: 'relatedPatient',
       populate: [{
         path: 'img',
@@ -87,7 +89,9 @@ exports.getTodaysAppointment = async (req, res) => {
 
 exports.getAppointment = async (req, res) => {
   try {
-    const result = await Appointment.find({ _id: req.params.id, isDeleted: false }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection').populate({
+    let query = req.mongoQuery
+    if (req.params.id) query._id = req.params.id
+    const result = await Appointment.find(query).populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection').populate({
       path: 'relatedPatient',
       populate: [{
         path: 'img',
@@ -189,7 +193,7 @@ exports.activateAppointment = async (req, res, next) => {
 
 exports.filterAppointments = async (req, res, next) => {
   try {
-    let query = { isDeleted: false }
+    let query = req.mongoQuery
     const { start, end, token, phone } = req.query
     if (start && end) query.originalDate = { $gte: start, $lte: end }
     if (token) query.token = token
@@ -205,7 +209,10 @@ exports.filterAppointments = async (req, res, next) => {
 
 exports.searchAppointment = async (req, res, next) => {
   try {
-    const result = await Appointment.find({ $text: { $search: req.body.search }, isDeleted: false })
+    let query = req.mongoQuery
+    let { search } = req.body
+    if (search) query.$text = { $search: search }
+    const result = await Appointment.find(query)
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (err) {
