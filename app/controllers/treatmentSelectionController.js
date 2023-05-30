@@ -118,7 +118,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
             relatedPatient: req.body.relatedPatient,
             relatedDoctor: req.body.relatedDoctor,
             originalDate: new Date(req.body.originalDate), // Convert to Date object
-            phone: req.body.phone
+            phone: req.body.phone,
+            relatedBranch: req.body.relatedBranch
         };
 
         const numTreatments = req.body.treatmentTimes;
@@ -312,7 +313,7 @@ exports.treatmentPayment = async (req, res, next) => {
 
             var repayRecord = await Repay.create({
                 relatedAppointment: req.body.relatedAppointment,
-                relatedTreatmentSelection: req.body.relatedTreatmentSelection,
+                relatedTreatmentSelection: req.body.id,
                 paidAmount: req.body.paidAmount
             })
             //transaction
