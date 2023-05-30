@@ -15,15 +15,15 @@ let PatientSchema = new Schema({
     type: Number,
   },
   phone: {
-    type:String,
-    required:true
+    type: String,
+    required: true
   },
   dateOfBirth: {
     type: Date,
   },
   date: {
-    type:String
-  },  
+    type: String
+  },
   email: {
     type: String,
     lowercase: true,
@@ -52,33 +52,37 @@ let PatientSchema = new Schema({
     type: Date
   },
   isDeleted: {
-    type:Boolean,
-    required:true,
-    default:false
+    type: Boolean,
+    required: true,
+    default: false
   },
   patientStatus: {
-    type:String,
-    enum:['New','Old'],
+    type: String,
+    enum: ['New', 'Old'],
 
-    default:'New',
+    default: 'New',
 
   },
   patientID: {
-    type:String,
+    type: String,
   },
   seq: {
-    type:Number
+    type: Number
   },
-  img:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'Attachments',
+  img: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Attachments',
   },
   relatedTreatmentSelection: {
-    type:[mongoose.Schema.Types.ObjectId],
-    ref:'TreatmentSelections'
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'TreatmentSelections'
+  },
+  relatedBranch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Branches'
   },
 });
-const patient = mongoose.model('Patients',PatientSchema)
+const patient = mongoose.model('Patients', PatientSchema)
 module.exports = patient;
 
 

@@ -82,7 +82,11 @@ let TreatmentSelectionSchema = new Schema({
   relatedTreatmentVoucher:{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'TreatmentVouchers'
-  }
+  },
+  relatedBranch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Branches'
+  },
 
 });
 const patient = mongoose.model('TreatmentSelections', TreatmentSelectionSchema)
