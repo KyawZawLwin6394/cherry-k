@@ -2,11 +2,9 @@
 const TreatmentSelection = require('../models/treatmentSelection');
 const Appointment = require('../models/appointment');
 const Transaction = require('../models/transaction');
-const Treatment = require('../models/treatment');
 const Patient = require('../models/patient');
 const TreatmentVoucher = require('../models/treatmentVoucher');
-const treatment = require('../models/treatment');
-const treatmentVoucher = require('../models/treatmentVoucher');
+const Repay = require('../models/repayRecord');
 
 exports.listAllTreatmentSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -307,6 +305,12 @@ exports.treatmentPayment = async (req, res, next) => {
             //         "amount": paidAmount,
             //     }
             // )
+
+            var repayRecord = await Repay.create({
+                relatedAppointment:req.body.relatedAppointment,
+                relatedTreatmentSelection:req.body.relatedTreatmentSelection,
+                paidAmount:req.body.paidAmount
+            })
             //transaction
             var fTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
