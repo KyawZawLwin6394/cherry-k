@@ -8,23 +8,27 @@ const Schema = mongoose.Schema;
 let RepayRecordSchema = new Schema({
   relatedAppointment: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'Appointments'
+    ref: 'Appointments'
   },
   relatedTreatmentSelection: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'TreatmentSelections'
+    ref: 'TreatmentSelections'
   },
   createdAt: {
-    type:Date,
-    default:Date.now()
+    type: Date,
+    default: Date.now()
   },
   isDeleted: {
     type: Boolean,
-    default:false
+    default: false
   },
   paidAmount: {
     type: Number
-  }
+  },
+  relatedBranch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Branches'
+  },
 });
 
 module.exports = mongoose.model('RepayRecords', RepayRecordSchema);

@@ -18,7 +18,7 @@ let LogSchema = new Schema({
     },
     date: {
         type: Date,
-        default:Date.now()
+        default: Date.now()
     },
     currentQty: {
         type: Number,
@@ -29,23 +29,27 @@ let LogSchema = new Schema({
     finalQty: {
         type: Number,
     },
-    relatedProcedureItems:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'ProcedureItems'
+    relatedProcedureItems: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ProcedureItems'
     },
-    relatedAccessoryItems:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'AccessoryItems'
+    relatedAccessoryItems: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AccessoryItems'
     },
-    relatedMachine:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'FixedAssets'
+    relatedMachine: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'FixedAssets'
     },
     isDeleted: {
         type: Boolean,
         required: true,
         default: false
-    }
+    },
+    relatedBranch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branches'
+    },
 });
 
 module.exports = mongoose.model('Logs', LogSchema);

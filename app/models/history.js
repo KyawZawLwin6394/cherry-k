@@ -33,7 +33,11 @@ let HistorySchema = new Schema({
         type: Boolean,
         required: true,
         default: false
-    }
+    },
+    relatedBranch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branches'
+      },
 });
 
 module.exports = mongoose.model('Histories', HistorySchema);

@@ -36,14 +36,14 @@ let ProcedureHistorySchema = new Schema({
     //     SIG: String
     // }],
     customTreatmentPackages: {
-        item_id:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:'Treatments'
+        item_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Treatments'
         }
     },
-    status:{
-        type:String,
-        enum:['Finished']
+    status: {
+        type: String,
+        enum: ['Finished']
     },
     isDeleted: {
         type: Boolean,
@@ -51,21 +51,25 @@ let ProcedureHistorySchema = new Schema({
         default: false
     },
     date: {
-        type:Date,
-        default:Date.now()
+        type: Date,
+        default: Date.now()
     },
     pHistory: {
-        type:[mongoose.Schema.Types.ObjectId],
-        ref:'Attachments'
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'Attachments'
     },
-    relatedAppointment:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Appointments'
+    relatedAppointment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Appointments'
     },
-    relatedTreatmentSelection:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'TreatmentSelection'
-    }
+    relatedTreatmentSelection: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'TreatmentSelection'
+    },
+    relatedBranch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branches'
+    },
 });
 
 module.exports = mongoose.model('ProcedureHistories', ProcedureHistorySchema);

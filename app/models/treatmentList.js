@@ -26,7 +26,11 @@ let TreatmentListSchema = new Schema({
     type:Boolean,
     required:true,
     default:false
-  }
+  },
+  relatedBranch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Branches'
+  },
 });
 
 module.exports = mongoose.model('TreatmentLists', TreatmentListSchema);

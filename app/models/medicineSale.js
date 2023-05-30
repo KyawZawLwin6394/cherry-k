@@ -83,7 +83,11 @@ let MedicineSaleSchema = new Schema({
   relatedTransaction:{
     type:[mongoose.Schema.Types.ObjectId],
     ref:'Transactions'
-  }
+  },
+  relatedBranch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Branches'
+  },
 });
 
 module.exports = mongoose.model('MedicineSales', MedicineSaleSchema);

@@ -65,7 +65,11 @@ let AccessoryItem = new Schema({
   relatedSubCategory: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'SubCategories'
-  }
+  },
+  relatedBranch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Branches'
+  },
 });
 
 module.exports = mongoose.model('AccessoryItems', AccessoryItem);

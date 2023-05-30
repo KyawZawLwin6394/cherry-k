@@ -12,7 +12,7 @@ let StockTransferSchema = new Schema({
         },
         stockQty: Number,
         requestedQty: Number,
-        transferQty:Number
+        transferQty: Number
     }],
     medicineLists: [{
         item_id: {
@@ -21,7 +21,7 @@ let StockTransferSchema = new Schema({
         },
         stockQty: Number,
         requestedQty: Number,
-        transferQty:Number
+        transferQty: Number
     }],
     procedureAccessory: [{
         item_id: {
@@ -30,28 +30,32 @@ let StockTransferSchema = new Schema({
         },
         stockQty: Number,
         requestedQty: Number,
-        transferQty:Number
+        transferQty: Number
     }],
-    relatedBranch : {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Branches'
+    relatedBranch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branches'
     },
-    date:{
-        type:Date
+    date: {
+        type: Date
     },
-    requestNo:{
-        type:String
+    requestNo: {
+        type: String
     },
-    requestedBy:{
-        type:String
+    requestedBy: {
+        type: String
     },
-    isDeleted:{
-        type:Boolean,
-        default:false
+    isDeleted: {
+        type: Boolean,
+        default: false
     },
-    seq:{
-        type:Number
-    }
+    seq: {
+        type: Number
+    },
+    relatedBranch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branches'
+    },
 
 });
 

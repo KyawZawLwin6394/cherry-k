@@ -61,7 +61,11 @@ let AppointmentSchema = new Schema({
   },
   status: {
     type:String
-  }
+  },
+  relatedBranch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Branches'
+  },
 });
 
 module.exports = mongoose.model('Appointments', AppointmentSchema);

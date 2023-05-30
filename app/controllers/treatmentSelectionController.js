@@ -13,7 +13,7 @@ exports.listAllTreatmentSelections = async (req, res) => {
     try {
         limit = +limit <= 100 ? +limit : 10; //limit
         skip = +skip || 0;
-        let query = { isDeleted: false },
+        let query = req.mongoQuery,
             regexKeyword;
         role ? (query['role'] = role.toUpperCase()) : '';
         keyword && /\w/.test(keyword)
@@ -48,7 +48,9 @@ exports.listAllTreatmentSelections = async (req, res) => {
 };
 
 exports.getTreatmentSelection = async (req, res) => {
-    const result = await TreatmentSelection.find({ _id: req.params.id, isDeleted: false }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
+    let query = req.mongoQuery
+    if (req.params.id) query._id = req.params.id
+    const result = await TreatmentSelection.find(query).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
         path: 'relatedTreatment',
         populate: [{
             path: 'relatedDoctor',
@@ -72,7 +74,9 @@ exports.getTreatmentSelection = async (req, res) => {
 };
 
 exports.getTreatementSelectionByTreatmentID = async (req, res) => {
-    const result = await TreatmentSelection.find({ relatedTreatment: req.params.id, isDeleted: false }).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
+    let query = req.mongoQuery
+    if (req.params.id) query.relatedTreatment = req.params.id
+    const result = await TreatmentSelection.find(query).populate('relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
         path: 'relatedTreatment',
         model: 'Treatments',
         populate: {
@@ -250,7 +254,7 @@ exports.updateTreatmentSelection = async (req, res, next) => {
 exports.treatmentPayment = async (req, res, next) => {
     let data = req.body;
     try {
-        let { paidAmount, paymentMethod } = data;
+        let { paidAmount } = data;
         const treatmentSelectionQuery = await TreatmentSelection.find({ _id: req.body.id, isDeleted: false }).populate('relatedTreatment').populate('relatedAppointments');
         const result = await TreatmentSelection.findOneAndUpdate(
             { _id: req.body.id },
@@ -307,9 +311,9 @@ exports.treatmentPayment = async (req, res, next) => {
             // )
 
             var repayRecord = await Repay.create({
-                relatedAppointment:req.body.relatedAppointment,
-                relatedTreatmentSelection:req.body.relatedTreatmentSelection,
-                paidAmount:req.body.paidAmount
+                relatedAppointment: req.body.relatedAppointment,
+                relatedTreatmentSelection: req.body.relatedTreatmentSelection,
+                paidAmount: req.body.paidAmount
             })
             //transaction
             var fTransResult = await Transaction.create({

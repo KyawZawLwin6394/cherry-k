@@ -6,43 +6,47 @@ const Schema = mongoose.Schema;
 
 
 let StockSchema = new Schema({
-  relatedBranch:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'Branches'
+  relatedBranch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Branches'
   },
-  relatedProcedureItems:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'MedicineItems'
+  relatedProcedureItems: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'MedicineItems'
   },
-  relatedMedicineItems:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'ProcedureItems'
+  relatedMedicineItems: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ProcedureItems'
   },
-  relatedAccessoryItems:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'AccessoryItems'
+  relatedAccessoryItems: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AccessoryItems'
   },
-  relatedMachine : {
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'FixedAssets'
+  relatedMachine: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'FixedAssets'
   },
-  currentQty:{
-    type:Number
+  currentQty: {
+    type: Number
   },
-  fromUnit:{
-    type:Number
+  fromUnit: {
+    type: Number
   },
-  toUnit:{
-    type:Number
+  toUnit: {
+    type: Number
   },
-  reorderQty:{
-    type:Number
+  reorderQty: {
+    type: Number
   },
   isDeleted: {
-    type:Boolean,
-    required:true,
-    default:false
-  }
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  relatedBranch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Branches'
+  },
 });
 
 module.exports = mongoose.model('Stocks', StockSchema);
