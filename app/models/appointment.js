@@ -60,7 +60,8 @@ let AppointmentSchema = new Schema({
     ref:'TreatmentSelections'
   },
   status: {
-    type:Boolean
+    type:Boolean,
+    default:false
   },
   relatedBranch: {
     type: mongoose.Schema.Types.ObjectId,
