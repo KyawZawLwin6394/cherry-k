@@ -17,4 +17,5 @@ module.exports = (app) => {
 
     app.route('/api/repayments').get(catchError(repayment.listAllRepayments))
     app.route('/api/repayments/:relatedPateintTreatmentid').get(catchError(repayment.getRelatedPayment))
+    app.route('/api/repay-record/:id').get(catchError(repayment.getRepayRecord))
 };

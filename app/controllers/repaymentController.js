@@ -2,6 +2,7 @@
 const Repayment = require('../models/repayment');
 const PatientTreatment = require('../models/patientTreatment');
 const Transaction = require('../models/transaction');
+const RepayRecord = require('../models/repayRecord');
 
 exports.listAllRepayments = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -10,7 +11,7 @@ exports.listAllRepayments = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 20; //limit
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -39,23 +40,23 @@ exports.listAllRepayments = async (req, res) => {
 };
 
 exports.getRepayment = async (req, res) => {
-  const result = await Repayment.find({ _id: req.params.id,isDeleted:false }).populate('relatedPateintTreatment')
+  const result = await Repayment.find({ _id: req.params.id, isDeleted: false }).populate('relatedPateintTreatment')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.getRelatedPayment = async (req, res) => {
-  const result = await Repayment.find({ relatedPateintTreatment: req.params.relatedPateintTreatmentid,isDeleted:false }).populate('relatedPateintTreatment')
+  const result = await Repayment.find({ relatedPateintTreatment: req.params.relatedPateintTreatmentid, isDeleted: false }).populate('relatedPateintTreatment')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.createRepayment = async (req, res, next) => {
-    let data = req.body;
+  let data = req.body;
   try {
-    data = {...data, remaningCredit:data.remaningCredit-data.repaymentAmount}
+    data = { ...data, remaningCredit: data.remaningCredit - data.repaymentAmount }
 
     //first transaction 
     const fTransaction = new Transaction({
@@ -72,7 +73,7 @@ exports.createRepayment = async (req, res, next) => {
         "date": Date.now(),
         "remark": req.body.description,
         "relatedBank": req.body.relatedBank,
-        "relatedCash":req.body.relatedCash,
+        "relatedCash": req.body.relatedCash,
         "type": "Debit",
         "relatedTransaction": fTransResult._id
       }
@@ -84,23 +85,23 @@ exports.createRepayment = async (req, res, next) => {
     const result = await newRepayment.save();
 
     //update PatientTreament's leftover amount
-    
+
     const patientTreatmentResults = await PatientTreatment.findOneAndUpdate(
-        { _id: data.relatedPateintTreatment },
-        {leftOverAmount:data.remaningCredit},
-        { new: true },
-      )
+      { _id: data.relatedPateintTreatment },
+      { leftOverAmount: data.remaningCredit },
+      { new: true },
+    )
 
     res.status(200).send({
       message: 'Repayment create success',
       success: true,
       data: result,
       patientTreatment: patientTreatmentResults,
-      fTrans:fTransResult,
-      sTrans:secTransResult
+      fTrans: fTransResult,
+      sTrans: secTransResult
     });
   } catch (error) {
-   // console.log(error )
+    // console.log(error )
     return res.status(500).send({ "error": true, message: error.message })
   }
 };
@@ -144,3 +145,13 @@ exports.activateRepayment = async (req, res, next) => {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
+
+exports.getRepayRecord = async (req, res) => {
+  try {
+    const result = await RepayRecord.find({ relatedTreatmentSelection: req.params.id })
+    if (result.length === 0) return res.status(404).send({ error: true, message: 'No Records Found!' })
+    return res.status(200).send({ success: true, data: result })
+  } catch (error) {
+    return res.status(500).send({ error: true, message: error.message })
+  }
+}
