@@ -320,14 +320,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 paidAmount: req.body.paidAmount,
                 relatedBranch: req.body.relatedBranch
             })
-            var rpRecordPopulated = await Repay.find({ id: repayRecord.id }).populate(' relatedAppointment relatedBranch').populate({
-                path: 'relatedTreatmentSelection',
-                model: 'TreatmentSelections',
-                populate: {
-                    path: 'relatedTreatment',
-                    model: 'Treatments'
-                }
-            })
+            var rpRecordPopulated = await Repay.find({ id: repayRecord.id }).populate(' relatedAppointment')
             //transaction
             var fTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
