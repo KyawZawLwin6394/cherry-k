@@ -161,6 +161,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedTransaction": fTransResult._id
             });
             tvcCreate = true;
+        } else if (req.body.paymentMethod === 'FOC') {
+            tvcCreate = true;
         }
         if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
         if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
