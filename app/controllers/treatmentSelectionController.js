@@ -174,7 +174,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedPatient": req.body.relatedPatient,
                 "paymentMethod": "Advanced", //enum: ['by Appointment','Lapsum','Total','Advanced']
                 "amount": req.body.paidAmount,
-                "relatedBank": req.body.relatedBank, //must be bank acc from accounting accs
+                "relatedBank": req.body.relatedBank, 
+                "bankType":req.body.bankType,//must be bank acc from accounting accs
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash //must be cash acc from accounting accs
             }
@@ -272,6 +273,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 "paymentMethod": 'by Appointment', //enum: ['by Appointment','Lapsum','Total','Advanced']
                 "amount": paidAmount,
                 "relatedBank": req.body.relatedBank, //must be bank acc from accounting accs
+                "bankType":req.body.bankType,
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash //must be cash acc from accounting accs
             }

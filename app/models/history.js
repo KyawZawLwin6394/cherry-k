@@ -37,7 +37,23 @@ let HistorySchema = new Schema({
     relatedBranch: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Branches'
-      },
+    },
+    lmp:{
+        type:Date
+    },
+    desiredTreatment:{
+        type:String
+    },
+    note:{
+        type:String
+    },
+    complaint:{
+        type:String
+    },
+    consent:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Attachments"
+    }
 });
 
 module.exports = mongoose.model('Histories', HistorySchema);

@@ -22,6 +22,8 @@ var storage = multer.diskStorage({
             cb(null, './uploads/cherry-k/history');
         } else if (file.fieldname === "phistory") {
             cb(null, './uploads/cherry-k/phistory');
+        } else if (file.fieldname === "consent") {
+            cb(null, './uploads/cherry-k/consent');
         }
 
     },
@@ -34,6 +36,8 @@ var storage = multer.diskStorage({
         } else if (file.fieldname === "history") {
             cb(null, "TH-" + name + randomText + Date.now() + "." + ext)
         } else if (file.fieldname === "phistory") {
+            cb(null, "PH-" + name + randomText + Date.now() + "." + ext)
+        } else if (file.fieldname === "consent") {
             cb(null, "PH-" + name + randomText + Date.now() + "." + ext)
         }
 
@@ -78,6 +82,10 @@ exports.upload = multer({
         {
             name: 'phistory',
             maxCount: 2
+        },
+        {
+            name: 'consent',
+            maxCount: 1
         }
 
 

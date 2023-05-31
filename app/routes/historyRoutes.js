@@ -3,11 +3,12 @@
 const history = require("../controllers/historyController");
 const { catchError } = require("../lib/errorHandler");
 const verifyToken = require('../lib/verifyToken');
+const upload = require('../lib/fieldUploader').upload;
 
 module.exports = (app) => {
 
     app.route('/api/history')
-        .post(catchError(history.createHistory))
+        .post(upload ,catchError( history.createHistory))
         .put(catchError(history.updateHistory))
 
     app.route('/api/history/:id')
