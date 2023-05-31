@@ -51,11 +51,7 @@ let StockTransferSchema = new Schema({
     },
     seq: {
         type: Number
-    },
-    relatedBranch: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Branches'
-    },
+    }
 
 });
 
