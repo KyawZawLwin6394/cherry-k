@@ -4,7 +4,7 @@ const Stock = require('../models/stock');
 exports.listAllStocks = async (req, res) => {
     let query = req.mongoQuery
     try {
-        let result = await Stock.find(query);
+        let result = await Stock.find(query).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
         let count = await Stock.find(query).count();
         res.status(200).send({
             success: true,
@@ -19,7 +19,7 @@ exports.listAllStocks = async (req, res) => {
 exports.getStock = async (req, res) => {
     let query = req.mongoQuery
     if (req.params.id) query._id = req.params.id
-    const result = await Stock.find(query);
+    const result = await Stock.find(query).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -45,7 +45,7 @@ exports.updateStock = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        );
+        ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })

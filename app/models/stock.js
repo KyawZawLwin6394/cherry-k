@@ -43,10 +43,6 @@ let StockSchema = new Schema({
     required: true,
     default: false
   },
-  relatedBranch: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Branches'
-  },
 });
 
 module.exports = mongoose.model('Stocks', StockSchema);
