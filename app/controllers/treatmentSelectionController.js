@@ -162,7 +162,27 @@ exports.createTreatmentSelection = async (req, res, next) => {
             });
             tvcCreate = true;
         } else if (req.body.paymentMethod === 'FOC') {
-            tvcCreate = true;
+            //--> treatment voucher create
+            let dataTVC = {
+                "relatedTreatmentSelection": result._id,
+                "relatedTreatment": req.body.relatedTreatment,
+                "relatedAppointment": req.body.relatedAppointment,
+                "relatedPatient": req.body.relatedPatient,
+                "paymentMethod": "FOC", //enum: ['by Appointment','Lapsum','Total','Advanced']
+                "amount": req.body.paidAmount,
+                "relatedBank": req.body.relatedBank, 
+                "bankType":req.body.bankType,//must be bank acc from accounting accs
+                "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
+                "relatedCash": req.body.relatedCash //must be cash acc from accounting accs
+            }
+            let today = new Date().toISOString()
+            const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
+            if (latestDocument[0].seq === undefined) dataTVC = { ...dataTVC, seq: 1, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-1" } // if seq is undefined set initial patientID and seq
+            if (latestDocument[0].seq) {
+                const increment = latestDocument[0].seq + 1
+                dataTVC = { ...dataTVC, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-" + increment, seq: increment }
+            }
+            var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
         if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
         if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
