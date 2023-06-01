@@ -28,31 +28,19 @@ exports.getTotal = async (req, res) => {
 
         const pipeline2 = [
             {
-              $group: {
-                _id: '$paymentMethod',
-                totalAmount: { $sum: '$amount' } // Replace 'amount' with the desired field name
-              }
+                $group: {
+                    _id: '$paymentMethod',
+                    totalAmount: { $sum: '$amount' } // Replace 'amount' with the desired field name
+                }
             },
             {
-              $group: {
-                _id: null,
-                paymentMethods: {
-                  $push: {
+                $project: {
+                    _id: 0,
                     paymentMethod: '$_id',
-                    totalAmount: '$totalAmount'
-                  }
-                },
-                totalAmount: { $sum: '$totalAmount' }
-              }
-            },
-            {
-              $project: {
-                _id: 0,
-                paymentMethods: 1,
-                totalAmount: 1
-              }
+                    totalAmount: 1
+                }
             }
-          ];
+        ];
         const tvPaymentMethod = await TreatmentVoucher.aggregate(pipeline2);
         const msPaymentMethod = await MedicineSale.aggregate(pipeline);
 
@@ -86,7 +74,7 @@ exports.getTotal = async (req, res) => {
                 expenseTotal: expenseTotal[0].totalAmount,
                 profit: MSTotal[0].totalAmount + TVTotal[0].totalAmount - expenseTotal[0].totalAmount,
                 msPaymentMethod: msPaymentMethod,
-                tvPaymentMethod: tvPaymentMethod[0] // Access the result from the first element of the array
+                tvPaymentMethod: tvPaymentMethod // Access the result from the first element of the array
             }
         });
     } catch (error) {
