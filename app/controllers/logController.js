@@ -4,6 +4,7 @@ const ProcedureItem = require('../models/procedureItem');
 const AccessoryItem = require('../models/accessoryItem');
 const Machine = require('../models/fixedAsset');
 const Usage = require('../models/usage');
+const Stock = require('../models/stock')
 
 exports.listAllLog = async (req, res) => {
   try {
@@ -61,6 +62,7 @@ exports.filterLogs = async (req, res, next) => {
 
 exports.createUsage = async (req, res) => {
   let { relatedTreatmentSelection, relatedAppointment, procedureMedicine, procedureAccessory, machine } = req.body;
+  let { relatedBranch } = req.mongoQuery;
   let machineError = []
   let procedureItemsError = []
   let accessoryItemsError = []
@@ -75,8 +77,8 @@ exports.createUsage = async (req, res) => {
         } else {
           let min = e.stock - e.actual
           try {
-            const result = await ProcedureItem.findOneAndUpdate(
-              { _id: e.item_id },
+            const result = await Stock.findOneAndUpdate(
+              { _id: e.item_id, relatedBranch: relatedBranch },
               { currentQuantity: min },
               { new: true },
             )
@@ -89,7 +91,8 @@ exports.createUsage = async (req, res) => {
             "relatedProcedureItems": e.item_id,
             "currentQty": e.stock,
             "actualQty": e.actual,
-            "finalQty": min
+            "finalQty": min,
+            "relatedBranch": relatedBranch
           })
         }
       })
@@ -104,8 +107,8 @@ exports.createUsage = async (req, res) => {
         } else {
           let min = e.stock - e.actual
           try {
-            const result = await AccessoryItem.findOneAndUpdate(
-              { _id: e.item_id },
+            const result = await Stock.findOneAndUpdate(
+              { _id: e.item_id, relatedBranch: relatedBranch },
               { currentQuantity: min },
               { new: true },
             )
@@ -118,7 +121,8 @@ exports.createUsage = async (req, res) => {
             "relatedAccessoryItems": e.item_id,
             "currentQty": e.stock,
             "actualQty": e.actual,
-            "finalQty": min
+            "finalQty": min,
+            "relatedBranch": relatedBranch
           })
         }
       })
@@ -133,8 +137,8 @@ exports.createUsage = async (req, res) => {
         } else {
           let min = e.stock - e.actual
           try {
-            const result = await Machine.findOneAndUpdate(
-              { _id: e.item_id },
+            const result = await Stock.findOneAndUpdate(
+              { _id: e.item_id, relatedBranch: relatedBranch },
               { currentQuantity: min },
               { new: true },
             )
@@ -147,7 +151,8 @@ exports.createUsage = async (req, res) => {
             "relatedMachine": e.item_id,
             "currentQty": e.stock,
             "actualQty": e.actual,
-            "finalQty": min
+            "finalQty": min,
+            "relatedBranch": relatedBranch
           })
         }
       })
