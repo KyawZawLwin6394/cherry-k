@@ -11,11 +11,51 @@ exports.getTotal = async (req, res) => {
                 $group: {
                     _id: null,
                     totalAmount: {
-                        $sum: '$totalAmount' // Replace 'amount' with the desired field name
+                        $sum: '$totalAmount' // Replace 'totalAmount' with the desired field name
                     }
                 }
             }
-        ])
+        ]);
+
+        const pipeline = [
+            {
+                $group: {
+                    _id: '$paymentMethod',
+                    totalAmount: { $sum: '$totalAmount' }
+                }
+            }
+        ];
+
+        const pipeline2 = [
+            {
+              $group: {
+                _id: '$paymentMethod',
+                totalAmount: { $sum: '$amount' } // Replace 'amount' with the desired field name
+              }
+            },
+            {
+              $group: {
+                _id: null,
+                paymentMethods: {
+                  $push: {
+                    paymentMethod: '$_id',
+                    totalAmount: '$totalAmount'
+                  }
+                },
+                totalAmount: { $sum: '$totalAmount' }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                paymentMethods: 1,
+                totalAmount: 1
+              }
+            }
+          ];
+        const tvPaymentMethod = await TreatmentVoucher.aggregate(pipeline2);
+        const msPaymentMethod = await MedicineSale.aggregate(pipeline);
+
         const TVTotal = await TreatmentVoucher.aggregate([
             {
                 $group: {
@@ -25,32 +65,36 @@ exports.getTotal = async (req, res) => {
                     }
                 }
             }
-        ])
+        ]);
 
         const expenseTotal = await Expense.aggregate([
             {
                 $group: {
                     _id: null,
                     totalAmount: {
-                        $sum: '$finalAmount' // Replace 'amount' with the desired field name
+                        $sum: '$finalAmount' // Replace 'finalAmount' with the desired field name
                     }
                 }
             }
-        ])
+        ]);
+
         return res.status(200).send({
             success: true,
             data: {
                 MSTotal: MSTotal[0].totalAmount,
                 TVTotal: TVTotal[0].totalAmount,
                 expenseTotal: expenseTotal[0].totalAmount,
-                profit: (MSTotal[0].totalAmount + TVTotal[0].totalAmount) - expenseTotal[0].totalAmount
+                profit: MSTotal[0].totalAmount + TVTotal[0].totalAmount - expenseTotal[0].totalAmount,
+                msPaymentMethod: msPaymentMethod,
+                tvPaymentMethod: tvPaymentMethod[0] // Access the result from the first element of the array
             }
-        })
+        });
     } catch (error) {
-        // console.log(error)
-        return res.status(500).send({ error: true, message: 'Internal Server Error!' })
+        console.error(error);
+        return res.status(500).send({ error: true, message: 'Internal Server Error!' });
     }
-}
+};
+
 
 exports.listAllLog = async (req, res) => {
     try {
