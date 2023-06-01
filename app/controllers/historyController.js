@@ -56,9 +56,26 @@ exports.createHistory = async (req, res, next) => {
 
 exports.updateHistory = async (req, res, next) => {
   try {
+    let files = req.files;
+    let data = req.body;
+    console.log(req.body)
+    if (files.consent.length > 0) {
+      for (const element of files.consent) {
+        let imgPath = element.path.split('cherry-k')[1];
+        const attachData = {
+          fileName: element.originalname,
+          imgUrl: imgPath,
+          image: imgPath.split('\\')[2]
+        };
+        const attachResult = await Attachment.create(attachData);
+        data = { ...data, consent: attachResult._id.toString() }
+      }
+    }
+    data = { ...data, skinCareAndCosmetic: JSON.parse(req.body.skinCareAndCosmetic) }
+    console.log(data)
     const result = await History.findOneAndUpdate(
-      { _id: req.body.id },
-      req.body,
+      { _id: data.id },
+      data,
       { new: true },
     ).populate('relatedPatient')
     return res.status(200).send({ success: true, data: result });

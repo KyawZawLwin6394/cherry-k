@@ -8,8 +8,8 @@ const upload = require('../lib/fieldUploader').upload;
 module.exports = (app) => {
 
     app.route('/api/history')
-        .post(upload ,catchError( history.createHistory))
-        .put(catchError(history.updateHistory))
+        .post(upload, catchError(history.createHistory))
+        .put(upload, catchError(history.updateHistory))
 
     app.route('/api/history/:id')
         .get(catchError(history.getHistory))

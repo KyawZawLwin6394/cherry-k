@@ -60,6 +60,94 @@ exports.filterLogs = async (req, res, next) => {
   }
 }
 
+// exports.createUsage = async (req, res) => {
+//   const { relatedTreatmentSelection, relatedAppointment, procedureMedicine, procedureAccessory, machine } = req.body;
+//   const { relatedBranch } = req.mongoQuery;
+//   const machineError = [];
+//   const procedureItemsError = [];
+//   const accessoryItemsError = [];
+
+//   try {
+//     const processItems = async (items, Model, relatedField) => {
+//       for (const item of items) {
+//         if (item.stock < item.actual) {
+//           procedureItemsError.push(item);
+//         } else {
+//           const min = item.stock - item.actual;
+//           try {
+//             await Model.findOneAndUpdate(
+//               { _id: item.item_id, ...(relatedBranch && { relatedBranch }) },
+//               { currentQuantity: min },
+//               { new: true }
+//             );
+//             await Log.create({
+//               relatedTreatmentSelection,
+//               relatedAppointment,
+//               [relatedField]: item.item_id,
+//               currentQty: item.stock,
+//               actualQty: item.actual,
+//               finalQty: min,
+//               ...(relatedBranch && { relatedBranch })
+//             });
+//           } catch (error) {
+//             procedureItemsError.push(item);
+//           }
+//         }
+//       }
+//     };
+
+//     if (relatedBranch === undefined) {
+//       if (procedureMedicine) {
+//         await processItems(procedureMedicine, Stock, "relatedProcedureItems");
+//       }
+
+//       if (procedureAccessory) {
+//         await processItems(procedureAccessory, AccessoryItem, "relatedAccessoryItems");
+//       }
+
+//       if (machine) {
+//         await processItems(machine, Machine, "relatedMachine");
+//       }
+//     } else if (relatedBranch) {
+//       if (procedureMedicine) {
+//         await processItems(procedureMedicine, Stock, "relatedProcedureItems");
+//       }
+
+//       if (procedureAccessory) {
+//         await processItems(procedureAccessory, Stock, "relatedAccessoryItems");
+//       }
+
+//       if (machine) {
+//         await processItems(machine, Stock, "relatedMachine");
+//       }
+//     }
+
+//     const usageResult = await Usage.create(req.body);
+//     const response = { success: true };
+
+//     if (machineError.length > 0) {
+//       response.machineError = machineError;
+//     }
+
+//     if (procedureItemsError.length > 0) {
+//       response.procedureItemsError = procedureItemsError;
+//     }
+
+//     if (accessoryItemsError.length > 0) {
+//       response.accessoryItemsError = accessoryItemsError;
+//     }
+
+//     if (usageResult) {
+//       response.usageResult = usageResult;
+//     }
+
+//     return res.status(200).send(response);
+//   } catch (error) {
+//     return res.status(500).send({ error: true, message: error.message });
+//   }
+// };
+
+
 exports.createUsage = async (req, res) => {
   let { relatedTreatmentSelection, relatedAppointment, procedureMedicine, procedureAccessory, machine } = req.body;
   let { relatedBranch } = req.mongoQuery;
