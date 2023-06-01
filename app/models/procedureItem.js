@@ -58,6 +58,9 @@ let procedureItemSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
   },
+  unit:{
+    type:String
+  }
 });
 
 module.exports = mongoose.model('ProcedureItems', procedureItemSchema);

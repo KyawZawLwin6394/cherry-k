@@ -58,6 +58,9 @@ let MedicineItemSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
   },
+  unit:{
+    type:String
+  }
 });
 
 module.exports = mongoose.model('MedicineItems', MedicineItemSchema);

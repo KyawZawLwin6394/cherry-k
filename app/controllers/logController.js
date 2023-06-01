@@ -74,11 +74,15 @@ exports.createUsage = async (req, res) => {
           procedureItemsError.push(e)
         } else {
           let min = e.stock - e.actual
-          const result = await ProcedureItem.findOneAndUpdate(
-            { _id: e.item_id },
-            { currentQuantity: min },
-            { new: true },
-          )
+          try {
+            const result = await ProcedureItem.findOneAndUpdate(
+              { _id: e.item_id },
+              { currentQuantity: min },
+              { new: true },
+            )
+          } catch (error) {
+            procedureItemsError.push(e);
+          }
           const logResult = await Log.create({
             "relatedTreatmentSelection": relatedTreatmentSelection,
             "relatedAppointment": relatedAppointment,
@@ -99,11 +103,15 @@ exports.createUsage = async (req, res) => {
           accessoryItemsError.push(e)
         } else {
           let min = e.stock - e.actual
-          const result = await AccessoryItem.findOneAndUpdate(
-            { _id: e.item_id },
-            { currentQuantity: min },
-            { new: true },
-          )
+          try {
+            const result = await AccessoryItem.findOneAndUpdate(
+              { _id: e.item_id },
+              { currentQuantity: min },
+              { new: true },
+            )
+          } catch (error) {
+            accessoryItemsError.push(e)
+          }
           const logResult = await Log.create({
             "relatedTreatmentSelection": relatedTreatmentSelection,
             "relatedAppointment": relatedAppointment,
@@ -124,11 +132,15 @@ exports.createUsage = async (req, res) => {
           machineError.push(e)
         } else {
           let min = e.stock - e.actual
-          const result = await Machine.findOneAndUpdate(
-            { _id: e.item_id },
-            { currentQuantity: min },
-            { new: true },
-          )
+          try {
+            const result = await Machine.findOneAndUpdate(
+              { _id: e.item_id },
+              { currentQuantity: min },
+              { new: true },
+            )
+          } catch (error) {
+            machineError.push(e)
+          }
           const logResult = await Log.create({
             "relatedTreatmentSelection": relatedTreatmentSelection,
             "relatedAppointment": relatedAppointment,

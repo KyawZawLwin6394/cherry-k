@@ -70,6 +70,9 @@ let AccessoryItem = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
   },
+  unit:{
+    type:String
+  }
 });
 
 module.exports = mongoose.model('AccessoryItems', AccessoryItem);
