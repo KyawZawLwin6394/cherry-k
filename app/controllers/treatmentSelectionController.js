@@ -161,8 +161,11 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedTransaction": fTransResult._id
             });
             tvcCreate = true;
-        } else if (req.body.paymentMethod === 'FOC') {
-            //--> treatment voucher create
+        }
+        if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
+        if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
+        const result = await TreatmentSelection.create(data)
+        if (req.body.paymentMethod === 'FOC') {
             let dataTVC = {
                 "relatedTreatmentSelection": result._id,
                 "relatedTreatment": req.body.relatedTreatment,
@@ -170,8 +173,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedPatient": req.body.relatedPatient,
                 "paymentMethod": "FOC", //enum: ['by Appointment','Lapsum','Total','Advanced']
                 "amount": req.body.paidAmount,
-                "relatedBank": req.body.relatedBank, 
-                "bankType":req.body.bankType,//must be bank acc from accounting accs
+                "relatedBank": req.body.relatedBank,
+                "bankType": req.body.bankType,//must be bank acc from accounting accs
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash //must be cash acc from accounting accs
             }
@@ -184,9 +187,6 @@ exports.createTreatmentSelection = async (req, res, next) => {
             }
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
-        if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
-        if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
-        const result = await TreatmentSelection.create(data)
         if (tvcCreate === true) {
             //--> treatment voucher create
             let dataTVC = {
@@ -196,8 +196,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedPatient": req.body.relatedPatient,
                 "paymentMethod": "Advanced", //enum: ['by Appointment','Lapsum','Total','Advanced']
                 "amount": req.body.paidAmount,
-                "relatedBank": req.body.relatedBank, 
-                "bankType":req.body.bankType,//must be bank acc from accounting accs
+                "relatedBank": req.body.relatedBank,
+                "bankType": req.body.bankType,//must be bank acc from accounting accs
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash //must be cash acc from accounting accs
             }
@@ -252,7 +252,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
         if (fTransResult) response.secTransResult = secTransResult
         res.status(200).send(response);
     } catch (error) {
-        //console.log(error)
+        console.log(error)
         return res.status(500).send({ "error": true, message: error.message })
     }
 };
@@ -295,7 +295,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 "paymentMethod": 'by Appointment', //enum: ['by Appointment','Lapsum','Total','Advanced']
                 "amount": paidAmount,
                 "relatedBank": req.body.relatedBank, //must be bank acc from accounting accs
-                "bankType":req.body.bankType,
+                "bankType": req.body.bankType,
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash //must be cash acc from accounting accs
             }

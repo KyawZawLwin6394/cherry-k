@@ -29,7 +29,7 @@ let TreatmentVoucherSchema = new Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['by Appointment', 'Lumpsum', 'Total', 'Advanced']
+        enum: ['by Appointment', 'Lumpsum', 'Total', 'Advanced', 'FOC']
     },
     amount: {
         type: Number
