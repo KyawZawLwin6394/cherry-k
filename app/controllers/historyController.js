@@ -29,7 +29,7 @@ exports.createHistory = async (req, res, next) => {
     let files = req.files;
     let data = req.body;
     console.log(req.body)
-    if (files.consent.length > 0) {
+    if (files.consent) {
       for (const element of files.consent) {
         let imgPath = element.path.split('cherry-k')[1];
         const attachData = {
@@ -59,7 +59,7 @@ exports.updateHistory = async (req, res, next) => {
     let files = req.files;
     let data = req.body;
     console.log(req.body)
-    if (files.consent.length > 0) {
+    if (files.consent) {
       for (const element of files.consent) {
         let imgPath = element.path.split('cherry-k')[1];
         const attachData = {
