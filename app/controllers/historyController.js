@@ -77,7 +77,7 @@ exports.updateHistory = async (req, res, next) => {
       { _id: data.id },
       data,
       { new: true },
-    ).populate('relatedPatient')
+    ).populate('relatedPatient consent')
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
