@@ -8,19 +8,19 @@ const upload = require('../lib/fieldUploader').upload;
 module.exports = (app) => {
 
     app.route('/api/history')
-        .post(upload, catchError(history.createHistory))
-        .put(upload, catchError(history.updateHistory))
+        .post(upload, verifyToken, catchError(history.createHistory))
+        .put(upload, verifyToken, catchError(history.updateHistory))
 
     app.route('/api/history/:id')
-        .get(catchError(history.getHistory))
-        .delete(catchError(history.deleteHistory))
-        .post(catchError(history.activateHistory))
+        .get(verifyToken, catchError(history.getHistory))
+        .delete(verifyToken, catchError(history.deleteHistory))
+        .post(verifyToken, catchError(history.activateHistory))
 
-    app.route('/api/histories').get(catchError(history.listAllHistories))
+    app.route('/api/histories').get(verifyToken, catchError(history.listAllHistories))
 
     app.route('/api/histories-filter')
-        .get(catchError(history.filterHistories))
+        .get(verifyToken, catchError(history.filterHistories))
 
     app.route('/api/histories-search')
-        .post(catchError(history.searchHistories))
+        .post(verifyToken, catchError(history.searchHistories))
 };

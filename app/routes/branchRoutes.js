@@ -7,13 +7,13 @@ const verifyToken = require('../lib/verifyToken');
 module.exports = (app) => {
 
     app.route('/api/branch')
-        .post(catchError(branch.createBranch))
-        .put(catchError(branch.updateBranch))
-        
-    app.route('/api/branch/:id')
-        .get(catchError(branch.getBranch))
-        .delete(catchError(branch.deleteBranch)) 
-        .post(catchError(branch.activateBranch))
+        .post(verifyToken, catchError(branch.createBranch))
+        .put(verifyToken, catchError(branch.updateBranch))
 
-    app.route('/api/branches').get(catchError(branch.listAllBranches))
+    app.route('/api/branch/:id')
+        .get(verifyToken, catchError(branch.getBranch))
+        .delete(verifyToken, catchError(branch.deleteBranch))
+        .post(verifyToken, catchError(branch.activateBranch))
+
+    app.route('/api/branches').get(verifyToken, catchError(branch.listAllBranches))
 };
