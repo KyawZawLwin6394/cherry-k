@@ -15,7 +15,7 @@ exports.listAllTreatmentVouchers = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
+        let result = await TreatmentVoucher.find(query).populate('createdBy relatedTreatment relatedAppointment relatedPatient')
         count = await TreatmentVoucher.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
@@ -39,7 +39,7 @@ exports.listAllTreatmentVouchers = async (req, res) => {
 exports.getTreatmentVoucher = async (req, res) => {
     let query = req.mongoQuery
     if (req.params.id) query._id = req.params.id
-    const result = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
+    const result = await TreatmentVoucher.find(query).populate('createdBy relatedTreatment relatedAppointment relatedPatient')
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -53,7 +53,7 @@ exports.getRelatedTreatmentVoucher = async (req, res) => {
         if (relatedPatient) query.relatedPatient = relatedPatient
         if (relatedTreatment) query.relatedTreatment = relatedTreatment
         if (treatmentSelection) query.relatedTreatmentSelection = treatmentSelection
-        const result = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient relatedTreatmentSelection')
+        const result = await TreatmentVoucher.find(query).populate('createdBy relatedTreatment relatedAppointment relatedPatient relatedTreatmentSelection')
         if (!result)
             return res.status(404).json({ error: true, message: 'No Record Found' });
         return res.status(200).send({ success: true, data: result });
@@ -68,7 +68,7 @@ exports.searchTreatmentVoucher = async (req, res, next) => {
         let { search, relatedPatient } = req.body
         if (relatedPatient) query.relatedPatient = relatedPatient
         if (search) query.$text = { $search: search }
-        const result = await TreatmentVoucher.find(query)
+        const result = await TreatmentVoucher.find(query).populate('createdBy relatedTreatment relatedAppointment relatedPatient relatedTreatmentSelection')
         if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
         return res.status(200).send({ success: true, data: result })
     } catch (err) {
@@ -114,7 +114,7 @@ exports.updateTreatmentVoucher = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        ).populate('relatedTreatment relatedAppointment relatedPatient');
+        ).populate('createdBy relatedTreatment relatedAppointment relatedPatient');
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
@@ -156,7 +156,7 @@ exports.getTodaysTreatmentVoucher = async (req, res) => {
         start.setHours(0, 0, 0, 0);
         end.setHours(23, 59, 59, 999);
         if (start && end) query.originalDate = { $gte: start, $lt: end }
-        const result = await TreatmentVoucher.find(query).populate('relatedAppointment relatedPatient').populate({
+        const result = await TreatmentVoucher.find(query).populate('createdBy relatedAppointment relatedPatient').populate({
             path: 'relatedTreatment',
             model: 'Treatments',
             populate: {

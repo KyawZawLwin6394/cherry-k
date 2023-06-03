@@ -15,7 +15,7 @@ exports.listAllTransactions = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Transaction.find(query).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+    let result = await Transaction.find(query).populate('createdBy relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
     count = await Transaction.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -37,14 +37,14 @@ exports.listAllTransactions = async (req, res) => {
 };
 
 exports.getTransaction = async (req, res) => {
-  const result = await Transaction.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+  const result = await Transaction.find({ _id: req.params.id,isDeleted:false }).populate('createdBy relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.getRelatedTransaction = async (req, res) => {
-  const result = await Transaction.find({ relatedAccounting: req.params.id,isDeleted:false }).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+  const result = await Transaction.find({ relatedAccounting: req.params.id,isDeleted:false }).populate('createdBy relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -71,7 +71,7 @@ exports.updateTransaction = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+    ).populate('relatedAccounting').populate('createdBy relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
@@ -107,7 +107,7 @@ exports.activateTransaction = async (req, res, next) => {
 
 exports.trialBalance = async (req,res) => {
   try{
-    const result = await Transaction.find({relatedAccounting:req.params.relatedAccounting, type:'Debit'}).populate('relatedAccounting relatedTreatment relatedBank relatedCash relatedTransaction relatedMedicineSale');
+    const result = await Transaction.find({relatedAccounting:req.params.relatedAccounting, type:'Debit'}).populate('createdBy relatedAccounting relatedTreatment relatedBank relatedCash relatedTransaction relatedMedicineSale');
     if (result.length === 0) return res.status(500).send({error:true, message:'Data Not Found!'})
     return res.status(200).send({success:true, debit:result})
   } catch (err) {

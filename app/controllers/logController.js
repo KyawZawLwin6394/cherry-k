@@ -8,7 +8,7 @@ const Stock = require('../models/stock')
 
 exports.listAllLog = async (req, res) => {
   try {
-    let result = await Log.find({ isDeleted: false }).populate('relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine').populate({
+    let result = await Log.find({ isDeleted: false }).populate('createdBy relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine').populate({
       path: 'relatedTreatmentSelection',
       populate: [{
         path: 'relatedTreatment',
@@ -29,7 +29,7 @@ exports.listAllLog = async (req, res) => {
 
 exports.getRelatedUsage = async (req, res) => {
   try {
-    let result = await Log.find({ isDeleted: false }).populate('relatedTreatmentSelection relatedAppointment');
+    let result = await Log.find({ isDeleted: false }).populate('createdBy relatedTreatmentSelection relatedAppointment');
     let count = await Log.find({ isDeleted: false }).count();
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' });
     res.status(200).send({
@@ -52,7 +52,7 @@ exports.filterLogs = async (req, res, next) => {
       query.$or.push(...[{ relatedProcedureItems: id }, { relatedAccessoryItems: id }, { relatedMachine: id }])
     }
     if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
-    const result = await Log.find(query).populate('relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine');
+    const result = await Log.find(query).populate('createdBy relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine');
     if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
     res.status(200).send({ success: true, data: result })
   } catch (err) {
@@ -154,6 +154,7 @@ exports.createUsage = async (req, res) => {
   let machineError = []
   let procedureItemsError = []
   let accessoryItemsError = []
+  let createdBy = req.credentials.id
   try {
 
     //procedureMedicine
@@ -179,7 +180,8 @@ exports.createUsage = async (req, res) => {
               "relatedProcedureItems": e.item_id,
               "currentQty": e.stock,
               "actualQty": e.actual,
-              "finalQty": min
+              "finalQty": min,
+              "createdBy": createdBy
             })
           }
         })
@@ -208,7 +210,8 @@ exports.createUsage = async (req, res) => {
               "relatedAccessoryItems": e.item_id,
               "currentQty": e.stock,
               "actualQty": e.actual,
-              "finalQty": min
+              "finalQty": min,
+              "createdBy": createdBy
             })
           }
         })
@@ -237,7 +240,8 @@ exports.createUsage = async (req, res) => {
               "relatedMachine": e.item_id,
               "currentQty": e.stock,
               "actualQty": e.actual,
-              "finalQty": min
+              "finalQty": min,
+              "createdBy": createdBy
             })
           }
         })
@@ -265,7 +269,8 @@ exports.createUsage = async (req, res) => {
               "currentQty": e.stock,
               "actualQty": e.actual,
               "finalQty": min,
-              "relatedBranch": relatedBranch
+              "relatedBranch": relatedBranch,
+              "createdBy": createdBy
             })
           }
         })
@@ -295,7 +300,8 @@ exports.createUsage = async (req, res) => {
               "currentQty": e.stock,
               "actualQty": e.actual,
               "finalQty": min,
-              "relatedBranch": relatedBranch
+              "relatedBranch": relatedBranch,
+              "createdBy": createdBy
             })
           }
         })
@@ -325,7 +331,8 @@ exports.createUsage = async (req, res) => {
               "currentQty": e.stock,
               "actualQty": e.actual,
               "finalQty": min,
-              "relatedBranch": relatedBranch
+              "relatedBranch": relatedBranch,
+              "createdBy": createdBy
             })
           }
         })

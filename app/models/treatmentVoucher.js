@@ -66,7 +66,11 @@ let TreatmentVoucherSchema = new Schema({
     bankType:{
         type:String,
         enum:['Normal','POS','Pay']
-    }
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users'
+      }
 });
 
 module.exports = mongoose.model('TreatmentVouchers', TreatmentVoucherSchema);

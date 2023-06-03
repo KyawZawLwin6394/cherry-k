@@ -50,6 +50,10 @@ let LogSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Branches'
     },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users'
+    }
 });
 
 module.exports = mongoose.model('Logs', LogSchema);
