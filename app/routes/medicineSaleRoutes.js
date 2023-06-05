@@ -20,5 +20,6 @@ module.exports = (app) => {
     app.route('/api/medicine-sales/code').get(verifyToken, catchError(medicineSale.createCode))
 
     app.route('/api/medicine-sales/transaction').post(verifyToken, catchError(medicineSale.createMedicineSaleTransaction))
+    app.route('/api/medicine-sales/filter').get( catchError(medicineSale.filterMedicineSales))
 
 };
