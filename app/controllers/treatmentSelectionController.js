@@ -137,7 +137,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
         appointmentResult.map(function (element, index) {
             relatedAppointments.push(element._id)
         })
-        data = { ...data, relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments }
+        data = { ...data, relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments, createdBy:createdBy }
         if (data.paidAmount) {
             data = { ...data, leftOverAmount: data.totalAmount - data.paidAmount } // leftOverAmount Calculation
         }
