@@ -25,14 +25,7 @@ let PatientSchema = new Schema({
     type: String
   },
   email: {
-    type: String,
-    lowercase: true,
-    trim: true,
-    validate: {
-      isAsync: true,
-      validator: validator.isEmail,
-      message: 'Invalid Email Address.',
-    }
+    type: String
   },
   gender: {
     type: String,
