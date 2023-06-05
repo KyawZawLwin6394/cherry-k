@@ -10,7 +10,7 @@ exports.listAllMedicineItems = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = { isDeleted: false },
+    let query = req.mongoQuery,
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -40,14 +40,18 @@ exports.listAllMedicineItems = async (req, res) => {
 };
 
 exports.getMedicineItem = async (req, res) => {
-  const result = await MedicineItem.find({ _id: req.params.id, isDeleted: false }).populate('name');
+  let query = req.mongoQuery;
+  query = { ...query, _id: req.params.id }
+  const result = await MedicineItem.find(query).populate('name');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.getRelatedMedicineItem = async (req, res) => {
-  const result = await MedicineItem.find({ name: req.params.id, isDeleted: false }).populate('name');
+  let query = req.mongoQuery;
+  query = { ...query, name: req.params.id }
+  const result = await MedicineItem.find(query).populate('name');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -121,7 +125,7 @@ exports.activateMedicineItem = async (req, res, next) => {
 
 exports.filterMedicineItems = async (req, res, next) => {
   try {
-    let query = {}
+    let query = req.mongoQuery
     let { gender, startDate, endDate, status } = req.query
     if (gender) query.gender = gender
     if (status) query.patientStatus = status
@@ -137,7 +141,10 @@ exports.filterMedicineItems = async (req, res, next) => {
 
 exports.searchMedicineItems = async (req, res, next) => {
   try {
-    const result = await MedicineItem.find({ $text: { $search: req.body.search } }).populate('name')
+    let query = req.mongoQuery
+    let { search } = req.body
+    if (search) query.$text = { $search: search }
+    const result = await MedicineItem.find(query).populate('name')
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (err) {

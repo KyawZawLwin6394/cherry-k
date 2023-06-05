@@ -9,6 +9,10 @@ let MedicineSaleSchema = new Schema({
   voucherCode: {
     type:String
   },
+  createdBy: {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Users'
+  },
   createdAt: {
     type:Date,
     default:Date.now()

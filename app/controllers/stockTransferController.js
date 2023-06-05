@@ -8,7 +8,7 @@ exports.listAllStockTransfers = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = { isDeleted: false },
+    let query = req.mongoQuery,
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -43,7 +43,7 @@ exports.listAllStockRequests = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = { isDeleted: false },
+    let query = req.mongoQuery,
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -72,7 +72,9 @@ exports.listAllStockRequests = async (req, res) => {
 };
 
 exports.getStockTransfer = async (req, res) => {
-  const result = await StockTransfer.find({ _id: req.params.id, isDeleted: false }).populate('procedureMedicine.item_id medicineLists.item_id procedureAccessory.item_id relatedBranch')
+  let query = req.mongoQuery
+  if (req.params.id) query._id = req.params.id
+  const result = await StockTransfer.find(query).populate('procedureMedicine.item_id medicineLists.item_id procedureAccessory.item_id relatedBranch')
   if (result.length === 0)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });

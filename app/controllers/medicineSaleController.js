@@ -10,7 +10,7 @@ exports.listAllMedicineSales = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = { isDeleted: false },
+    let query = req.mongoQuery,
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -51,7 +51,9 @@ exports.listAllMedicineSales = async (req, res) => {
 };
 
 exports.getMedicineSale = async (req, res) => {
-  const result = await MedicineSale.find({ _id: req.params.id, isDeleted: false }).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy')
+  let query = req.mongoQuery
+  if (req.params.id) query._id = req.params.id
+  const result = await MedicineSale.find(query).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -59,6 +61,7 @@ exports.getMedicineSale = async (req, res) => {
 
 exports.createMedicineSale = async (req, res, next) => {
   let data = req.body;
+  let createdBy = req.credentials.id
   try {
     //prepare CUS-ID
     const latestDocument = await MedicineSale.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -73,7 +76,8 @@ exports.createMedicineSale = async (req, res, next) => {
       "date": Date.now(),
       "remark": req.body.remark,
       "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines)
-      "type": "Credit"
+      "type": "Credit",
+      "createdBy": createdBy
     })
     const fTransResult = await fTransaction.save()
     //sec transaction
@@ -85,7 +89,8 @@ exports.createMedicineSale = async (req, res, next) => {
         "relatedBank": req.body.relatedBank,
         "relatedCash": req.body.relatedCash,
         "type": "Debit",
-        "relatedTransaction": fTransResult._id
+        "relatedTransaction": fTransResult._id,
+        "createdBy": createdBy
       }
     )
     const secTransResult = await secTransaction.save();
@@ -99,7 +104,7 @@ exports.createMedicineSale = async (req, res, next) => {
       { amount: parseInt(req.body.payAmount) + parseInt(acc[0].amount) },
       { new: true },
     )
-    data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] }
+    data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy }
     const newMedicineSale = new MedicineSale(data)
     const medicineSaleResult = await newMedicineSale.save()
     res.status(200).send({
@@ -119,13 +124,15 @@ exports.createMedicineSale = async (req, res, next) => {
 
 exports.createMedicineSaleTransaction = async (req, res, next) => {
   try {
+    let createdBy = req.credentials.id
     //first transaction 
     const fTransaction = new Transaction({
       "amount": req.body.amount,
       "date": req.body.date,
       "remark": req.body.remark,
       "relatedAccounting": "6423eb395fb841d5566db36d",
-      "type": "Credit"
+      "type": "Credit",
+      "createdBy": createdBy
     })
     const fTransResult = await fTransaction.save()
     //sec transaction
@@ -137,7 +144,8 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
         "relatedBank": req.body.relatedBank,
         "relatedCash": req.body.relatedCash,
         "type": "Debit",
-        "relatedTransaction": fTransResult._id
+        "relatedTransaction": fTransResult._id,
+        "createdBy": createdBy
       }
     )
     const secTransResult = await secTransaction.save();
@@ -151,7 +159,7 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
       { amount: parseInt(req.body.amount) + parseInt(acc[0].amount) },
       { new: true },
     )
-
+    req.body = { ...req.body, createdBy: createdBy }
     const newMedicineSale = new MedicineSale(req.body)
     const medicineSaleResult = newMedicineSale.save()
     res.status(200).send({
