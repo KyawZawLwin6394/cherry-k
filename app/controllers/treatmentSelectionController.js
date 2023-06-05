@@ -283,6 +283,7 @@ exports.updateTreatmentSelection = async (req, res, next) => {
 
 exports.treatmentPayment = async (req, res, next) => {
     let data = req.body;
+    let createdBy = req.credentials.id;
     try {
         let { paidAmount } = data;
         const treatmentSelectionQuery = await TreatmentSelection.find({ _id: req.body.id, isDeleted: false }).populate('relatedTreatment').populate('relatedAppointments');
