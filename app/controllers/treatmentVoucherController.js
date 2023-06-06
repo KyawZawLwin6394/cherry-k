@@ -48,11 +48,13 @@ exports.getTreatmentVoucher = async (req, res) => {
 exports.getRelatedTreatmentVoucher = async (req, res) => {
     try {
         let query = req.mongoQuery;
-        let { relatedPatient, relatedTreatment, start, end, treatmentSelection } = req.body
+        let { relatedPatient, relatedTreatment, start, end, treatmentSelection, createdBy, relatedBranch } = req.body
         if (start && end) query.createdAt = { $gte: start, $lte: end }
         if (relatedPatient) query.relatedPatient = relatedPatient
         if (relatedTreatment) query.relatedTreatment = relatedTreatment
         if (treatmentSelection) query.relatedTreatmentSelection = treatmentSelection
+        if (createdBy) query.createdBy = createdBy
+        if (relatedBranch) query.relatedBranch = relatedBranch
         const result = await TreatmentVoucher.find(query).populate('createdBy relatedTreatment relatedAppointment relatedPatient relatedTreatmentSelection')
         if (!result)
             return res.status(404).json({ error: true, message: 'No Record Found' });
