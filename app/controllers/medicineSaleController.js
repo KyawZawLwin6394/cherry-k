@@ -17,6 +17,9 @@ exports.listAllMedicineSales = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
+    if (req.query.createdBy) query.createdBy = req.query.createdBy
+    console.log(query)
+
     let result = await MedicineSale.find(query).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy').populate({
       path: 'relatedTransaction',
       populate: [{
