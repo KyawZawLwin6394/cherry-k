@@ -52,6 +52,15 @@ let UsageSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
   },
+  machineError: {
+    type: Array
+  },
+  procedureItemsError: {
+    type: Array
+  },
+  accessoryItemsError: {
+    type: Array
+  }
 });
 
 module.exports = mongoose.model('Usages', UsageSchema);

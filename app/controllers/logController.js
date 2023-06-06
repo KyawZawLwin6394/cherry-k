@@ -339,12 +339,13 @@ exports.createUsage = async (req, res) => {
       }
     }
     //usage create
+    req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
     let usageResult = await Usage.create(req.body);
     //error handling
     let response = { success: true }
     if (machineError.length > 0) response.machineError = machineError
     if (procedureItemsError.length > 0) response.procedureItemsError = procedureItemsError
-    if (machineError.length > 0) response.machineError = machineError
+    if (accessoryItemsError.length > 0) response.accessoryItemsError = accessoryItemsError
     if (usageResult !== undefined) response.usageResult = usageResult
 
     return res.status(200).send(response)
