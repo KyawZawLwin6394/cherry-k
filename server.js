@@ -107,45 +107,52 @@ if (mongoose.connection.readyState != 1) {
   //     if (err) { console.log(err) } else { console.log('Procedure Accessories Indexes Created Successfully!') }
   //   })
 
-  //   db.collection('proceduremedicines').createIndex({
-  //     code: 'text',
-  //     name: 'text'
-  //   }, function (err, result) {
-  //     if (err) { console.log(err) } else { console.log('Procedure Medicine Indexes Created Successfully!') }
-  //   })
+  //db.collection('medicinesales').createIndex({
+    //     voucherCode: 'text',
+    //     seq: 'text'
+    //   }, function (err, result) {
+    //     if (err) { console.log(err) } else { console.log('Procedure Accessories Indexes Created Successfully!') }
+    //   })
 
-  //   db.collection('medicinelists').createIndex({
-  //     code: 'text',
-  //     procedureItemName: 'text'
-  //   }, function (err, result) {
-  //     if (err) { console.log(err) } else { console.log('Medicine Lists Indexes Created Successfully!') }
-  //   })
+    //   db.collection('proceduremedicines').createIndex({
+    //     code: 'text',
+    //     name: 'text'
+    //   }, function (err, result) {
+    //     if (err) { console.log(err) } else { console.log('Procedure Medicine Indexes Created Successfully!') }
+    //   })
 
-  //   db.collection('treatments').createIndex({
-  //     treatmentCode: 'text',
-  //     treatmentName: 'text'
-  //   }, function (err, result) {
-  //     if (err) { console.log(err) } else { console.log('Treatment Indexes Created Successfully!') }
-  //   })
+    //   db.collection('medicinelists').createIndex({
+    //     code: 'text',
+    //     procedureItemName: 'text'
+    //   }, function (err, result) {
+    //     if (err) { console.log(err) } else { console.log('Medicine Lists Indexes Created Successfully!') }
+    //   })
+
+    //   db.collection('treatments').createIndex({
+    //     treatmentCode: 'text',
+    //     treatmentName: 'text'
+    //   }, function (err, result) {
+    //     if (err) { console.log(err) } else { console.log('Treatment Indexes Created Successfully!') }
+    //   })
 
 
 
-  // });
-  module.exports = db;
+    // });
+    module.exports = db;
 
-}
+  }
 mongoose.plugin((schema) => {
-  schema.options.usePushEach = true;
-});
+    schema.options.usePushEach = true;
+  });
 
-//static files
-app.use('/static', express.static(path.join(__dirname, 'uploads')));
-app.use(relatedBranchMiddleware);
+  //static files
+  app.use('/static', express.static(path.join(__dirname, 'uploads')));
+  app.use(relatedBranchMiddleware);
 
-// Bring in our dependencies
-require('./config/express')(app, config);
+  // Bring in our dependencies
+  require('./config/express')(app, config);
 
-server.listen(port, () => {
-  console.log('We are live on port: ', port);
-});
+  server.listen(port, () => {
+    console.log('We are live on port: ', port);
+  });
 

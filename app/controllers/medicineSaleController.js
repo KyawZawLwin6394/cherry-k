@@ -256,3 +256,16 @@ exports.filterMedicineSales = async (req, res, next) => {
     return res.status(500).send({ error: true, message: err.message })
   }
 }
+
+exports.searchMedicineSale = async (req, res, next) => {
+  try {
+    let query = req.mongoQuery
+    let { search } = req.body
+    if (search) query.$text = { $search: search }
+    const result = await MedicineSale.find(query).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy');
+    if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
+    return res.status(200).send({ success: true, data: result })
+  } catch (err) {
+    return res.status(500).send({ error: true, message: err.message })
+  }
+}
