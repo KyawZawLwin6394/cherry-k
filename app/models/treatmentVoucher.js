@@ -63,14 +63,18 @@ let TreatmentVoucherSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Branches'
     },
-    bankType:{
-        type:String,
-        enum:['Normal','POS','Pay']
+    bankType: {
+        type: String,
+        enum: ['Normal', 'POS', 'Pay']
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users'
-      }
+    },
+    relatedAccounting: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AccountingLists'
+    }
 });
 
 module.exports = mongoose.model('TreatmentVouchers', TreatmentVoucherSchema);

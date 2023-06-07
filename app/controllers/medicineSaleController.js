@@ -247,9 +247,9 @@ exports.filterMedicineSales = async (req, res, next) => {
   try {
     let query = req.mongoQuery
     const { start, end } = req.query
-    if (start && end) query.originalDate = { $gte: start, $lte: end }
+    if (start && end) query.createdAt = { $gte: start, $lte: end }
     if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
-    const result = await MedicineSale.find(query).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy');
+    const result = await MedicineSale.find(query).populate('relatedPatient relatedTransaction relatedBranch').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy','givenName');
     if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
     res.status(200).send({ success: true, data: result })
   } catch (err) {
@@ -262,7 +262,7 @@ exports.searchMedicineSale = async (req, res, next) => {
     let query = req.mongoQuery
     let { search } = req.body
     if (search) query.$text = { $search: search }
-    const result = await MedicineSale.find(query)
+    const result = await MedicineSale.find(query).populate('relatedPatient medicineItems.item_id')
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (err) {
