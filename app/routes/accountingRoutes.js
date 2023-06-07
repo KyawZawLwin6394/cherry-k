@@ -16,4 +16,5 @@ module.exports = (app) => {
         .post(verifyToken, catchError(accountingList.activateAccountingList))
 
     app.route('/api/accounting-lists').get(verifyToken, catchError(accountingList.listAllAccountingLists))
+    app.route('/api/accounting-lists/related/:id').get(verifyToken, catchError(accountingList.getAccountingListByRelatedHeader))
 };

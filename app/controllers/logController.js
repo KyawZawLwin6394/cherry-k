@@ -5,6 +5,7 @@ const AccessoryItem = require('../models/accessoryItem');
 const Machine = require('../models/fixedAsset');
 const Usage = require('../models/usage');
 const Stock = require('../models/stock')
+const UsageRecords = require('../models/usageRecord');
 
 exports.listAllLog = async (req, res) => {
   try {
@@ -341,12 +342,26 @@ exports.createUsage = async (req, res) => {
     //usage create
     req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
     let usageResult = await Usage.create(req.body);
+    let status;
+    if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
+    let usageRecordResult = await UsageRecords.create({
+      relatedUsage: usageResult._id,
+      usageStatus: status,
+      procedureMedicine: req.body.procedureMedicine,
+      procedureAccessory: req.body.procedureAccessory,
+      machine: req.body.machine,
+      relatedBranch: req.mongoQuery.relatedBranch,
+      machineError: machineError,
+      procedureItemsError: procedureItemsError,
+      accessoryItemsError: accessoryItemsError
+    })
     //error handling
     let response = { success: true }
     if (machineError.length > 0) response.machineError = machineError
     if (procedureItemsError.length > 0) response.procedureItemsError = procedureItemsError
     if (accessoryItemsError.length > 0) response.accessoryItemsError = accessoryItemsError
     if (usageResult !== undefined) response.usageResult = usageResult
+    if (usageRecordResult !== undefined) response.usageRecordResult = usageRecordResult
 
     return res.status(200).send(response)
   } catch (error) {
