@@ -74,8 +74,12 @@ let AppointmentSchema = new Schema({
   usageStatus: {
     type: String,
     enum: ['Pending', 'In Progress', 'Finished'],
-    default:'Pending'
+    default: 'Pending'
   },
+  relatedUsage: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usages'
+  }
 });
 
 module.exports = mongoose.model('Appointments', AppointmentSchema);

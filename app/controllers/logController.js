@@ -345,7 +345,7 @@ exports.createUsage = async (req, res) => {
     let usageResult = await Usage.create(req.body);
     let status;
     if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
-    if (machineError.length === 0 || procedureItemsError.length === 0 || accessoryItemsError.length === 0) status = 'Finished'
+    if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
     let usageRecordResult = await UsageRecords.create({
       relatedUsage: usageResult._id,
       usageStatus: status,
@@ -359,7 +359,7 @@ exports.createUsage = async (req, res) => {
     })
     const appointmentUpdate = await Appointment.findOneAndUpdate(
       { _id: req.body.relatedAppointment },
-      { usageStatus: status },
+      { usageStatus: status, relatedUsage: usageResult._id },
       { new: true }
     )
     //error handling
