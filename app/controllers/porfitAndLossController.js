@@ -86,14 +86,15 @@ exports.getTotal = async (req, res) => {
 
 exports.listAllLog = async (req, res) => {
     try {
-        let result = await Log.find({ isDeleted: false }).populate('relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine').populate({
+        let query = req.mongoQuery
+        let result = await Log.find(query).populate('relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine').populate({
             path: 'relatedTreatmentSelection',
             populate: [{
                 path: 'relatedTreatment',
                 model: 'Treatments'
             }]
         });
-        let count = await Log.find({ isDeleted: false }).count();
+        let count = await Log.find(query).count();
         if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' });
         res.status(200).send({
             success: true,
@@ -108,7 +109,7 @@ exports.listAllLog = async (req, res) => {
 exports.getDay = async (req, res) => {
     let { startDate, endDate } = req.body
     try {
-        let query = { isDeleted: false }
+        let query = req.mongoQuery
         if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate }
         const meidicineSaleWeek = await MedicineSale.find(query).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment').populate({
             path: 'relatedTransaction',
@@ -124,7 +125,9 @@ exports.getDay = async (req, res) => {
             }]
         });
         const treatmentVoucherWeek = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
-        const expenseWeek = await Expense.find({ date: { $gte: startDate, $lte: endDate }, isDeleted: false }).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+        let query2 = { date: { $gte: startDate, $lte: endDate }, isDeleted: false }
+        if (req.mongoQuery.relatedBranch) query.relatedBranch = req.mongoQuery.relatedBranch
+        const expenseWeek = await Expense.find(query2).populate('relatedAccounting relatedBankAccount relatedCashAccount')
         res.status(200).send({
             succes: true,
             data: {
@@ -153,7 +156,7 @@ exports.getMonth = async (req, res) => {
         const startDate = new Date(Date.UTC(new Date().getFullYear(), months.indexOf(month), 1));
         const endDate = new Date(Date.UTC(new Date().getFullYear(), months.indexOf(month) + 1, 1));
 
-        let query = { isDeleted: false }
+        let query = req.mongoQuery
         if (month) query.createdAt = { $gte: startDate, $lte: endDate }
 
         const meidicineSaleWeek = await MedicineSale.find(query).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment').populate({
@@ -170,7 +173,9 @@ exports.getMonth = async (req, res) => {
             }]
         });
         const treatmentVoucherWeek = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
-        const expenseWeek = await Expense.find({ date: { $gte: startDate, $lte: endDate }, isDeleted: false }).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+        let query2 = { date: { $gte: startDate, $lte: endDate }, isDeleted: false }
+        if (req.mongoQuery.relatedBranch) query.relatedBranch = req.mongoQuery.relatedBranch
+        const expenseWeek = await Expense.find(query2).populate('relatedAccounting relatedBankAccount relatedCashAccount')
         res.status(200).send({
             succes: true,
             data: {
@@ -217,7 +222,7 @@ exports.getWeek = async (req, res) => {
 
     try {
         //preparing query
-        let query = { isDeleted: false }
+        let query = req.mongoQuery
         if (weekName) query.createdAt = { $gte: startDate, $lte: endDate }
 
         const meidicineSaleWeek = await MedicineSale.find(query).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment').populate({
@@ -234,7 +239,9 @@ exports.getWeek = async (req, res) => {
             }]
         });
         const treatmentVoucherWeek = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
-        const expenseWeek = await Expense.find({ date: { $gte: startDate, $lte: endDate }, isDeleted: false }).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+        let query2 = { date: { $gte: startDate, $lte: endDate }, isDeleted: false }
+        if (req.mongoQuery.relatedBranch) query2.relatedBranch = req.mongoQuery.relatedBranch
+        const expenseWeek = await Expense.find(query2).populate('relatedAccounting relatedBankAccount relatedCashAccount')
 
         res.status(200).send({
             succes: true,

@@ -9,7 +9,7 @@ exports.listAllIncomes = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 30; //limit
     skip = +skip || 0;
-    let query = { isDeleted: false },
+    let query = req.mongoQuery,
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -38,7 +38,9 @@ exports.listAllIncomes = async (req, res) => {
 };
 
 exports.getIncome = async (req, res) => {
-  const result = await Income.find({ _id: req.params.id, isDeleted: false }).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
+  let query = req.mongoQuery
+  if (req.params.id) query._id = req.params.id
+  const result = await Income.find(query).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -66,7 +68,8 @@ exports.createIncome = async (req, res, next) => {
       "treatmentFlag": false,
       "relatedTransaction": null,
       "relatedAccounting": newBody.relatedAccounting,
-      "relatedIncome" : result._id
+      "relatedIncome" : result._id,
+      "relatedBranch":newBody.relatedBranch
     }
     const newTrans = new Transaction(firstTransaction)
     const fTransResult = await newTrans.save();
@@ -83,6 +86,7 @@ exports.createIncome = async (req, res, next) => {
         "relatedTransaction": fTransResult._id,
         "relatedAccounting": newBody.relatedAccounting,
         "relatedIncome" : result._id,
+        "relatedBranch":newBody.relatedBranch,
         "relatedCredit": newBody.relatedCredit
       }
       const secTrans = new Transaction(secondTransaction)
@@ -102,7 +106,8 @@ exports.createIncome = async (req, res, next) => {
         "relatedAccounting": (newBody.relatedBankAccount) ? newBody.relatedBankAccount : newBody.relatedCashAccount,
         "relatedIncome" : result._id,
         "relatedBank": newBody.relatedBankAccount,
-        "relatedCash": newBody.relatedCashAccount
+        "relatedCash": newBody.relatedCashAccount,
+        "relatedBranch":newBody.relatedBranch
       }
       const secTrans = new Transaction(secondTransaction)
       var secTransResult = await secTrans.save();

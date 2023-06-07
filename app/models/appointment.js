@@ -28,6 +28,10 @@ let AppointmentSchema = new Schema({
     //   return !this.relatedDoctor; // doctor is required if field2 is not provided
     // }
   },
+  relatedNurse:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Nurses'
+  },
   description: {
     type:String
   },
