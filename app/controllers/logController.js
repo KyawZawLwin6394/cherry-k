@@ -382,7 +382,7 @@ exports.getUsageRecordsByUsageID = async (req, res) => {
   try {
     let query = req.mongoQuery;
     if (req.params.id) query.relatedUsage = req.params.id
-    const result = await UsageRecords.find(query)
+    const result = await UsageRecords.find(query).populate('relatedUsage procedureMedicine.item_id procedureAccessory.item_id machine.item_id machineError.item_id procedureItemsError.item_id accessoryItemsError.item_id')
     return res.status(200).send({ success: true, data: result })
   } catch (error) {
     return res.status(500).send({ error: true, message: error.message })
