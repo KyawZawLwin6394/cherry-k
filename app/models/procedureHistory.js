@@ -70,6 +70,12 @@ let ProcedureHistorySchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Branches'
     },
+    complaint: {
+        type: String
+    },
+    improvement: {
+        type: String
+    }
 });
 
 module.exports = mongoose.model('ProcedureHistories', ProcedureHistorySchema);
