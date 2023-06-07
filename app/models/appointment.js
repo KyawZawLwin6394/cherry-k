@@ -73,7 +73,8 @@ let AppointmentSchema = new Schema({
   },
   usageStatus: {
     type: String,
-    enum: ['Pending', 'In Progress', 'Finished']
+    enum: ['Pending', 'In Progress', 'Finished'],
+    default:'Pending'
   },
 });
 
