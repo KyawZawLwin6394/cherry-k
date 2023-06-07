@@ -28,131 +28,128 @@ if (mongoose.connection.readyState != 1) {
     console.log('Database is connected');
   });
 
+  // db.collection('medicinesales').createIndex({
+  //   voucherCode: 'text',
+  //   seq: 'text'
+  // }, function (err, result) {
+  //   if (err) { console.log(err) } else { console.log('Procedure Accessories Indexes Created Successfully!') }
+  // })
+
   // db.collection('patients').createIndex({ name: 'text', phone: 'text', email: 'text', patientID: 'text' }, function (err, result) {
   //   if (err) {
   //     console.log(err);
   //   } else {
   //     console.log("Patient Indexes Created Successfully!");
   //   }
+  // });
+  // db.collection('treatmentselections').createIndex({
+  //   code: 'text',
+  //   selectionStatus: 'text'
+  // }, function (err, result) {
+  //   if (err) { console.log(err) } else { console.log('Treatment Indexes Created Successfully!') }
+  // })
+  // db.collection('accessoryitems').createIndex({
+  //   code: 'text',
+  //   accessoryItemName: 'text'
+  // }, function (err, result) {
+  //   if (err) { console.log(err) } else { console.log('Accessory Items Indexes Created Successfully!') }
+  // })
 
-  //   db.collection('treatmentselections').createIndex({
-  //     code: 'text',
-  //     selectionStatus: 'text'
-  //   }, function (err, result) {
-  //     if (err) { console.log(err) } else { console.log('Treatment Indexes Created Successfully!') }
-  //   })
-  //   db.collection('accessoryitems').createIndex({
-  //     code: 'text',
-  //     accessoryItemName: 'text'
-  //   }, function (err, result) {
-  //     if (err) { console.log(err) } else { console.log('Accessory Items Indexes Created Successfully!') }
-  //   })
+  // db.collection('appointments').createIndex({
+  //   status: 'text',
+  //   phone: 'text'
+  // }, function (err, result) {
+  //   if (err) {
+  //     console.log(err)
+  //   } else {
+  //     console.log("Appointment Indexes Created Successfully!")
+  //   }
+  // })
 
-  //   db.collection('appointments').createIndex({
-  //     status: 'text',
-  //     phone: 'text'
-  //   }, function (err, result) {
-  //     if (err) {
-  //       console.log(err)
-  //     } else {
-  //       console.log("Appointment Indexes Created Successfully!")
-  //     }
-  //   })
+  // db.collection('brands').createIndex({
+  //   code: 'text',
+  //   name: 'text'
+  // }, function (err, result) {
+  //   if (err) {
+  //     console.log(err)
+  //   } else {
+  //     console.log('Brand Indexes Created Successfully!')
+  //   }
+  // })
 
-  //   db.collection('brands').createIndex({
-  //     code: 'text',
-  //     name: 'text'
-  //   }, function (err, result) {
-  //     if (err) {
-  //       console.log(err)
-  //     } else {
-  //       console.log('Brand Indexes Created Successfully!')
-  //     }
-  //   })
+  // db.collection('treatmentlists').createIndex({
+  //   code: 'text',
+  //   name: 'text'
+  // }, function (err, result) {
+  //   if (err) { console.log(err) } else { console.log('Treatment List Indexes Created Successfully!') }
+  // })
 
-  //   db.collection('treatmentlists').createIndex({
-  //     code: 'text',
-  //     name: 'text'
-  //   }, function (err, result) {
-  //     if (err) { console.log(err) } else { console.log('Treatment List Indexes Created Successfully!') }
-  //   })
+  // db.collection('currencies').createIndex({
+  //   code: 'text',
+  //   name: 'text'
+  // }, function (err, result) {
+  //   if (err) { console.log(err) } else { console.log('Currency Indexes Created Successfully!') }
+  // })
 
-  //   db.collection('currencies').createIndex({
-  //     code: 'text',
-  //     name: 'text'
-  //   }, function (err, result) {
-  //     if (err) { console.log(err) } else { console.log('Currency Indexes Created Successfully!') }
-  //   })
-
-  //   db.collection('medicineitems').createIndex({
-  //     code: 'text',
-  //     medicineItemName: 'text'
-  //   }, function (err, result) {
-  //     if (err) { console.log(err) } else { console.log('medicineItems Indexes Created Successfully!') }
-  //   })
-
-
-
-  //   db.collection('procedureitems').createIndex({
-  //     code: 'text',
-  //     procedureItemName: 'text'
-  //   }, function (err, result) {
-  //     if (err) { console.log(err) } else { console.log('Procedure Items Indexes Created Successfully!') }
-  //   })
-
-  //   db.collection('procedureaccessories').createIndex({
-  //     code: 'text',
-  //     name: 'text'
-  //   }, function (err, result) {
-  //     if (err) { console.log(err) } else { console.log('Procedure Accessories Indexes Created Successfully!') }
-  //   })
-
-  //db.collection('medicinesales').createIndex({
-    //     voucherCode: 'text',
-    //     seq: 'text'
-    //   }, function (err, result) {
-    //     if (err) { console.log(err) } else { console.log('Procedure Accessories Indexes Created Successfully!') }
-    //   })
-
-    //   db.collection('proceduremedicines').createIndex({
-    //     code: 'text',
-    //     name: 'text'
-    //   }, function (err, result) {
-    //     if (err) { console.log(err) } else { console.log('Procedure Medicine Indexes Created Successfully!') }
-    //   })
-
-    //   db.collection('medicinelists').createIndex({
-    //     code: 'text',
-    //     procedureItemName: 'text'
-    //   }, function (err, result) {
-    //     if (err) { console.log(err) } else { console.log('Medicine Lists Indexes Created Successfully!') }
-    //   })
-
-    //   db.collection('treatments').createIndex({
-    //     treatmentCode: 'text',
-    //     treatmentName: 'text'
-    //   }, function (err, result) {
-    //     if (err) { console.log(err) } else { console.log('Treatment Indexes Created Successfully!') }
-    //   })
+  // db.collection('medicineitems').createIndex({
+  //   code: 'text',
+  //   medicineItemName: 'text'
+  // }, function (err, result) {
+  //   if (err) { console.log(err) } else { console.log('medicineItems Indexes Created Successfully!') }
+  // })
 
 
 
-    // });
-    module.exports = db;
+  // db.collection('procedureitems').createIndex({
+  //   code: 'text',
+  //   procedureItemName: 'text'
+  // }, function (err, result) {
+  //   if (err) { console.log(err) } else { console.log('Procedure Items Indexes Created Successfully!') }
+  // })
 
-  }
+  // db.collection('procedureaccessories').createIndex({
+  //   code: 'text',
+  //   name: 'text'
+  // }, function (err, result) {
+  //   if (err) { console.log(err) } else { console.log('Procedure Accessories Indexes Created Successfully!') }
+  // })
+
+
+
+  // db.collection('proceduremedicines').createIndex({
+  //   code: 'text',
+  //   name: 'text'
+  // }, function (err, result) {
+  //   if (err) { console.log(err) } else { console.log('Procedure Medicine Indexes Created Successfully!') }
+  // })
+
+  // db.collection('medicinelists').createIndex({
+  //   code: 'text',
+  //   procedureItemName: 'text'
+  // }, function (err, result) {
+  //   if (err) { console.log(err) } else { console.log('Medicine Lists Indexes Created Successfully!') }
+  // })
+
+  // db.collection('treatments').createIndex({
+  //   treatmentCode: 'text',
+  //   treatmentName: 'text'
+  // }, function (err, result) {
+  //   if (err) { console.log(err) } else { console.log('Treatment Indexes Created Successfully!') }
+  // })
+
+}
 mongoose.plugin((schema) => {
-    schema.options.usePushEach = true;
-  });
+  schema.options.usePushEach = true;
+});
 
-  //static files
-  app.use('/static', express.static(path.join(__dirname, 'uploads')));
-  app.use(relatedBranchMiddleware);
+//static files
+app.use('/static', express.static(path.join(__dirname, 'uploads')));
+app.use(relatedBranchMiddleware);
 
-  // Bring in our dependencies
-  require('./config/express')(app, config);
+// Bring in our dependencies
+require('./config/express')(app, config);
 
-  server.listen(port, () => {
-    console.log('We are live on port: ', port);
-  });
+server.listen(port, () => {
+  console.log('We are live on port: ', port);
+});
 
