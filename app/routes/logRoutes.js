@@ -8,4 +8,5 @@ module.exports = (app) => {
     app.route('/api/logs').get(verifyToken, catchError(log.listAllLog))
     app.route('/api/logs/filter').get(verifyToken, catchError(log.filterLogs))
     app.route('/api/logs/usage').post(verifyToken, catchError(log.createUsage))
+    app.route('/api/logs/usage/related-usage/:id').get(verifyToken, catchError(log.getUsageRecordsByUsageID))
 };
