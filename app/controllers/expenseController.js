@@ -16,7 +16,7 @@ exports.listAllExpenses = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await Expense.find(query).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
+        let result = await Expense.find(query).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
         count = await Expense.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
@@ -40,7 +40,7 @@ exports.listAllExpenses = async (req, res) => {
 exports.getExpense = async (req, res) => {
     let query = req.mongoQuery
     if (req.params.id) query._id = req.params.id
-    const result = await Expense.find(query).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
+    const result = await Expense.find(query).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -51,7 +51,7 @@ exports.createExpense = async (req, res, next) => {
         const newBody = req.body;
         const newExpense = new Expense(newBody);
         const result = await newExpense.save();
-        const populatedResult = await Expense.find({_id:result._id}).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
+        const populatedResult = await Expense.find({_id:result._id}).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
         const firstTransaction =
         {
             "initialExchangeRate": newBody.initialExchangeRate,
@@ -127,7 +127,7 @@ exports.updateExpense = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        ).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
+        ).populate('relatedAccounting').populate('relatedBranch').populate('relatedBankAccount').populate('relatedCashAccount')
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })

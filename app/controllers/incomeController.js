@@ -16,7 +16,7 @@ exports.listAllIncomes = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Income.find(query).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount');
+    let result = await Income.find(query).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount');
     count = await Income.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -40,7 +40,7 @@ exports.listAllIncomes = async (req, res) => {
 exports.getIncome = async (req, res) => {
   let query = req.mongoQuery
   if (req.params.id) query._id = req.params.id
-  const result = await Income.find(query).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
+  const result = await Income.find(query).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -51,7 +51,7 @@ exports.createIncome = async (req, res, next) => {
     const newBody = req.body;
     const newIncome = new Income(newBody);
     const result = await newIncome.save();
-    const populatedResult = await Income.find({_id:result._id}).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
+    const populatedResult = await Income.find({_id:result._id}).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
     // const bankResult = await Bank.findOneAndUpdate(
     //   { _id: req.body.id },
     //   { $inc: { balance: 50 } },
@@ -132,7 +132,7 @@ exports.updateIncome = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
+    ).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })

@@ -4,7 +4,7 @@ const Nurse = require('../models/nurse');
 exports.listAllNurses = async (req, res) => {
     try {
         let query = req.mongoQuery
-        let result = await Nurse.find(query);
+        let result = await Nurse.find(query).populate('relatedBranch')
         let count = await Nurse.find(query).count();
         res.status(200).send({
             success: true,
@@ -19,7 +19,7 @@ exports.listAllNurses = async (req, res) => {
 exports.getNurse = async (req, res) => {
     let query = req.mongoQuery
     if (req.params.id) query._id = req.params.id
-    const result = await Nurse.find({ _id: req.params.id, isDeleted: false });
+    const result = await Nurse.find({ _id: req.params.id, isDeleted: false }).populate('relatedBranch');
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -45,7 +45,7 @@ exports.updateNurse = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        );
+        ).populate('relatedBranch');
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })

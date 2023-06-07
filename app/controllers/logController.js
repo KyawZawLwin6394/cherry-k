@@ -6,6 +6,7 @@ const Machine = require('../models/fixedAsset');
 const Usage = require('../models/usage');
 const Stock = require('../models/stock')
 const UsageRecords = require('../models/usageRecord');
+const Appointment = require('../models/appointment')
 
 exports.listAllLog = async (req, res) => {
   try {
@@ -344,6 +345,7 @@ exports.createUsage = async (req, res) => {
     let usageResult = await Usage.create(req.body);
     let status;
     if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
+    if (machineError.length === 0 || procedureItemsError.length === 0 || accessoryItemsError.length === 0) status = 'Finished'
     let usageRecordResult = await UsageRecords.create({
       relatedUsage: usageResult._id,
       usageStatus: status,
@@ -355,6 +357,11 @@ exports.createUsage = async (req, res) => {
       procedureItemsError: procedureItemsError,
       accessoryItemsError: accessoryItemsError
     })
+    const appointmentUpdate = await Appointment.findOneAndUpdate(
+      { _id: req.body.relatedAppointment },
+      { usageStatus: status },
+      { new: true }
+    )
     //error handling
     let response = { success: true }
     if (machineError.length > 0) response.machineError = machineError
@@ -362,6 +369,7 @@ exports.createUsage = async (req, res) => {
     if (accessoryItemsError.length > 0) response.accessoryItemsError = accessoryItemsError
     if (usageResult !== undefined) response.usageResult = usageResult
     if (usageRecordResult !== undefined) response.usageRecordResult = usageRecordResult
+    if (appointmentUpdate !== undefined) response.appointmentUpdate = appointmentUpdate
 
     return res.status(200).send(response)
   } catch (error) {
