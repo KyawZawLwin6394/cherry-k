@@ -3,8 +3,9 @@ const Nurse = require('../models/nurse');
 
 exports.listAllNurses = async (req, res) => {
     try {
-        let result = await Nurse.find({ isDeleted: false });
-        let count = await Nurse.find({ isDeleted: false }).count();
+        let query = req.mongoQuery
+        let result = await Nurse.find(query);
+        let count = await Nurse.find(query).count();
         res.status(200).send({
             success: true,
             count: count,
@@ -16,6 +17,8 @@ exports.listAllNurses = async (req, res) => {
 };
 
 exports.getNurse = async (req, res) => {
+    let query = req.mongoQuery
+    if (req.params.id) query._id = req.params.id
     const result = await Nurse.find({ _id: req.params.id, isDeleted: false });
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });

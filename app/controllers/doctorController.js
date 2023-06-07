@@ -3,8 +3,9 @@ const Doctor = require('../models/doctor');
 
 exports.listAllDoctors = async (req, res) => {
   try {
-    let result = await Doctor.find({isDeleted:false});
-    let count = await Doctor.find({isDeleted:false}).count();
+    let query = req.mongoQuery
+    let result = await Doctor.find(query);
+    let count = await Doctor.find(query).count();
     res.status(200).send({
       success: true,
       count: count,
@@ -16,6 +17,8 @@ exports.listAllDoctors = async (req, res) => {
 };
 
 exports.getDoctor = async (req, res) => {
+  let query = req.mongoQuery
+  if (req.params.id) query._id = req.params.id
   const result = await Doctor.find({ _id: req.params.id,isDeleted:false });
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });

@@ -3,20 +3,23 @@ const Therapist = require('../models/therapist');
 
 exports.listAllTherapists = async (req, res) => {
   try {
-    let result = await Therapist.find({isDeleted:false});
-    let count = await Therapist.find({isDeleted:false}).count();
+    let query = req.mongoQuery
+    let result = await Therapist.find(query);
+    let count = await Therapist.find(query).count();
     res.status(200).send({
       success: true,
       count: count,
       data: result
     });
   } catch (error) {
-    return res.status(500).send({ error:true, message:'No Record Found!'});
+    return res.status(500).send({ error: true, message: 'No Record Found!' });
   }
 };
 
 exports.getTherapist = async (req, res) => {
-  const result = await Therapist.find({ _id: req.params.id,isDeleted:false });
+  let query = req.mongoQuery
+  if (req.params.id) query._id = req.params.id
+  const result = await Therapist.find(query);
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
