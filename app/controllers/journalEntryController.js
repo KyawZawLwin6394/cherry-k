@@ -38,12 +38,39 @@ exports.getAllJournals = async (req, res) => {
 
 exports.getJournal = async (req, res) => {
     try {
-        const result = await Transaction.find({ _id: req.params.id, isDeleted: false, JEFlag:true }).populate('relatedAccounting');
+        const result = await Transaction.find({ _id: req.params.id, isDeleted: false, JEFlag: true }).populate('relatedAccounting');
         if (!result)
             return res.status(500).json({ error: true, message: 'No Record Found' });
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, message: error.message })
+    }
+};
+
+exports.deleteJournal = async (req, res, next) => {
+    try {
+        const result = await Transaction.findOneAndUpdate(
+            { _id: req.params.id, JEFlag: true },
+            { isDeleted: true },
+            { new: true },
+        );
+        return res.status(200).send({ success: true, data: { isDeleted: result.isDeleted } });
+    } catch (error) {
+        return res.status(500).send({ "error": true, "message": error.message })
+
+    }
+}
+
+exports.activateJournal = async (req, res, next) => {
+    try {
+        const result = await Transaction.findOneAndUpdate(
+            { _id: req.params.id, JEFlag: true },
+            { isDeleted: false },
+            { new: true },
+        );
+        return res.status(200).send({ success: true, data: { isDeleted: result.isDeleted } });
+    } catch (error) {
+        return res.status(500).send({ "error": true, "message": error.message })
     }
 };
 
@@ -57,7 +84,7 @@ exports.createJournal = async (req, res, next) => {
             date: date,
             remark: remark,
             type: fromAccType,
-            JEFlag:true
+            JEFlag: true
         })
 
         const debitTrans = await Transaction.create({
@@ -66,7 +93,7 @@ exports.createJournal = async (req, res, next) => {
             date: date,
             remark: remark,
             type: toAccType,
-            JEFlag:true
+            JEFlag: true
         })
 
         res.status(200).send({

@@ -11,6 +11,8 @@ module.exports = (app) => {
 
     app.route('/api/journal/:id')
         .get(verifyToken, catchError(journal.getJournal))
+        .delete(verifyToken, catchError(journal.deleteJournal))
+        .post(verifyToken, catchError(journal.activateJournal))
 
     app.route('/api/journals').get(verifyToken, catchError(journal.getAllJournals))
 };
