@@ -9,18 +9,18 @@ let StockSchema = new Schema({
   relatedBranch: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
-  }, 
-  createdBy:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'Users'
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Users'
   },
   relatedProcedureItems: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'MedicineItems'
+    ref: 'ProcedureItems'
   },
   relatedMedicineItems: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'ProcedureItems'
+    ref: 'MedicineItems'
   },
   relatedAccessoryItems: {
     type: mongoose.Schema.Types.ObjectId,
