@@ -156,6 +156,9 @@ exports.createUsage = async (req, res) => {
   let machineError = []
   let procedureItemsError = []
   let accessoryItemsError = []
+  let machineFinished = []
+  let procedureItemsFinished = []
+  let accessoryItemsFinished = []
   let createdBy = req.credentials.id
   try {
 
@@ -173,6 +176,7 @@ exports.createUsage = async (req, res) => {
                 { currentQuantity: min },
                 { new: true },
               )
+              procedureItemsFinished.push(e)
             } catch (error) {
               procedureItemsError.push(e);
             }
@@ -203,6 +207,8 @@ exports.createUsage = async (req, res) => {
                 { currentQuantity: min },
                 { new: true },
               )
+              accessoryItemsFinished.push(e)
+
             } catch (error) {
               accessoryItemsError.push(e)
             }
@@ -233,6 +239,8 @@ exports.createUsage = async (req, res) => {
                 { currentQuantity: min },
                 { new: true },
               )
+              machineFinished.push(e)
+
             } catch (error) {
               machineError.push(e)
             }
@@ -261,6 +269,7 @@ exports.createUsage = async (req, res) => {
                 { currentQuantity: min },
                 { new: true },
               )
+              procedureItemsFinished.push(e)
             } catch (error) {
               procedureItemsError.push(e);
             }
@@ -292,6 +301,7 @@ exports.createUsage = async (req, res) => {
                 { currentQuantity: min },
                 { new: true },
               )
+              accessoryItemsFinished.push(e)
             } catch (error) {
               accessoryItemsError.push(e)
             }
@@ -323,6 +333,7 @@ exports.createUsage = async (req, res) => {
                 { currentQuantity: min },
                 { new: true },
               )
+              machineFinished.push(e)
             } catch (error) {
               machineError.push(e)
             }
@@ -349,9 +360,9 @@ exports.createUsage = async (req, res) => {
     let usageRecordResult = await UsageRecords.create({
       relatedUsage: usageResult._id,
       usageStatus: status,
-      procedureMedicine: req.body.procedureMedicine,
-      procedureAccessory: req.body.procedureAccessory,
-      machine: req.body.machine,
+      procedureMedicine: procedureItemsFinished,
+      procedureAccessory: accessoryItemsFinished,
+      machine: machineFinished,
       relatedBranch: req.mongoQuery.relatedBranch,
       machineError: machineError,
       procedureItemsError: procedureItemsError,
