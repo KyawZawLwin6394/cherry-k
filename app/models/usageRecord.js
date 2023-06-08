@@ -21,6 +21,7 @@ let UsageRecordSchema = new Schema({
         },
         stock: Number,
         actual: Number,
+        remark: String,
         quantity: Number,
         perUsageQTY: Number
     }],
@@ -31,6 +32,7 @@ let UsageRecordSchema = new Schema({
         },
         stock: Number,
         actual: Number,
+        remark: String,
         quantity: Number,
         perUsageQTY: Number
     }],
@@ -41,6 +43,7 @@ let UsageRecordSchema = new Schema({
         },
         stock: Number,
         actual: Number,
+        remark: String,
         quantity: Number,
         perUsageQTY: Number
     }],
@@ -60,6 +63,7 @@ let UsageRecordSchema = new Schema({
         },
         stock: Number,
         actual: Number,
+        remark: String,
         quantity: Number,
         perUsageQTY: Number
     }],
@@ -70,6 +74,7 @@ let UsageRecordSchema = new Schema({
         },
         stock: Number,
         actual: Number,
+        remark: String,
         quantity: Number,
         perUsageQTY: Number
     }],
@@ -80,6 +85,7 @@ let UsageRecordSchema = new Schema({
         },
         stock: Number,
         actual: Number,
+        remark: String,
         quantity: Number,
         perUsageQTY: Number
     }]
