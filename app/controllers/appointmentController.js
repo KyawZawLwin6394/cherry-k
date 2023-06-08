@@ -62,7 +62,7 @@ exports.getTodaysAppointment = async (req, res) => {
     end.setHours(23, 59, 59, 999);
     let query = req.mongoQuery
     if (start && end) query.originalDate = { $gte: start, $lt: end }
-    const result = await Appointment.find(query).populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection').populate({
+    const result = await Appointment.find(query).populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection relatedNurse').populate({
       path: 'relatedPatient',
       populate: [{
         path: 'img',
