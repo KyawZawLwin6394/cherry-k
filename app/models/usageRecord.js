@@ -20,7 +20,9 @@ let UsageRecordSchema = new Schema({
             ref: 'ProcedureItems'
         },
         stock: Number,
-        actual: Number
+        actual: Number,
+        quantity: Number,
+        perUsageQTY: Number
     }],
     procedureAccessory: [{
         item_id: {
@@ -28,7 +30,9 @@ let UsageRecordSchema = new Schema({
             ref: 'AccessoryItems'
         },
         stock: Number,
-        actual: Number
+        actual: Number,
+        quantity: Number,
+        perUsageQTY: Number
     }],
     machine: [{
         item_id: {
@@ -36,12 +40,14 @@ let UsageRecordSchema = new Schema({
             ref: 'FixedAssets'
         },
         stock: Number,
-        actual: Number
+        actual: Number,
+        quantity: Number,
+        perUsageQTY: Number
     }],
     isDeleted: {
         type: Boolean,
         required: true,
-        default: false
+        default: false,
     },
     relatedBranch: {
         type: mongoose.Schema.Types.ObjectId,
@@ -53,7 +59,9 @@ let UsageRecordSchema = new Schema({
             ref: 'FixedAssets'
         },
         stock: Number,
-        actual: Number
+        actual: Number,
+        quantity: Number,
+        perUsageQTY: Number
     }],
     procedureItemsError: [{
         item_id: {
@@ -61,7 +69,9 @@ let UsageRecordSchema = new Schema({
             ref: 'ProcedureItems'
         },
         stock: Number,
-        actual: Number
+        actual: Number,
+        quantity: Number,
+        perUsageQTY: Number
     }],
     accessoryItemsError: [{
         item_id: {
@@ -69,7 +79,9 @@ let UsageRecordSchema = new Schema({
             ref: 'AccessoryItems'
         },
         stock: Number,
-        actual: Number
+        actual: Number,
+        quantity: Number,
+        perUsageQTY: Number
     }]
 });
 
