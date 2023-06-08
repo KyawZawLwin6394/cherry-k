@@ -91,7 +91,7 @@ exports.getAppointment = async (req, res) => {
   try {
     let query = req.mongoQuery
     if (req.params.id) query._id = req.params.id
-    const result = await Appointment.find(query).populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection').populate({
+    const result = await Appointment.find(query).populate('relatedDoctor').populate('relatedTherapist').populate('relatedTreatmentSelection relatedNurse').populate({
       path: 'relatedPatient',
       populate: [{
         path: 'img',
