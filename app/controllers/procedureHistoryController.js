@@ -84,18 +84,18 @@ exports.createProcedureHistory = async (req, res, next) => {
   data = { ...data, pHistory: [] };
   let files = req.files;
   try {
-    if (files.phistory.length > 0) {
-      for (const element of files.phistory) {
-        let imgPath = element.path.split('cherry-k')[1];
-        const attachData = {
-          fileName: element.originalname,
-          imgUrl: imgPath,
-          image: imgPath.split('\\')[2]
-        };
-        const attachResult = await Attachment.create(attachData);
-        data.pHistory.push(attachResult._id.toString());
-      }
-    }
+    // if (files.phistory.length > 0) {
+    //   for (const element of files.phistory) {
+    //     let imgPath = element.path.split('cherry-k')[1];
+    //     const attachData = {
+    //       fileName: element.originalname,
+    //       imgUrl: imgPath,
+    //       image: imgPath.split('\\')[2]
+    //     };
+    //     const attachResult = await Attachment.create(attachData);
+    //     data.pHistory.push(attachResult._id.toString());
+    //   }
+    // }
     const result = await procedureHistory.create(data);
     const populate = await procedureHistory.find({ _id: result._id }).populate('medicineItems.item_id customTreatmentPackages.item_id pHistory relatedAppointment relatedTreatmentSelection')
     res.status(200).send({

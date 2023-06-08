@@ -64,7 +64,7 @@ let ProcedureHistorySchema = new Schema({
     },
     relatedTreatmentSelection: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'TreatmentSelection'
+        ref: 'TreatmentSelections'
     },
     relatedBranch: {
         type: mongoose.Schema.Types.ObjectId,
@@ -74,6 +74,9 @@ let ProcedureHistorySchema = new Schema({
         type: String
     },
     improvement: {
+        type: String
+    },
+    remark: {
         type: String
     }
 });
