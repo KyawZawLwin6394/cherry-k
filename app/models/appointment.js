@@ -79,6 +79,10 @@ let AppointmentSchema = new Schema({
   relatedUsage: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Usages'
+  },
+  isCommissioned: {
+    type: Boolean,
+    default: false
   }
 });
 
