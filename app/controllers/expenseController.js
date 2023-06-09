@@ -1,6 +1,7 @@
 'use strict';
 const Expense = require('../models/expense');
 const Transaction = require('../models/transaction');
+const Accounting = require('../models/accountingList');
 
 exports.listAllExpenses = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -51,7 +52,7 @@ exports.createExpense = async (req, res, next) => {
         const newBody = req.body;
         const newExpense = new Expense(newBody);
         const result = await newExpense.save();
-        const populatedResult = await Expense.find({_id:result._id}).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
+        const populatedResult = await Expense.find({ _id: result._id }).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
         const firstTransaction =
         {
             "initialExchangeRate": newBody.initialExchangeRate,
@@ -63,8 +64,8 @@ exports.createExpense = async (req, res, next) => {
             "treatmentFlag": false,
             "relatedTransaction": null,
             "relatedAccounting": newBody.relatedAccounting,
-            "relatedExpense" : result._id,
-            "relatedBranch":newBody.relatedBranch
+            "relatedExpense": result._id,
+            "relatedBranch": newBody.relatedBranch
         }
         const newTrans = new Transaction(firstTransaction)
         const fTransResult = await newTrans.save();
@@ -80,34 +81,47 @@ exports.createExpense = async (req, res, next) => {
                 "treatmentFlag": false,
                 "relatedTransaction": fTransResult._id,
                 "relatedAccounting": newBody.relatedAccounting,
-                "relatedExpense" : result._id,
-                "relatedCredit":newBody.relatedCredit,
-                "relatedBranch":newBody.relatedBranch
+                "relatedExpense": result._id,
+                "relatedCredit": newBody.relatedCredit,
+                "relatedBranch": newBody.relatedBranch
             }
             const secTrans = new Transaction(secondTransaction)
             var secTransResult = await secTrans.save();
+
         } else {
             //bank or cash
-            
-                const secondTransaction = {
-                    "initialExchangeRate": newBody.initialExchangeRate,
-                    "amount": newBody.finalAmount,
-                    "date": newBody.date,
-                    "remark": newBody.remark,
-                    "type": "Credit",
-                    "relatedTreatment": newBody.relatedTreatment,
-                    "treatmentFlag": false,
-                    "relatedTransaction": fTransResult._id,
-                    "relatedAccounting": (newBody.relatedBankAccount) ? newBody.relatedBankAccount : newBody.relatedCashAccount,
-                    "relatedExpense" : result._id,
-                    "relatedBank": newBody.relatedBankAccount,
-                    "relatedCash": newBody.relatedCashAccount,
-                    "relatedBranch":newBody.relatedBranch
-                }
-            
+
+            const secondTransaction = {
+                "initialExchangeRate": newBody.initialExchangeRate,
+                "amount": newBody.finalAmount,
+                "date": newBody.date,
+                "remark": newBody.remark,
+                "type": "Credit",
+                "relatedTreatment": newBody.relatedTreatment,
+                "treatmentFlag": false,
+                "relatedTransaction": fTransResult._id,
+                "relatedAccounting": (newBody.relatedBankAccount) ? newBody.relatedBankAccount : newBody.relatedCashAccount,
+                "relatedExpense": result._id,
+                "relatedBank": newBody.relatedBankAccount,
+                "relatedCash": newBody.relatedCashAccount,
+                "relatedBranch": newBody.relatedBranch
+            }
+
 
             const secTrans = new Transaction(secondTransaction)
             var secTransResult = await secTrans.save();
+            if (newBody.relatedBankAccount) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: newBody.relatedBankAccount },
+                    { $inc: { amount: -newBody.finalAmount } }
+                )
+            } else if (newBody.relatedCash) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: newBody.relatedCash },
+                    { $inc: { amount: -newBody.finalAmount } }
+                )
+            }
+
         }
         res.status(200).send({
             message: 'Expense create success',

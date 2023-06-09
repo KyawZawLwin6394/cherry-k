@@ -2,6 +2,8 @@
 const Income = require('../models/income');
 const Transaction = require('../models/transaction')
 const Bank = require('../models/bank');
+const Accounting = require('../models/accountingList');
+
 exports.listAllIncomes = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
   let count = 0;
@@ -51,7 +53,7 @@ exports.createIncome = async (req, res, next) => {
     const newBody = req.body;
     const newIncome = new Income(newBody);
     const result = await newIncome.save();
-    const populatedResult = await Income.find({_id:result._id}).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
+    const populatedResult = await Income.find({ _id: result._id }).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
     // const bankResult = await Bank.findOneAndUpdate(
     //   { _id: req.body.id },
     //   { $inc: { balance: 50 } },
@@ -68,8 +70,8 @@ exports.createIncome = async (req, res, next) => {
       "treatmentFlag": false,
       "relatedTransaction": null,
       "relatedAccounting": newBody.relatedAccounting,
-      "relatedIncome" : result._id,
-      "relatedBranch":newBody.relatedBranch
+      "relatedIncome": result._id,
+      "relatedBranch": newBody.relatedBranch
     }
     const newTrans = new Transaction(firstTransaction)
     const fTransResult = await newTrans.save();
@@ -85,13 +87,13 @@ exports.createIncome = async (req, res, next) => {
         "treatmentFlag": false,
         "relatedTransaction": fTransResult._id,
         "relatedAccounting": newBody.relatedAccounting,
-        "relatedIncome" : result._id,
-        "relatedBranch":newBody.relatedBranch,
+        "relatedIncome": result._id,
+        "relatedBranch": newBody.relatedBranch,
         "relatedCredit": newBody.relatedCredit
       }
       const secTrans = new Transaction(secondTransaction)
       var secTransResult = await secTrans.save();
-      
+
     } else {
       //bank or cash
       const secondTransaction = {
@@ -104,15 +106,26 @@ exports.createIncome = async (req, res, next) => {
         "treatmentFlag": false,
         "relatedTransaction": fTransResult._id,
         "relatedAccounting": (newBody.relatedBankAccount) ? newBody.relatedBankAccount : newBody.relatedCashAccount,
-        "relatedIncome" : result._id,
+        "relatedIncome": result._id,
         "relatedBank": newBody.relatedBankAccount,
         "relatedCash": newBody.relatedCashAccount,
-        "relatedBranch":newBody.relatedBranch
+        "relatedBranch": newBody.relatedBranch
       }
       const secTrans = new Transaction(secondTransaction)
       var secTransResult = await secTrans.save();
+      if (newBody.relatedBankAccount) {
+        var amountUpdate = await Accounting.findOneAndUpdate(
+          { _id: newBody.relatedBankAccount },
+          { $inc: { amount: newBody.finalAmount } }
+        )
+      } else if (newBody.relatedCash) {
+        var amountUpdate = await Accounting.findOneAndUpdate(
+          { _id: newBody.relatedCash },
+          { $inc: { amount: newBody.finalAmount } }
+        )
+      }
     }
-    
+
     console.log(result, fTransResult, secTransResult)
     res.status(200).send({
       message: 'Income create success',

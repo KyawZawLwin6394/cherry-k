@@ -79,6 +79,17 @@ exports.createRepayment = async (req, res, next) => {
       }
     )
     const secTransResult = await secTransaction.save();
+    if (req.body.relatedBank) {
+      var amountUpdate = await Accounting.findOneAndUpdate(
+        { _id: req.body.relatedBank },
+        { $inc: { amount: req.body.repaymentAmount } }
+      )
+    } else if (req.body.relatedCash) {
+      var amountUpdate = await Accounting.findOneAndUpdate(
+        { _id: req.body.relatedCash },
+        { $inc: { amount: req.body.repaymentAmount } }
+      )
+    }
 
     const newBody = data;
     const newRepayment = new Repayment(newBody);

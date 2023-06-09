@@ -97,6 +97,17 @@ exports.createMedicineSale = async (req, res, next) => {
       }
     )
     const secTransResult = await secTransaction.save();
+    if (req.body.relatedBankAccount) {
+      var amountUpdate = await Accounting.findOneAndUpdate(
+        { _id: req.body.relatedBankAccount },
+        { $inc: { amount: data.payAmount } }
+      )
+    } else if (req.body.relatedCash) {
+      var amountUpdate = await Accounting.findOneAndUpdate(
+        { _id: req.body.relatedCash },
+        { $inc: { amount: data.payAmount } }
+      )
+    }
     let objID = ''
     if (req.body.relatedBank) objID = req.body.relatedBank
     if (req.body.relatedCash) objID = req.body.relatedCash
@@ -152,6 +163,17 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
       }
     )
     const secTransResult = await secTransaction.save();
+    if (req.body.relatedBankAccount) {
+      var amountUpdate = await Accounting.findOneAndUpdate(
+        { _id: req.body.relatedBankAccount },
+        { $inc: { amount: req.body.amount } }
+      )
+    } else if (req.body.relatedCash) {
+      var amountUpdate = await Accounting.findOneAndUpdate(
+        { _id: req.body.relatedCash },
+        { $inc: { amount: req.body.amount } }
+      )
+    }
     let objID = ''
     if (req.body.relatedBank) objID = req.body.relatedBank
     if (req.body.relatedCash) objID = req.body.relatedCash
@@ -249,7 +271,7 @@ exports.filterMedicineSales = async (req, res, next) => {
     const { start, end } = req.query
     if (start && end) query.createdAt = { $gte: start, $lte: end }
     if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
-    const result = await MedicineSale.find(query).populate('relatedPatient relatedTransaction relatedBranch').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy','givenName');
+    const result = await MedicineSale.find(query).populate('relatedPatient relatedTransaction relatedBranch').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy', 'givenName');
     if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
     res.status(200).send({ success: true, data: result })
   } catch (err) {

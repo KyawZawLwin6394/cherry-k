@@ -137,7 +137,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
         appointmentResult.map(function (element, index) {
             relatedAppointments.push(element._id)
         })
-        data = { ...data, relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments, createdBy:createdBy }
+        data = { ...data, relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments, createdBy: createdBy }
         if (data.paidAmount) {
             data = { ...data, leftOverAmount: data.totalAmount - data.paidAmount } // leftOverAmount Calculation
         }
@@ -164,6 +164,17 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedTransaction": fTransResult._id,
                 "createdBy": createdBy
             });
+            if (req.body.relatedBank) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: req.body.relatedBank },
+                    { $inc: { amount: req.body.paidAmount } }
+                )
+            } else if (req.body.relatedCash) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: req.body.relatedCash },
+                    { $inc: { amount: req.body.paidAmount } }
+                )
+            }
             tvcCreate = true;
         }
         if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
@@ -337,6 +348,17 @@ exports.treatmentPayment = async (req, res, next) => {
                 "relatedTransaction": fTransResult._id,
                 "createdBy": createdBy
             });
+            if (req.body.relatedBank) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: req.body.relatedBank },
+                    { $inc: { amount: req.body.paidAmount } }
+                )
+            } else if (req.body.relatedCash) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: req.body.relatedCash },
+                    { $inc: { amount: req.body.paidAmount } }
+                )
+            }
         } else if (result.paymentMethod === 'Cash Down') { //byAppointment
             // const treatmentVoucherResult = await TreatmentVoucher.create(
             //     {
