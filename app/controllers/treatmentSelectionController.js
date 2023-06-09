@@ -5,6 +5,7 @@ const Transaction = require('../models/transaction');
 const Patient = require('../models/patient');
 const TreatmentVoucher = require('../models/treatmentVoucher');
 const Repay = require('../models/repayRecord');
+const Accounting = require('../models/accountingList');
 
 exports.listAllTreatmentSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
