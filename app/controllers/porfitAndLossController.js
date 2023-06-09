@@ -83,6 +83,127 @@ exports.getTotal = async (req, res) => {
     }
 };
 
+exports.getTotalwithBranch = async (req, res) => {
+    try {
+        const relatedBranchId = req.mongoQuery.relatedBranch; // Assuming you're passing the relatedBranch ID as a query parameter
+
+        const MSTotal = await MedicineSale.aggregate([
+            {
+                $match: {
+                    relatedBranch: relatedBranchId // Filter documents by relatedBranch ID
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: {
+                        $sum: '$totalAmount' // Replace 'totalAmount' with the desired field name
+                    }
+                }
+            }
+        ]);
+
+        const pipeline = [
+            {
+                $match: {
+                    relatedBranch: relatedBranchId // Filter documents by relatedBranch ID
+                }
+            },
+            {
+                $group: {
+                    _id: '$paymentMethod',
+                    totalAmount: { $sum: '$totalAmount' }
+                }
+            }
+        ];
+
+        const pipeline2 = [
+            {
+                $match: {
+                    relatedBranch: relatedBranchId // Filter documents by relatedBranch ID
+                }
+            },
+            {
+                $group: {
+                    _id: '$paymentMethod',
+                    totalAmount: { $sum: '$amount' } // Replace 'amount' with the desired field name
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    paymentMethod: '$_id',
+                    totalAmount: 1
+                }
+            }
+        ];
+        const tvPaymentMethod = await TreatmentVoucher.aggregate(pipeline2);
+        const msPaymentMethod = await MedicineSale.aggregate(pipeline);
+
+        const TVTotal = await TreatmentVoucher.aggregate([
+            {
+                $match: {
+                    relatedBranch: relatedBranchId // Filter documents by relatedBranch ID
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: {
+                        $sum: '$amount' // Replace 'amount' with the desired field name
+                    }
+                }
+            }
+        ]);
+
+        const expenseTotal = await Expense.aggregate([
+            {
+                $match: {
+                    relatedBranch: relatedBranchId // Filter documents by relatedBranch ID
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: {
+                        $sum: '$finalAmount' // Replace 'finalAmount' with the desired field name
+                    }
+                }
+            }
+        ]);
+        if (MSTotal.length > 0 && TVTotal.length > 0 && expenseTotal.length > 0 && MSTotal.length > 0) {
+            return res.status(200).send({
+                success: true,
+                data: {
+                    MSTotal: MSTotal[0].totalAmount,
+                    TVTotal: TVTotal[0].totalAmount,
+                    expenseTotal: expenseTotal[0].totalAmount,
+                    profit: MSTotal[0].totalAmount + TVTotal[0].totalAmount - expenseTotal[0].totalAmount,
+                    msPaymentMethod: msPaymentMethod,
+                    tvPaymentMethod: tvPaymentMethod // Access the result from the first element of the array
+                }
+            });
+        }
+
+        return res.status(200).send({
+            success: true,
+            data: {
+                MSTotal: 0,
+                TVTotal: 0,
+                expenseTotal: 0,
+                profit: 0,
+                msPaymentMethod: msPaymentMethod,
+                tvPaymentMethod: tvPaymentMethod // Access the result from the first element of the array
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ error: true, message: 'Internal Server Error!' });
+    }
+};
+
+
 
 exports.listAllLog = async (req, res) => {
     try {
