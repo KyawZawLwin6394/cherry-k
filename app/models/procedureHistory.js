@@ -23,7 +23,8 @@ let ProcedureHistorySchema = new Schema({
         totalQTY: Number,
         subTotal: Number,
         SIG: String,
-        subSIG: String
+        subSIG: String,
+        remark:String
     }],
     // treatmentPackages: [{
     //     item_id: {
