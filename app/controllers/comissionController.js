@@ -170,7 +170,8 @@ exports.collectComission = async (req, res) => {
             endDate: endDate,
             collectAmount: collectAmount,
             remark: remark,
-            relatedDoctor: relatedDoctor
+            relatedDoctor: relatedDoctor,
+            relatedCommissions: objectIds
         })
         return res.status(200).send({ success: true, updateResult: updateResult, comissionPayResult: cPayResult })
     } catch (e) {
