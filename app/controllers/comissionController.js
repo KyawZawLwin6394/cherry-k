@@ -54,6 +54,10 @@ exports.createComission = async (req, res, next) => {
         { _id: req.body.doctorID },
         { commissionAmount: comission }
     )
+    let appointmentUpdate = await Appointment.findOneAndUpdate(
+        { _id: req.body.appointmentID },
+        { isCommissioned: true }
+    )
     let newBody = req.body;
     try {
         const newComission = new Comission(newBody);
