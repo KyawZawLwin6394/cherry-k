@@ -15,7 +15,6 @@ let FixedAssetSchema = new Schema({
   relatedAccount: {
     type:mongoose.Schema.Types.ObjectId,
     ref:'AccountingLists',
-    required:true
   },
   type: {
     type: String
