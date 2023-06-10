@@ -186,7 +186,7 @@ exports.getTotalwithBranch = async (req, res) => {
         if (MSTotal.length > 0 || TVTotal.length > 0 || expenseTotal.length > 0) {
             return res.status(200).send({
                 success: true,
-                data: 
+                data: data
             });
         }
 
