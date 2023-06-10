@@ -141,8 +141,7 @@ exports.searchCommission = async (req, res) => {
         let query = { status: 'Unclaimed' }
         if (month) query.date = { $gte: startDate, $lte: endDate }
         if (doctor) query.relatedDoctor = doctor
-        const result = await Comission.find(query)
-        // .populate('relatedDoctor relatedVoucher relatedPatient')
+        const result = await Comission.find(query).populate('relatedDoctor relatedVoucher relatedPatient')
         for (let i = 0; i < result.length; i++) {
             total = result[i].commissionAmount + total
         }
