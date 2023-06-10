@@ -1,5 +1,9 @@
 'use strict';
 const StockTransfer = require('../models/stockTransfer');
+const Stock = require('../models/stock');
+const ProcedureMedicine = require('../models/procedureItem');
+const MedicineLists = require('../models/medicineItem');
+const ProcedureAccessory = require('../models/accessoryItem');
 
 exports.listAllStockTransfers = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -82,14 +86,93 @@ exports.getStockTransfer = async (req, res) => {
 
 exports.createStockTransfer = async (req, res, next) => {
   let newBody = req.body;
+  const { procedureMedicine, medicineLists, procedureAccessory } = req.body;
+  let procedureMedicineError = []
+  let medicineListsError = []
+  let procedureAccessoryError = []
+  let procedureMedicineFinished = []
+  let medicineListsFinished = []
+  let procedureAccessoryFinished = []
   try {
+    if (procedureMedicine !== undefined) {
+      procedureMedicine.map(async (e, i) => {
+        if (e.stockQty < e.transferQty) {
+          procedureMedicineError.push(e)
+        } else if (e.stockQty > e.transferQty) {
+          let min = e.stockQty - e.transferQty
+          try {
+            procedureMedicineFinished.push(e)
+            const stockResult = await Stock.findOneAndUpdate(
+              { relatedProcedureItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
+              { $inc: { currentQty: e.transferQty } }
+            )
+            const mainResult = await ProcedureMedicine.findOneAndUpdate(
+              { _id: e.item_id },
+              { $inc: { currentQuantity: -e.transferQty } }
+            )
+          } catch (error) {
+            procedureMedicineError.push(e)
+          }
+        }
+      })
+    }
+    if (medicineLists !== undefined) {
+      medicineLists.map(async (e, i) => {
+        if (e.stockQty < e.transferQty) {
+          medicineListsError.push(e)
+        } else if (e.stockQty > e.transferQty) {
+          let min = e.stockQty - e.transferQty
+          try {
+            medicineListsFinished.push(e)
+            const stockResult = await Stock.findOneAndUpdate(
+              { relatedMedicineItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
+              { $inc: { currentQty: e.transferQty } }
+            )
+            const mainResult = await MedicineLists.findOneAndUpdate(
+              { _id: e.item_id },
+              { $inc: { currentQuantity: -e.transferQty } }
+            )
+          } catch (error) {
+            medicineListsError.push(e)
+          }
+        }
+      })
+    }
+    if (procedureAccessory !== undefined) {
+      procedureAccessory.map(async (e, i) => {
+        if (e.stockQty < e.transferQty) {
+          procedureAccessoryError.push(e)
+        } else if (e.stockQty > e.transferQty) {
+          let min = e.stockQty - e.transferQty
+          try {
+            procedureAccessoryFinished.push(e)
+            const stockResult = await Stock.findOneAndUpdate(
+              { relatedAccessoryItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
+              { $inc: { currentQty: e.transferQty } }
+            )
+            const mainResult = await ProcedureAccessory.findOneAndUpdate(
+              { _id: e.item_id },
+              { $inc: { currentQuantity: -e.transferQty } }
+            )
+          } catch (error) {
+            procedureAccessoryError.push(e)
+          }
+        }
+      })
+    }
     const newStockTransfer = new StockTransfer(newBody);
     const result = await newStockTransfer.save();
-    res.status(200).send({
-      message: 'StockTransfer create success',
-      success: true,
-      data: result
-    });
+
+    let response = { success: true, message: 'StockTransfer create success' }
+    if (procedureMedicineError.length > 0) response.procedureMedicineError = procedureMedicineError
+    if (medicineListsError.length > 0) response.medicineListsError = medicineListsError
+    if (procedureAccessoryError.length > 0) response.procedureAccessoryError = procedureAccessoryError
+    if (procedureMedicineFinished !== undefined) response.procedureMedicineFinished = procedureMedicineFinished
+    if (medicineListsFinished !== undefined) response.medicineListsFinished = medicineListsFinished
+    if (procedureAccessoryFinished !== undefined) response.procedureAccessoryFinished = procedureAccessoryFinished
+    response = { ...response, data: result }
+
+    res.status(200).send(response);
   } catch (error) {
     // console.log(error )
     return res.status(500).send({ "error": true, message: error.message })
