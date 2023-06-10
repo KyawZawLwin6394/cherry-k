@@ -193,7 +193,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "bankType": req.body.bankType,//must be bank acc from accounting accs
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash, //must be cash acc from accounting accs
-                "createdBy": createdBy
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -217,7 +218,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "bankType": req.body.bankType,//must be bank acc from accounting accs
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash, //must be cash acc from accounting accs
-                "createdBy": createdBy
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -317,7 +319,9 @@ exports.treatmentPayment = async (req, res, next) => {
                 "bankType": req.body.bankType,
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash,
-                "createdBy": createdBy //must be cash acc from accounting accs
+                "createdBy": createdBy, //must be cash acc from accounting accs
+                "relatedBranch": req.mongoQuery.relatedBranch
+
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -335,7 +339,8 @@ exports.treatmentPayment = async (req, res, next) => {
                 "remark": null,
                 "relatedAccounting": result.relatedTreatment.relatedAccount,
                 "type": "Credit",
-                "createdBy": createdBy
+                "createdBy": createdBy,
+                "relatedBranch":req.mongoQuery.relatedBranch
             })
             //sec transaction
             var secTransResult = await Transaction.create({
@@ -347,7 +352,8 @@ exports.treatmentPayment = async (req, res, next) => {
                 "relatedCash": req.body.relatedCash,
                 "type": "Debit",
                 "relatedTransaction": fTransResult._id,
-                "createdBy": createdBy
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
             });
             if (req.body.relatedBank) {
                 var amountUpdate = await Accounting.findOneAndUpdate(
@@ -386,7 +392,8 @@ exports.treatmentPayment = async (req, res, next) => {
                 "relatedBranch": req.body.relatedBranch,
                 "relatedAccounting": "6467379159a9bc811d97f4d2", //Advance received from customer
                 "type": "Debit",
-                "createdBy": createdBy
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
             })
             //sec transaction
             var secTransResult = await Transaction.create({
@@ -397,7 +404,8 @@ exports.treatmentPayment = async (req, res, next) => {
                 "relatedAccounting": result.relatedTreatment.relatedAccount,
                 "type": "Credit",
                 "relatedTransaction": fTransResult._id,
-                "createdBy": createdBy
+                "createdBy": createdBy,
+                "relatedBranch":req.mongoQuery.relatedBranch
             })
         }
         let response = {
@@ -454,7 +462,8 @@ exports.createTreatmentTransaction = async (req, res) => {
             "remark": req.body.remark,
             "relatedAccounting": req.body.firstAccount,
             "type": "Credit",
-            "createdBy": createdBy
+            "createdBy": createdBy,
+            "relatedBranch":req.mongoQuery.relatedBranch
         })
         const fTransResult = await fTransaction.save()
         const secTransaction = new Transaction(
@@ -466,7 +475,8 @@ exports.createTreatmentTransaction = async (req, res) => {
                 "relatedAccounting": req.body.secondAccount,
                 "type": "Debit",
                 "relatedTransaction": fTransResult._id,
-                "createdBy": createdBy
+                "createdBy": createdBy,
+                "relatedBranch":req.mongoQuery.relatedBranch
             }
         )
         const secTransResult = await secTransaction.save()

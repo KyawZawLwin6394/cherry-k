@@ -164,19 +164,21 @@ exports.createUsage = async (req, res) => {
 
     //procedureMedicine
     if (relatedBranch === undefined) {
+      console.log('here branch undefined')
       if (procedureMedicine !== undefined) {
         procedureMedicine.map(async (e, i) => {
           if (e.stock < e.actual) {
             procedureItemsError.push(e)
-          } else {
+          } else if (e.stock > e.actual) {
             let min = e.stock - e.actual
             try {
+              procedureItemsFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id },
                 { currentQuantity: min },
                 { new: true },
               )
-              procedureItemsFinished.push(e)
+
             } catch (error) {
               procedureItemsError.push(e);
             }
@@ -199,15 +201,17 @@ exports.createUsage = async (req, res) => {
         procedureAccessory.map(async (e, i) => {
           if (e.stock < e.actual) {
             accessoryItemsError.push(e)
-          } else {
+          } else if (e.stock > e.actual) {
+            console.log('here', e.stock, e.actual)
             let min = e.stock - e.actual
             try {
+              accessoryItemsFinished.push(e)
               const result = await AccessoryItem.findOneAndUpdate(
                 { _id: e.item_id },
                 { currentQuantity: min },
                 { new: true },
               )
-              accessoryItemsFinished.push(e)
+
 
             } catch (error) {
               accessoryItemsError.push(e)
@@ -225,21 +229,22 @@ exports.createUsage = async (req, res) => {
         })
       }
 
-      //machine
+      // //machine
 
       if (machine !== undefined) {
         machine.map(async (e, i) => {
           if (e.stock < e.actual) {
             machineError.push(e)
-          } else {
+          } else if (e.stock > e.actual) {
             let min = e.stock - e.actual
             try {
+              machineFinished.push(e)
               const result = await Machine.findOneAndUpdate(
                 { _id: e.item_id },
                 { currentQuantity: min },
                 { new: true },
               )
-              machineFinished.push(e)
+
 
             } catch (error) {
               machineError.push(e)
@@ -261,15 +266,16 @@ exports.createUsage = async (req, res) => {
         procedureMedicine.map(async (e, i) => {
           if (e.stock < e.actual) {
             procedureItemsError.push(e)
-          } else {
+          } else if (e.stock > e.actual) {
             let min = e.stock - e.actual
             try {
+              procedureItemsFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
                 { currentQuantity: min },
                 { new: true },
               )
-              procedureItemsFinished.push(e)
+
             } catch (error) {
               procedureItemsError.push(e);
             }
@@ -293,15 +299,16 @@ exports.createUsage = async (req, res) => {
         procedureAccessory.map(async (e, i) => {
           if (e.stock < e.actual) {
             accessoryItemsError.push(e)
-          } else {
+          } else if (e.stock > e.actual) {
             let min = e.stock - e.actual
             try {
+              accessoryItemsFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
                 { currentQuantity: min },
                 { new: true },
               )
-              accessoryItemsFinished.push(e)
+
             } catch (error) {
               accessoryItemsError.push(e)
             }
@@ -325,15 +332,16 @@ exports.createUsage = async (req, res) => {
         machine.map(async (e, i) => {
           if (e.stock < e.actual) {
             machineError.push(e)
-          } else {
+          } else if (e.stock > e.actual) {
             let min = e.stock - e.actual
             try {
+              machineFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
                 { currentQuantity: min },
                 { new: true },
               )
-              machineFinished.push(e)
+
             } catch (error) {
               machineError.push(e)
             }
@@ -354,6 +362,11 @@ exports.createUsage = async (req, res) => {
     //usage create
     req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
     let usageResult = await Usage.create(req.body);
+    const appointmentUpdate = await Appointment.findOneAndUpdate(
+      { _id: req.body.relatedAppointment },
+      { usageStatus: status, relatedUsage: usageResult._id },
+      { new: true }
+    )
     let status;
     if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
     if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
@@ -368,11 +381,7 @@ exports.createUsage = async (req, res) => {
       procedureItemsError: procedureItemsError,
       accessoryItemsError: accessoryItemsError
     })
-    const appointmentUpdate = await Appointment.findOneAndUpdate(
-      { _id: req.body.relatedAppointment },
-      { usageStatus: status, relatedUsage: usageResult._id },
-      { new: true }
-    )
+
     //error handling
     let response = { success: true }
     if (machineError.length > 0) response.machineError = machineError

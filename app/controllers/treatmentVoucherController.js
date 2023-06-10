@@ -83,8 +83,8 @@ exports.getCode = async (req, res) => {
     try {
         let today = new Date().toISOString()
         const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
-        if (latestDocument[0].seq === undefined) data = { ...data, seq: 1, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-1" } // if seq is undefined set initial patientID and seq
-        if (latestDocument[0].seq) {
+        if (latestDocument.length === 0) data = { ...data, seq: 1, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-1" } // if seq is undefined set initial patientID and seq
+        if (latestDocument.length > 0) {
             const increment = latestDocument[0].seq + 1
             data = { ...data, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-" + increment, seq: increment }
         }
