@@ -362,6 +362,7 @@ exports.createUsage = async (req, res) => {
 
     const appResult = await Appointment.find({ _id: req.body.relatedAppointment })
     console.log(appResult[0].relatedUsage)
+    let status;
     if (appResult[0].relatedUsage === undefined) {
       //usage create
       req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
@@ -371,7 +372,7 @@ exports.createUsage = async (req, res) => {
         { usageStatus: status, relatedUsage: usageResult._id },
         { new: true }
       )
-      let status;
+
       if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
       if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
       var usageRecordResult = await UsageRecords.create({
@@ -385,26 +386,45 @@ exports.createUsage = async (req, res) => {
         procedureItemsError: procedureItemsError,
         accessoryItemsError: accessoryItemsError
       })
-    } else {
-      req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
-      let status;
-      if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
-      if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
-      var usageRecordResult = await UsageRecords.findOneAndUpdate(
-        { relatedUsage: appResult[0].relatedUsage },
-        {
-          usageStatus: status,
-          procedureMedicine: procedureItemsFinished,
-          procedureAccessory: accessoryItemsFinished,
-          machine: machineFinished,
-          relatedBranch: req.mongoQuery.relatedBranch,
-          machineError: machineError,
-          procedureItemsError: procedureItemsError,
-          accessoryItemsError: accessoryItemsError
-        },
-        { new: true }
-      )
     }
+    // else {
+    //   req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
+    //   if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
+    //   if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
+    //   var usageRecordResult = await UsageRecords.findOneAndUpdate(
+    //     { relatedUsage: appResult[0].relatedUsage },
+    //     {
+    //       $addToSet: {
+    //         procedureMedicine: {
+    //           $each: procedureItemsFinished,
+    //           $elemMatch: { item_id: { $ne: { $each: procedureItemsFinished.map(obj => obj.item_id) } } }
+    //         },
+    //         procedureAccessory: {
+    //           $each: accessoryItemsFinished,
+    //           $elemMatch: { item_id: { $ne: { $each: accessoryItemsFinished.map(obj => obj.item_id) } } }
+    //         },
+    //         machine: {
+    //           $each: machineFinished,
+    //           $elemMatch: { item_id: { $ne: { $each: machineFinished.map(obj => obj.item_id) } } }
+    //         },
+    //         machineError: {
+    //           $each: machineError,
+    //           $elemMatch: { item_id: { $ne: { $each: machineError.map(obj => obj.item_id) } } }
+    //         },
+    //         procedureItemsError: {
+    //           $each: procedureItemsError,
+    //           $elemMatch: { item_id: { $ne: { $each: procedureItemsError.map(obj => obj.item_id) } } }
+    //         },
+    //         accessoryItemsError: {
+    //           $each: accessoryItemsError,
+    //           $elemMatch: { item_id: { $ne: { $each: accessoryItemsError.map(obj => obj.item_id) } } }
+    //         },
+    //       },
+    //       usageStatus: status,
+    //     },
+    //     { new: true }
+    //   )
+    // }
 
 
     //error handling
