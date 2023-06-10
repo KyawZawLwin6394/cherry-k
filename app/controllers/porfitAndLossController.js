@@ -171,10 +171,6 @@ exports.getTotalwithBranch = async (req, res) => {
                 }
             }
         ]);
-        let mstotal = MSTotal[0].totalAmount
-        let tvtotal = TVTotal[0].totalAmount
-        let exptotal = expenseTotal[0].totalAmount
-        let profit = mstotal + tvtotal - exptotal
         let data = {
             MSTotal: MSTotal,
             TVTotal: TVTotal,
@@ -182,7 +178,6 @@ exports.getTotalwithBranch = async (req, res) => {
             msPaymentMethod: msPaymentMethod,
             tvPaymentMethod: tvPaymentMethod // Access the result from the first element of the array
         }
-        if (profit) { data.profit = profit } else { data.profit = 0 }
         if (MSTotal.length > 0 || TVTotal.length > 0 || expenseTotal.length > 0) {
             return res.status(200).send({
                 success: true,
