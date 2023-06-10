@@ -359,28 +359,53 @@ exports.createUsage = async (req, res) => {
         })
       }
     }
-    //usage create
-    req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
-    let usageResult = await Usage.create(req.body);
-    const appointmentUpdate = await Appointment.findOneAndUpdate(
-      { _id: req.body.relatedAppointment },
-      { usageStatus: status, relatedUsage: usageResult._id },
-      { new: true }
-    )
-    let status;
-    if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
-    if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
-    let usageRecordResult = await UsageRecords.create({
-      relatedUsage: usageResult._id,
-      usageStatus: status,
-      procedureMedicine: procedureItemsFinished,
-      procedureAccessory: accessoryItemsFinished,
-      machine: machineFinished,
-      relatedBranch: req.mongoQuery.relatedBranch,
-      machineError: machineError,
-      procedureItemsError: procedureItemsError,
-      accessoryItemsError: accessoryItemsError
-    })
+
+    const appResult = await Appointment.find({ _id: req.body.relatedAppointment })
+    console.log(appResult[0].relatedUsage)
+    if (appResult[0].relatedUsage === undefined) {
+      //usage create
+      req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
+      var usageResult = await Usage.create(req.body);
+      var appointmentUpdate = await Appointment.findOneAndUpdate(
+        { _id: req.body.relatedAppointment },
+        { usageStatus: status, relatedUsage: usageResult._id },
+        { new: true }
+      )
+      let status;
+      if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
+      if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
+      var usageRecordResult = await UsageRecords.create({
+        relatedUsage: usageResult._id,
+        usageStatus: status,
+        procedureMedicine: procedureItemsFinished,
+        procedureAccessory: accessoryItemsFinished,
+        machine: machineFinished,
+        relatedBranch: req.mongoQuery.relatedBranch,
+        machineError: machineError,
+        procedureItemsError: procedureItemsError,
+        accessoryItemsError: accessoryItemsError
+      })
+    } else {
+      req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
+      let status;
+      if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
+      if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
+      var usageRecordResult = await UsageRecords.findOneAndUpdate(
+        { relatedUsage: appResult[0].relatedUsage },
+        {
+          usageStatus: status,
+          procedureMedicine: procedureItemsFinished,
+          procedureAccessory: accessoryItemsFinished,
+          machine: machineFinished,
+          relatedBranch: req.mongoQuery.relatedBranch,
+          machineError: machineError,
+          procedureItemsError: procedureItemsError,
+          accessoryItemsError: accessoryItemsError
+        },
+        { new: true }
+      )
+    }
+
 
     //error handling
     let response = { success: true }

@@ -198,8 +198,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
-            if (latestDocument[0].seq === undefined) dataTVC = { ...dataTVC, seq: 1, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-1" } // if seq is undefined set initial patientID and seq
-            if (latestDocument[0].seq) {
+            if (latestDocument.length === 0) dataTVC = { ...dataTVC, seq: 1, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-1" } // if seq is undefined set initial patientID and seq
+            if (latestDocument.length > 0) {
                 const increment = latestDocument[0].seq + 1
                 dataTVC = { ...dataTVC, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-" + increment, seq: increment }
             }
@@ -223,8 +223,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
-            if (latestDocument[0].seq === undefined) dataTVC = { ...dataTVC, seq: 1, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-1" } // if seq is undefined set initial patientID and seq
-            if (latestDocument[0].seq) {
+            if (latestDocument.length === 0) dataTVC = { ...dataTVC, seq: 1, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-1" } // if seq is undefined set initial patientID and seq
+            if (latestDocument.length > 0) {
                 const increment = latestDocument[0].seq + 1
                 dataTVC = { ...dataTVC, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-" + increment, seq: increment }
             }
@@ -325,8 +325,8 @@ exports.treatmentPayment = async (req, res, next) => {
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
-            if (latestDocument[0].seq === undefined) dataTVC = { ...dataTVC, seq: 1, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-1" } // if seq is undefined set initial patientID and seq
-            if (latestDocument[0].seq) {
+            if (latestDocument.length === 0) dataTVC = { ...dataTVC, seq: 1, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-1" } // if seq is undefined set initial patientID and seq
+            if (latestDocument.length > 0) {
                 const increment = latestDocument[0].seq + 1
                 dataTVC = { ...dataTVC, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-" + increment, seq: increment }
             }
@@ -340,7 +340,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 "relatedAccounting": result.relatedTreatment.relatedAccount,
                 "type": "Credit",
                 "createdBy": createdBy,
-                "relatedBranch":req.mongoQuery.relatedBranch
+                "relatedBranch": req.mongoQuery.relatedBranch
             })
             //sec transaction
             var secTransResult = await Transaction.create({
@@ -405,7 +405,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 "type": "Credit",
                 "relatedTransaction": fTransResult._id,
                 "createdBy": createdBy,
-                "relatedBranch":req.mongoQuery.relatedBranch
+                "relatedBranch": req.mongoQuery.relatedBranch
             })
         }
         let response = {
@@ -463,7 +463,7 @@ exports.createTreatmentTransaction = async (req, res) => {
             "relatedAccounting": req.body.firstAccount,
             "type": "Credit",
             "createdBy": createdBy,
-            "relatedBranch":req.mongoQuery.relatedBranch
+            "relatedBranch": req.mongoQuery.relatedBranch
         })
         const fTransResult = await fTransaction.save()
         const secTransaction = new Transaction(
@@ -476,7 +476,7 @@ exports.createTreatmentTransaction = async (req, res) => {
                 "type": "Debit",
                 "relatedTransaction": fTransResult._id,
                 "createdBy": createdBy,
-                "relatedBranch":req.mongoQuery.relatedBranch
+                "relatedBranch": req.mongoQuery.relatedBranch
             }
         )
         const secTransResult = await secTransaction.save()
