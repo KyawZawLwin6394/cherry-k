@@ -366,15 +366,14 @@ exports.createUsage = async (req, res) => {
     if (appResult[0].relatedUsage === undefined) {
       //usage create
       req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
+      if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
+      if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
       var usageResult = await Usage.create(req.body);
       var appointmentUpdate = await Appointment.findOneAndUpdate(
         { _id: req.body.relatedAppointment },
         { usageStatus: status, relatedUsage: usageResult._id },
         { new: true }
       )
-
-      if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
-      if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
       var usageRecordResult = await UsageRecords.create({
         relatedUsage: usageResult._id,
         usageStatus: status,
