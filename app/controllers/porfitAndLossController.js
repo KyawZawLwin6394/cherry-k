@@ -65,17 +65,17 @@ exports.getTotal = async (req, res) => {
                 }
             }
         ]);
-
+        let response = {
+            msPaymentMethod: msPaymentMethod,
+            tvPaymentMethod: tvPaymentMethod
+        }
+        if (MSTotal.length > 0) response.MSTotal = MSTotal[0].totalAmount
+        if (TVTotal.length > 0) response.TVTotal = TVTotal[0].totalAmount
+        if (expenseTotal.length > 0) response.expenseTotal = expenseTotal[0].totalAmount
+        if (MSTotal.length > 0 || TVTotal.length > 0 || expenseTotal.length > 0) response.profit = MSTotal[0].totalAmount + TVTotal[0].totalAmount - expenseTotal[0].totalAmount
         return res.status(200).send({
             success: true,
-            data: {
-                MSTotal: MSTotal[0].totalAmount,
-                TVTotal: TVTotal[0].totalAmount,
-                expenseTotal: expenseTotal[0].totalAmount,
-                profit: MSTotal[0].totalAmount + TVTotal[0].totalAmount - expenseTotal[0].totalAmount,
-                msPaymentMethod: msPaymentMethod,
-                tvPaymentMethod: tvPaymentMethod // Access the result from the first element of the array
-            }
+            data: response
         });
     } catch (error) {
         console.error(error);
