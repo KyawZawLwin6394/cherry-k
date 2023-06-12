@@ -83,6 +83,46 @@ exports.getTotal = async (req, res) => {
     }
 };
 
+exports.getTotalWithDateFilter = async (req, res) => {
+    try {
+        let query = { isDeleted: false }
+        let query2 = { isDeleted: false }
+        let { branch, start, end } = req.query
+        if (start && end) query.createdAt = { $gte: start, $lte: end }
+        if (start && end) query2.date = { $gte: start, $lte: end }
+        if (branch) query.relatedBranch = branch
+        if (branch) query2.relatedBranch = branch
+
+
+        const MedicineSaleResult = await MedicineSale.find(query)
+        const TreatmentVoucherResult = await TreatmentVoucher.find(query)
+        const ExpenseResult = await Expense.find(query2)
+
+        const msTotalAmount = MedicineSaleResult.reduce((total, sale) => total + sale.grandTotal, 0);
+        const tvTotalAmount = TreatmentVoucherResult.reduce((total, sale) => total + sale.amount, 0);
+        const exTotalAmount = ExpenseResult.reduce((total, sale) => total + sale.finalAmount, 0);
+
+        const tvPaymentMethod = TreatmentVoucherResult.reduce((result, { paymentMethod, amount }) => {
+            result[paymentMethod] = (result[paymentMethod] || 0) + amount;
+            return result;
+        }, {});
+
+        const msPaymentMethod = MedicineSaleResult.reduce((result, { paymentMethod, totalAmount }) => {
+            result[paymentMethod] = (result[paymentMethod] || 0) + totalAmount;
+            return result;
+        }, {});
+
+        // Printing the results
+        console.log(tvPaymentMethod);
+        console.log(msPaymentMethod);
+
+        return res.status(200).send({ succes: true, msPaymentMethod: msPaymentMethod, tvPaymentMethod: tvPaymentMethod, MedicineSaleResult: MedicineSaleResult, TreatmentVoucherResult: TreatmentVoucherResult, ExpenseResult: ExpenseResult, MSTotal: msTotalAmount, TVTotal: tvTotalAmount, expenseTotal: exTotalAmount })
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ error: true, message: 'Internal Server Error!' });
+    }
+};
+
 exports.getTotalwithBranch = async (req, res) => {
     try {
         const relatedBranchId = req.mongoQuery.relatedBranch; // Assuming you're passing the relatedBranch ID as a query parameter
@@ -171,6 +211,7 @@ exports.getTotalwithBranch = async (req, res) => {
                 }
             }
         ]);
+        console.log(MSTotal)
         let data = {
             MSTotal: MSTotal,
             TVTotal: TVTotal,
