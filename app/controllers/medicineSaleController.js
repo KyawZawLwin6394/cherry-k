@@ -20,7 +20,7 @@ exports.listAllMedicineSales = async (req, res) => {
     if (req.query.createdBy) query.createdBy = req.query.createdBy
     console.log(query)
 
-    let result = await MedicineSale.find(query).populate('relatedPatient').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy').populate({
+    let result = await MedicineSale.find(query).populate('relatedPatient relatedBranch').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy').populate({
       path: 'relatedTransaction',
       populate: [{
         path: 'relatedAccounting',
