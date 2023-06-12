@@ -107,6 +107,8 @@ exports.getClosing = async (req, res) => {
         const sort = { _id: -1 }; // Sort by descending _id to get the latest document
 
         const latestDocument = await AccountBalance.findOne(query, { sort: { _id: -1 } });
+        console.log(latestDocument)
+        if (latestDocument === null) return res.status(404).send({ error: true, message: 'Not Found!' })
         const result = await AccountBalance.find({ _id: latestDocument._id }).populate('relatedAccounting')
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
