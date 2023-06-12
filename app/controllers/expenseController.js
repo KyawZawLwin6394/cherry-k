@@ -69,6 +69,12 @@ exports.createExpense = async (req, res, next) => {
         }
         const newTrans = new Transaction(firstTransaction)
         const fTransResult = await newTrans.save();
+        if (newBody.relatedAccounting) {
+            var amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: newBody.relatedAccounting },
+                { $inc: { amount: newBody.finalAmount } }
+            )
+        }
         if (req.body.relatedCredit) {
             //credit
             const secondTransaction = {

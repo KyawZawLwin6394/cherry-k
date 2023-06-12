@@ -20,6 +20,12 @@ let Discount = new Schema({
     conditionPackageQty: {
         type: Number
     },
+    startDate: {
+        type: Date
+    },
+    endDate: {
+        type: Date
+    },
     value: {
         type: Number,
     },

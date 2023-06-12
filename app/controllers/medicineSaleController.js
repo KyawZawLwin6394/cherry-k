@@ -90,6 +90,10 @@ exports.createMedicineSale = async (req, res, next) => {
       "createdBy": createdBy
     })
     const fTransResult = await fTransaction.save()
+    var amountUpdate = await Accounting.findOneAndUpdate(
+      { _id: "646739c059a9bc811d97fa8b" },
+      { $inc: { amount: -data.payAmount } }
+    )
     //sec transaction
     const secTransaction = new Transaction(
       {
@@ -156,6 +160,10 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
       "createdBy": createdBy
     })
     const fTransResult = await fTransaction.save()
+    var amountUpdate = await Accounting.findOneAndUpdate(
+      { _id: "6423eb395fb841d5566db36d" },
+      { $inc: { amount: -data.payAmount } }
+    )
     //sec transaction
     const secTransaction = new Transaction(
       {

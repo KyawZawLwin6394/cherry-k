@@ -15,6 +15,10 @@ module.exports = (app) => {
         .delete(verifyToken, catchError(stock.deleteStock))
         .post(verifyToken, catchError(stock.activateStock))
 
-    app.route('/api/stocks').get(verifyToken, catchError(stock.listAllStocks))
+    app.route('/api/stocks')
+        .get(verifyToken, catchError(stock.listAllStocks))
+
+    app.route('/api/stocks/copy')
+        .get(verifyToken, catchError(stock.copyStock))
 
 };

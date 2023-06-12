@@ -160,6 +160,10 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "type": "Credit",
                 "createdBy": createdBy
             })
+            var amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: "6467379159a9bc811d97f4d2" },
+                { $inc: { amount: -req.body.paidAmount } }
+            )
             //sec transaction
             var secTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,
@@ -349,6 +353,12 @@ exports.treatmentPayment = async (req, res, next) => {
                 "createdBy": createdBy,
                 "relatedBranch": req.mongoQuery.relatedBranch
             })
+            if (result.relatedTreatment.relatedAccount) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: result.relatedTreatment.relatedAccount },
+                    { $inc: { amount: -req.body.paidAmount } }
+                )
+            }
             //sec transaction
             var secTransResult = await Transaction.create({
                 "amount": req.body.paidAmount,

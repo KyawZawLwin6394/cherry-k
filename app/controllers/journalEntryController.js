@@ -1,6 +1,7 @@
 // relatedCreditAccount:id (credit)
 // relatedDebitAccount:id (debit)'use strict';
-const Transaction = require('../models/transaction')
+const Transaction = require('../models/transaction');
+const Accounting = require('../models/accountingList');
 exports.getAllJournals = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
     let count = 0;
@@ -86,6 +87,18 @@ exports.createJournal = async (req, res, next) => {
             type: fromAccType,
             JEFlag: true
         })
+        if (fromAcc) {
+            let amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: fromAcc },
+                { $inc: { amount: -amount } }
+            )
+        }
+        if (toAcc) {
+            let amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: toAcc },
+                { $inc: { amount: amount } }
+            )
+        }
 
         const debitTrans = await Transaction.create({
             relatedAccounting: toAcc,

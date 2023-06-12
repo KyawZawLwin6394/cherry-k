@@ -1,5 +1,10 @@
 'use strict';
 const Stock = require('../models/stock');
+const ProcedureItems = require('../models/procedureItem');
+const MedicineItems = require('../models/medicineItem');
+const AccessoryItems = require('../models/accessoryItem');
+const Branch = require('../models/branch');
+const branch = require('../models/branch');
 
 exports.listAllStocks = async (req, res) => {
     let query = req.mongoQuery
@@ -78,3 +83,69 @@ exports.activateStock = async (req, res, next) => {
         return res.status(500).send({ "error": true, "message": error.message })
     }
 };
+
+exports.copyStock = async (req, res) => {
+    try {
+        const procedureItems = await ProcedureItems.find({ isDeleted: false })
+        const accessoryItems = await AccessoryItems.find({ isDeleted: false })
+        const medicineItems = await MedicineItems.find({ isDeleted: false })
+        const branches = await Branch.find({})
+        for (let i = 0; i < procedureItems.length; i++) {
+            console.log('here')
+            for (let b = 0; b < branches.length; b++) {
+            console.log('here2')
+                var stockResult = await Stock.create(
+                    {
+                        "relatedBranch": branches[b]._id,
+                        "relatedProcedureItems": procedureItems[i]._id,
+                        "currentQty": procedureItems[i].currentQuantity,
+                        "fromUnit": procedureItems[i].fromUnit,
+                        "toUnit": procedureItems[i].toUnit,
+                        "totalUnit": (procedureItems[i].currentQuantity * procedureItems[i].toUnit) / procedureItems[i].fromUnit
+                    }
+                )
+                console.log(stockResult)
+            }
+        }
+
+        for (let i = 0; i < medicineItems.length; i++) {
+            console.log('here')
+            for (let b = 0; b < branches.length; b++) {
+            console.log('here2')
+                var stockResult = await Stock.create(
+                    {
+                        "relatedBranch": branches[b]._id,
+                        "relatedMedicineItems": medicineItems[i]._id,
+                        "currentQty": medicineItems[i].currentQuantity,
+                        "fromUnit": medicineItems[i].fromUnit,
+                        "toUnit": medicineItems[i].toUnit,
+                        "totalUnit": (medicineItems[i].currentQuantity * medicineItems[i].toUnit) / medicineItems[i].fromUnit
+                    }
+                )
+                console.log(stockResult)
+            }
+        }
+
+        for (let i = 0; i < accessoryItems.length; i++) {
+            console.log('here')
+            for (let b = 0; b < branches.length; b++) {
+            console.log('here2')
+                var stockResult = await Stock.create(
+                    {
+                        "relatedBranch": branches[b]._id,
+                        "relatedAccessoryItems": accessoryItems[i]._id,
+                        "currentQty": accessoryItems[i].currentQuantity,
+                        "fromUnit": accessoryItems[i].fromUnit,
+                        "toUnit": accessoryItems[i].toUnit,
+                        "totalUnit": (accessoryItems[i].currentQuantity * accessoryItems[i].toUnit) / accessoryItems[i].fromUnit
+                    }
+                )
+                console.log(stockResult)
+            }
+        }
+
+        return res.status(200).send({ success: true, data: 'data' })
+    } catch (error) {
+        return res.status(500).send({ "error": true, "message": error.message })
+    }
+}
