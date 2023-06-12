@@ -36,6 +36,9 @@ let Discount = new Schema({
     for: {
         type: String,
         enum: ['All', 'Member', 'Medicine-Sales', 'Treatment-Sales']
+    },
+    name: {
+        type: String
     }
 });
 

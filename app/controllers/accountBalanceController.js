@@ -100,3 +100,16 @@ exports.activateAccountBalance = async (req, res, next) => {
         return res.status(500).send({ "error": true, "message": error.message })
     }
 };
+
+exports.getClosing = async (req, res) => {
+    try {
+        const query = { relatedAccounting: req.query.relatedAccounting, type: req.query.type };
+        const sort = { _id: -1 }; // Sort by descending _id to get the latest document
+
+        const latestDocument = await AccountBalance.findOne(query, { sort: { _id: -1 } });
+        const result = await AccountBalance.find({ _id: latestDocument._id }).populate('relatedAccounting')
+        return res.status(200).send({ success: true, data: result });
+    } catch (error) {
+        return res.status(500).send({ "error": true, "message": error.message })
+    }
+}

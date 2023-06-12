@@ -16,5 +16,6 @@ module.exports = (app) => {
         .post(verifyToken, catchError(accountBalance.activateAccountBalance))
 
     app.route('/api/account-balances').get(verifyToken, catchError(accountBalance.listAllAccountBalances))
+    app.route('/api/account-balances/closing').get(verifyToken, catchError(accountBalance.getClosing))
 
 };
