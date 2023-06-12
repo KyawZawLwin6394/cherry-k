@@ -74,6 +74,10 @@ let PatientSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
   },
+  relatedMember: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Members'
+  }
 });
 const patient = mongoose.model('Patients', PatientSchema)
 module.exports = patient;
