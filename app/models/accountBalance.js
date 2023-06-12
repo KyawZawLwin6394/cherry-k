@@ -23,6 +23,11 @@ let AccountBalance = new Schema({
     },
     remark: {
         type: String,
+    },
+    isDeleted: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 });
 

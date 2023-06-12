@@ -25,7 +25,12 @@ let Member = new Schema({
     },
     conditionPackageQty: {
         type: Number
-    }
+    },
+    isDeleted: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
 });
 
 module.exports = mongoose.model('Members', Member);

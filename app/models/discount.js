@@ -39,7 +39,12 @@ let Discount = new Schema({
     },
     name: {
         type: String
-    }
+    },
+    isDeleted: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
 });
 
 module.exports = mongoose.model('Discounts', Discount);
