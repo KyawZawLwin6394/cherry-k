@@ -184,6 +184,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
             }
             tvcCreate = true;
         }
+        data = { createdBy: createdBy, relatedBranch: req.mongoQuery.relatedBranch }
         if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
         if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
         const result = await TreatmentSelection.create(data)

@@ -125,7 +125,7 @@ exports.createMedicineSale = async (req, res, next) => {
       { amount: parseInt(req.body.payAmount) + parseInt(acc[0].amount) },
       { new: true },
     )
-    data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy }
+    data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.mongoQuery.relatedBranch }
     const newMedicineSale = new MedicineSale(data)
     const medicineSaleResult = await newMedicineSale.save()
     res.status(200).send({
