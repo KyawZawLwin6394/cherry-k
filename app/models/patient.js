@@ -77,7 +77,16 @@ let PatientSchema = new Schema({
   relatedMember: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Members'
-  }
+  },
+  conditionAmount: {
+    type: Number,
+  },
+  conditionPurchaseFreq: {
+    type: Number,
+  },
+  conditionPackageQty: {
+    type: Number
+  },
 });
 const patient = mongoose.model('Patients', PatientSchema)
 module.exports = patient;

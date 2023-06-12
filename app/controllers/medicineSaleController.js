@@ -73,6 +73,13 @@ exports.createMedicineSale = async (req, res, next) => {
       const increment = latestDocument[0].seq + 1
       data = { ...data, voucherCode: "MVC-" + increment, seq: increment }
     }
+
+    const patientUpdate = await Patient.findOneAndUpdate(
+      { _id: req.body.relatedPatient },
+      { $inc: { conditionAmount: req.body.grandTotal, conditionPurchaseFreq: 1, conditionPackageQty: 1 } },
+      { new: true }
+    )
+
     //first transaction 
     const fTransaction = new Transaction({
       "amount": data.payAmount,
