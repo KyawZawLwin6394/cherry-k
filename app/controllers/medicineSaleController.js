@@ -130,7 +130,8 @@ exports.createMedicineSale = async (req, res, next) => {
       { amount: parseInt(req.body.payAmount) + parseInt(acc[0].amount) },
       { new: true },
     )
-    data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.mongoQuery.relatedBranch }
+    data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.body.relatedBranch }
+    console.log(data)
     const newMedicineSale = new MedicineSale(data)
     const medicineSaleResult = await newMedicineSale.save()
     res.status(200).send({
@@ -151,6 +152,7 @@ exports.createMedicineSale = async (req, res, next) => {
 exports.createMedicineSaleTransaction = async (req, res, next) => {
   try {
     let createdBy = req.credentials.id
+    let relatedBranch = req.body.relatedBranch
     //first transaction 
     const fTransaction = new Transaction({
       "amount": req.body.amount,
@@ -158,7 +160,10 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
       "remark": req.body.remark,
       "relatedAccounting": "6423eb395fb841d5566db36d",
       "type": "Credit",
-      "createdBy": createdBy
+      "createdBy": createdBy,
+      "relatedBranch":relatedBranch
+
+
     })
     const fTransResult = await fTransaction.save()
     var amountUpdate = await Accounting.findOneAndUpdate(
@@ -175,7 +180,8 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
         "relatedCash": req.body.relatedCash,
         "type": "Debit",
         "relatedTransaction": fTransResult._id,
-        "createdBy": createdBy
+        "createdBy": createdBy,
+        "relatedBranch":relatedBranch
       }
     )
     const secTransResult = await secTransaction.save();
@@ -200,7 +206,8 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
       { amount: parseInt(req.body.amount) + parseInt(acc[0].amount) },
       { new: true },
     )
-    req.body = { ...req.body, createdBy: createdBy }
+    req.body = { ...req.body, createdBy: createdBy, relatedBranch:relatedBranch }
+    console.log(req.body)
     const newMedicineSale = new MedicineSale(req.body)
     const medicineSaleResult = newMedicineSale.save()
     res.status(200).send({
