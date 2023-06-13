@@ -85,18 +85,85 @@ exports.getTotal = async (req, res) => {
 
 exports.getTotalWithDateFilter = async (req, res) => {
     try {
-        let query = { isDeleted: false }
-        let query2 = { isDeleted: false }
-        let { branch, start, end } = req.query
-        if (start && end) query.createdAt = { $gte: start, $lte: end }
-        if (start && end) query2.date = { $gte: start, $lte: end }
-        if (branch) query.relatedBranch = branch
-        if (branch) query2.relatedBranch = branch
+        let { start, end, weekName, monthName } = req.query
+        let query = { ...req.mongoQuery }
+        let exquery = { ...req.mongoQuery }
+        let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        let startDate, endDate;
+
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        // let { weekName, monthName } = req.body;
+        // Determine the start and end dates based on the weekName
+        if (weekName) {
+            switch (weekName) {
+                case 'First Week':
+                    startDate = new Date(year, month, 1);
+                    endDate = new Date(year, month, 7);
+                    break;
+                case 'Second Week':
+                    startDate = new Date(year, month, 8);
+                    endDate = new Date(year, month, 14);
+                    break;
+                case 'Third Week':
+                    startDate = new Date(year, month, 15);
+                    endDate = new Date(year, month, 21);
+                    break;
+                case 'Fourth Week':
+                    startDate = new Date(year, month, 22);
+                    endDate = new Date(year, month, getLastDayOfMonth(year, month));
+                    break;
+                default:
+                    res.status(400).json({ error: 'Invalid week name' });
+                    return;
+            }
+        }
 
 
-        const MedicineSaleResult = await MedicineSale.find(query)
-        const TreatmentVoucherResult = await TreatmentVoucher.find(query)
-        const ExpenseResult = await Expense.find(query2)
+        // Check if the provided month value is valid
+        if (monthName && !months.includes(monthName)) {
+            return res.status(400).json({ error: 'Invalid month' });
+        }
+
+        // Get the start and end dates for the specified month
+        const startedDate = new Date(Date.UTC(new Date().getFullYear(), months.indexOf(monthName), 1));
+        const endedDate = new Date(Date.UTC(new Date().getFullYear(), months.indexOf(monthName) + 1, 1));
+
+        if (start && end) {
+            query.createdAt = { $gte: start, $lte: end }
+            exquery.date = { $gte: start, $lte: end }
+            console.log('here1')
+        }
+        else if (weekName) {
+            query.createdAt = { $gte: startDate, $lte: endDate }
+            exquery.date = { $gte: startDate, $lte: endDate }
+            console.log('here2')
+        }
+        else if (monthName) {
+            query.createdAt = { $gte: startedDate, $lte: endedDate }
+            exquery.date = { $gte: startedDate, $lte: endedDate }
+            console.log('here3')
+        }
+        console.log(query, exquery)
+
+
+        const MedicineSaleResult = await MedicineSale.find(query).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment').populate({
+            path: 'relatedTransaction',
+            populate: [{
+                path: 'relatedAccounting',
+                model: 'AccountingLists'
+            }, {
+                path: 'relatedBank',
+                model: 'AccountingLists'
+            }, {
+                path: 'relatedCash',
+                model: 'AccountingLists'
+            }]
+        });
+        const TreatmentVoucherResult = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
+        const ExpenseResult = await Expense.find(exquery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
 
         const msTotalAmount = MedicineSaleResult.reduce((total, sale) => total + sale.grandTotal, 0);
         const tvTotalAmount = TreatmentVoucherResult.reduce((total, sale) => total + sale.amount, 0);
