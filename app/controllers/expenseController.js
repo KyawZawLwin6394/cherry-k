@@ -184,7 +184,7 @@ exports.activateExpense = async (req, res, next) => {
 exports.getwithExactDate = async (req, res) => {
     try {
         let { date } = req.query
-        let result = await Expense.find({ date: date })
+        let result = await Expense.find({ date: date }).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
         if (result.length === 0) return res.status(404).send({ error: true, message: 'Not Found!' })
         return res.status(200).send({ success: true, data: result })
     } catch (error) {

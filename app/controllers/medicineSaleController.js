@@ -1,7 +1,8 @@
 'use strict';
 const MedicineSale = require('../models/medicineSale');
 const Transaction = require('../models/transaction');
-const Accounting = require('../models/accountingList')
+const Accounting = require('../models/accountingList');
+const Patient = require('../models/patient')
 
 exports.listAllMedicineSales = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -297,7 +298,7 @@ exports.filterMedicineSales = async (req, res, next) => {
 exports.getwithExactDate = async (req, res) => {
   try {
     let { date } = req.query
-    let result = await MedicineSale.find({ createdAt: date })
+    let result = await MedicineSale.find({ createdAt: date }).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy')
     if (result.length === 0) return res.status(404).send({ error: true, message: 'Not Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (error) {
