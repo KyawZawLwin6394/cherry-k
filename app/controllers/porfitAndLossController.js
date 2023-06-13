@@ -3,6 +3,7 @@ const Log = require('../models/log');
 const MedicineSale = require('../models/medicineSale');
 const TreatmentVoucher = require('../models/treatmentVoucher');
 const Expense = require('../models/expense');
+const Income = require('../models/income');
 
 exports.getTotal = async (req, res) => {
     try {
@@ -121,7 +122,6 @@ exports.getTotalWithDateFilter = async (req, res) => {
             }
         }
 
-
         // Check if the provided month value is valid
         if (monthName && !months.includes(monthName)) {
             return res.status(400).json({ error: 'Invalid month' });
@@ -164,10 +164,12 @@ exports.getTotalWithDateFilter = async (req, res) => {
         });
         const TreatmentVoucherResult = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
         const ExpenseResult = await Expense.find(exquery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+        const IncomeResult = await Income.find(exquery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
 
         const msTotalAmount = MedicineSaleResult.reduce((total, sale) => total + sale.grandTotal, 0);
         const tvTotalAmount = TreatmentVoucherResult.reduce((total, sale) => total + sale.amount, 0);
         const exTotalAmount = ExpenseResult.reduce((total, sale) => total + sale.finalAmount, 0);
+        const inTotalAmount = IncomeResult.reduce((total, sale) => total + sale.finalAmount, 0);
 
         const tvPaymentMethod = TreatmentVoucherResult.reduce((result, { paymentMethod, amount }) => {
             result[paymentMethod] = (result[paymentMethod] || 0) + amount;
@@ -183,7 +185,7 @@ exports.getTotalWithDateFilter = async (req, res) => {
         console.log(tvPaymentMethod);
         console.log(msPaymentMethod);
 
-        return res.status(200).send({ succes: true, msPaymentMethod: msPaymentMethod, tvPaymentMethod: tvPaymentMethod, MedicineSaleResult: MedicineSaleResult, TreatmentVoucherResult: TreatmentVoucherResult, ExpenseResult: ExpenseResult, MSTotal: msTotalAmount, TVTotal: tvTotalAmount, expenseTotal: exTotalAmount })
+        return res.status(200).send({ succes: true, msPaymentMethod: msPaymentMethod, tvPaymentMethod: tvPaymentMethod, MedicineSaleResult: MedicineSaleResult, TreatmentVoucherResult: TreatmentVoucherResult, ExpenseResult: ExpenseResult, IncomeResult: IncomeResult, MSTotal: msTotalAmount, TVTotal: tvTotalAmount, expenseTotal: exTotalAmount, incomeTotal: inTotalAmount })
     } catch (error) {
         console.error(error);
         return res.status(500).send({ error: true, message: 'Internal Server Error!' });
