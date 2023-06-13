@@ -183,3 +183,15 @@ exports.activateIncome = async (req, res, next) => {
     return res.status(500).send({ "error": true, "message": error.message })
   }
 };
+
+exports.getwithExactDate = async (req, res) => {
+  try {
+    let { date } = req.query
+    let result = await Income.find({ date: date })
+    if (result.length === 0) return res.status(404).send({ error: true, message: 'Not Found!' })
+    return res.status(200).send({ success: true, data: result })
+  } catch (error) {
+    return res.status(500).send({ error: true, message: error.message })
+
+  }
+}

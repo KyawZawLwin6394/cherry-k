@@ -1,5 +1,6 @@
 "use strict";
 
+const { verify } = require("crypto");
 const expense = require("../controllers/expenseController");
 const { catchError } = require("../lib/errorHandler");
 const verifyToken = require('../lib/verifyToken');
@@ -16,4 +17,5 @@ module.exports = (app) => {
         .post(verifyToken, catchError(expense.activateExpense))
 
     app.route('/api/expenses').get(verifyToken, catchError(expense.listAllExpenses))
+    app.route('/api/expenses/get-date').get(verifyToken, catchError(expense.getwithExactDate))
 };

@@ -294,6 +294,17 @@ exports.filterMedicineSales = async (req, res, next) => {
   }
 }
 
+exports.getwithExactDate = async (req, res) => {
+  try {
+    let { date } = req.query
+    let result = await MedicineSale.find({ createdAt: date })
+    if (result.length === 0) return res.status(404).send({ error: true, message: 'Not Found!' })
+    return res.status(200).send({ success: true, data: result })
+  } catch (error) {
+    return res.status(500).send({ error: true, message: error.message })
+  }
+}
+
 exports.searchMedicineSale = async (req, res, next) => {
   try {
     let query = req.mongoQuery
@@ -303,6 +314,6 @@ exports.searchMedicineSale = async (req, res, next) => {
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (err) {
-    return res.status(500).send({ error: true, message: err.message })
+    return res.status(500).send({ error: true, message: error.message })
   }
 }
