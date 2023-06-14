@@ -60,6 +60,10 @@ let UsageSchema = new Schema({
   },
   accessoryItemsError: {
     type: Array
+  },
+  usageStatus: {
+    type: String,
+    enum: ['Pending', 'In Progress', 'Finished']
   }
 });
 
