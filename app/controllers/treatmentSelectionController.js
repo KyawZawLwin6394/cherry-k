@@ -208,7 +208,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash, //must be cash acc from accounting accs
                 "createdBy": createdBy,
-                "relatedBranch": req.mongoQuery.relatedBranch,
+                "relatedBranch": req.body.relatedBranch,
                 "remark": req.body.remark
             }
             let today = new Date().toISOString()
@@ -234,7 +234,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash, //must be cash acc from accounting accs
                 "createdBy": createdBy,
-                "relatedBranch": req.mongoQuery.relatedBranch,
+                "relatedBranch": req.body.relatedBranch,
                 "remark": req.body.remark
             }
             let today = new Date().toISOString()
@@ -336,7 +336,7 @@ exports.treatmentPayment = async (req, res, next) => {
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash,
                 "createdBy": createdBy, //must be cash acc from accounting accs
-                "relatedBranch": req.mongoQuery.relatedBranch,
+                "relatedBranch": req.body.relatedBranch,
                 "remark": req.body.remark
 
             }
