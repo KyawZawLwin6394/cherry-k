@@ -151,7 +151,7 @@ exports.filterLogs = async (req, res, next) => {
 
 exports.getUsage = async (req, res) => {
   try {
-    const result = await Usage.find({ _id: req.params.id }).populate('procedureMedicine.item_id procedureAccessory.item_id machine.item_id')
+    const result = await Usage.find({ _id: req.params.id }).populate('procedureMedicine.item_id procedureAccessory.item_id machine.item_id machineError.item_id procedureItemsError.item_id accessoryItemsError.item_id')
     if (result.length <= 0) return res.status(404).send({ error: true, message: 'Not Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (error) {
