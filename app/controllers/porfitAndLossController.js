@@ -4,6 +4,7 @@ const MedicineSale = require('../models/medicineSale');
 const TreatmentVoucher = require('../models/treatmentVoucher');
 const Expense = require('../models/expense');
 const Income = require('../models/income');
+const Currency = require('../models/currency');
 
 exports.getTotal = async (req, res) => {
     try {
@@ -92,6 +93,8 @@ exports.getTotalWithDateFilter = async (req, res) => {
         let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         let startDate, endDate;
 
+        const currencyList = await Currency.find({})
+
         const currentDate = new Date();
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
@@ -168,8 +171,17 @@ exports.getTotalWithDateFilter = async (req, res) => {
 
         const msTotalAmount = MedicineSaleResult.reduce((total, sale) => total + sale.grandTotal, 0);
         const tvTotalAmount = TreatmentVoucherResult.reduce((total, sale) => total + sale.amount, 0);
-        const exTotalAmount = ExpenseResult.reduce((total, sale) => total + sale.finalAmount, 0);
-        const inTotalAmount = IncomeResult.reduce((total, sale) => total + sale.finalAmount, 0);
+        const exTotalAmount = ExpenseResult.reduce((total, sale) => {
+            let current = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+            let ans = current * sale.finalAmount
+            return total + ans
+        }, 0);
+        console.log(exTotalAmount)
+        const inTotalAmount = IncomeResult.reduce((total, sale) => {
+            let cur = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+            let ans = cur * sale.finalAmount
+            return total + ans
+        }, 0);
 
         const tvPaymentMethod = TreatmentVoucherResult.reduce((result, { paymentMethod, amount }) => {
             result[paymentMethod] = (result[paymentMethod] || 0) + amount;
