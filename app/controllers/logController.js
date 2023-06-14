@@ -386,44 +386,45 @@ exports.createUsage = async (req, res) => {
         accessoryItemsError: accessoryItemsError
       })
     }
-    // else {
-    //   req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
-    //   if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
-    //   if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
-    //   var usageRecordResult = await UsageRecords.findOneAndUpdate(
-    //     { relatedUsage: appResult[0].relatedUsage },
-    //     {
-    //       $addToSet: {
-    //         procedureMedicine: {
-    //           $each: procedureItemsFinished,
-    //           $elemMatch: { item_id: { $ne: { $each: procedureItemsFinished.map(obj => obj.item_id) } } }
-    //         },
-    //         procedureAccessory: {
-    //           $each: accessoryItemsFinished,
-    //           $elemMatch: { item_id: { $ne: { $each: accessoryItemsFinished.map(obj => obj.item_id) } } }
-    //         },
-    //         machine: {
-    //           $each: machineFinished,
-    //           $elemMatch: { item_id: { $ne: { $each: machineFinished.map(obj => obj.item_id) } } }
-    //         },
-    //         machineError: {
-    //           $each: machineError,
-    //           $elemMatch: { item_id: { $ne: { $each: machineError.map(obj => obj.item_id) } } }
-    //         },
-    //         procedureItemsError: {
-    //           $each: procedureItemsError,
-    //           $elemMatch: { item_id: { $ne: { $each: procedureItemsError.map(obj => obj.item_id) } } }
-    //         },
-    //         accessoryItemsError: {
-    //           $each: accessoryItemsError,
-    //           $elemMatch: { item_id: { $ne: { $each: accessoryItemsError.map(obj => obj.item_id) } } }
-    //         },
-    //       },
-    //       usageStatus: status,
-    //     },
-    //     { new: true }
-    //   )
-    // }
+    else {
+      const usageRecordResult = await UsageRecords.find({ relatedUsage: appResult[0].relatedUsage },{sort:{createdAt:-1}})
+      // req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
+      // if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
+      // if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
+      // var usageRecordResult = await UsageRecords.findOneAndUpdate(
+      //   { relatedUsage: appResult[0].relatedUsage },
+      //   {
+      //     $addToSet: {
+      //       procedureMedicine: {
+      //         $each: procedureItemsFinished,
+      //         $elemMatch: { item_id: { $ne: { $each: procedureItemsFinished.map(obj => obj.item_id) } } }
+      //       },
+      //       procedureAccessory: {
+      //         $each: accessoryItemsFinished,
+      //         $elemMatch: { item_id: { $ne: { $each: accessoryItemsFinished.map(obj => obj.item_id) } } }
+      //       },
+      //       machine: {
+      //         $each: machineFinished,
+      //         $elemMatch: { item_id: { $ne: { $each: machineFinished.map(obj => obj.item_id) } } }
+      //       },
+      //       machineError: {
+      //         $each: machineError,
+      //         $elemMatch: { item_id: { $ne: { $each: machineError.map(obj => obj.item_id) } } }
+      //       },
+      //       procedureItemsError: {
+      //         $each: procedureItemsError,
+      //         $elemMatch: { item_id: { $ne: { $each: procedureItemsError.map(obj => obj.item_id) } } }
+      //       },
+      //       accessoryItemsError: {
+      //         $each: accessoryItemsError,
+      //         $elemMatch: { item_id: { $ne: { $each: accessoryItemsError.map(obj => obj.item_id) } } }
+      //       },
+      //     },
+      //     usageStatus: status,
+      //   },
+      //   { new: true }
+      // )
+    }
 
 
     //error handling

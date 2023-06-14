@@ -6,6 +6,10 @@ const Schema = mongoose.Schema;
 
 
 let UsageRecordSchema = new Schema({
+    createdAt: {
+        type: Date,
+        default: Date.now()
+    },
     relatedUsage: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Usages'

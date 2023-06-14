@@ -144,12 +144,14 @@ exports.createTreatmentSelection = async (req, res, next) => {
             { $inc: { conditionAmount: req.body.totalAmount, conditionPurchaseFreq: 1, conditionPackageQty: 1 } },
             { new: true }
         )
-        data = { ...data, relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments, createdBy: createdBy }
+
+        data = { ...data, relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments, createdBy: createdBy, relatedBranch: req.mongoQuery.relatedBranch }
+
         if (data.paidAmount) {
             data = { ...data, leftOverAmount: data.totalAmount - data.paidAmount } // leftOverAmount Calculation
         }
         if (data.paidAmount === 0) data = { ...data, leftOverAmount: data.totalAmount }
-
+        console.log(data,'data1')
         //first transaction 
         if (req.body.paymentMethod === 'Cash Down') {
             var fTransResult = await Transaction.create({
@@ -188,10 +190,11 @@ exports.createTreatmentSelection = async (req, res, next) => {
             }
             tvcCreate = true;
         }
-        data = { createdBy: createdBy, relatedBranch: req.mongoQuery.relatedBranch }
         if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
         if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
+        console.log(data,'data2')
         const result = await TreatmentSelection.create(data)
+
         if (req.body.paymentMethod === 'FOC') {
             let dataTVC = {
                 "relatedTreatmentSelection": result._id,
