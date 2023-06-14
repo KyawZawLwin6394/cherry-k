@@ -74,6 +74,13 @@ let TreatmentVoucherSchema = new Schema({
     relatedAccounting: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'AccountingLists'
+    },
+    saleReturnType: {
+        type: Boolean,
+        default: false
+    },
+    remark: {
+        type: String
     }
 });
 

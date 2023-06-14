@@ -93,6 +93,21 @@ let TreatmentSelectionSchema = new Schema({
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Users'
+  },
+  saleReturnFlag: {
+    type: Boolean,
+    default: false
+  },
+  purchaseType: {
+    type: String,
+    enum: ['Normal', 'Solid Beauty']
+  },
+  remark: {
+    type: String
+  },
+  payment: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Attachments'
   }
 
 });
