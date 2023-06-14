@@ -161,7 +161,7 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
       "relatedAccounting": "6423eb395fb841d5566db36d",
       "type": "Credit",
       "createdBy": createdBy,
-      "relatedBranch":relatedBranch
+      "relatedBranch": relatedBranch
 
 
     })
@@ -181,7 +181,7 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
         "type": "Debit",
         "relatedTransaction": fTransResult._id,
         "createdBy": createdBy,
-        "relatedBranch":relatedBranch
+        "relatedBranch": relatedBranch
       }
     )
     const secTransResult = await secTransaction.save();
@@ -206,7 +206,7 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
       { amount: parseInt(req.body.amount) + parseInt(acc[0].amount) },
       { new: true },
     )
-    req.body = { ...req.body, createdBy: createdBy, relatedBranch:relatedBranch }
+    req.body = { ...req.body, createdBy: createdBy, relatedBranch: relatedBranch }
     console.log(req.body)
     const newMedicineSale = new MedicineSale(req.body)
     const medicineSaleResult = newMedicineSale.save()
@@ -304,8 +304,11 @@ exports.filterMedicineSales = async (req, res, next) => {
 
 exports.getwithExactDate = async (req, res) => {
   try {
-    let { date } = req.query
-    let result = await MedicineSale.find({ createdAt: date }).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy')
+    let { exact } = req.query;
+    const date = new Date(exact);
+    const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()); // Set start date to the beginning of the day
+    const endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1); // Set end date to the beginning of the next day
+    let result = await MedicineSale.find({ createdAt: { $gte: startDate, $lt: endDate } }).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy')
     if (result.length === 0) return res.status(404).send({ error: true, message: 'Not Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (error) {
