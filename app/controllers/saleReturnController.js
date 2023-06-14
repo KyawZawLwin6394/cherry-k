@@ -15,7 +15,7 @@ exports.listAllSaleReturns = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await SaleReturn.find(query).populate('relatedPatient relatedTreatmentSelection relatedTreatmentVoucher relatedAppointment relatedSubTreatment')
+        let result = await SaleReturn.find(query).populate('relatedBranch relatedTreatmentSelection relatedTreatmentVoucher relatedAppointment relatedSubTreatment')
         count = await SaleReturn.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
@@ -39,7 +39,7 @@ exports.listAllSaleReturns = async (req, res) => {
 exports.getSaleReturn = async (req, res) => {
     let query = req.mongoQuery
     if (req.params.id) query._id = req.params.id
-    const result = await SaleReturn.find(query).populate('relatedPatient relatedTreatmentSelection relatedTreatmentVoucher relatedAppointment relatedSubTreatment')
+    const result = await SaleReturn.find(query).populate('relatedBranch relatedPatient relatedTreatmentSelection relatedTreatmentVoucher relatedAppointment relatedSubTreatment')
     if (result.length === 0)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -67,7 +67,7 @@ exports.updateSaleReturn = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        ).populate('relatedPatient relatedTreatmentSelection relatedTreatmentVoucher relatedAppointment relatedSubTreatment')
+        ).populate('relatedBranch relatedPatient relatedTreatmentSelection relatedTreatmentVoucher relatedAppointment relatedSubTreatment')
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })

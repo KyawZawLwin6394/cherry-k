@@ -47,6 +47,10 @@ let SaleReturnSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now()
+    },
+    relatedBranch:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Branches'
     }
 });
 
