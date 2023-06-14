@@ -151,7 +151,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
             data = { ...data, leftOverAmount: data.totalAmount - data.paidAmount } // leftOverAmount Calculation
         }
         if (data.paidAmount === 0) data = { ...data, leftOverAmount: data.totalAmount }
-        console.log(data,'data1')
+        console.log(data, 'data1')
         //first transaction 
         if (req.body.paymentMethod === 'Cash Down') {
             var fTransResult = await Transaction.create({
@@ -192,7 +192,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
         }
         if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
         if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
-        console.log(data,'data2')
+        console.log(data, 'data2')
         const result = await TreatmentSelection.create(data)
 
         if (req.body.paymentMethod === 'FOC') {
@@ -208,7 +208,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash, //must be cash acc from accounting accs
                 "createdBy": createdBy,
-                "relatedBranch": req.mongoQuery.relatedBranch
+                "relatedBranch": req.mongoQuery.relatedBranch,
+                "remark": req.body.remark
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -233,7 +234,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash, //must be cash acc from accounting accs
                 "createdBy": createdBy,
-                "relatedBranch": req.mongoQuery.relatedBranch
+                "relatedBranch": req.mongoQuery.relatedBranch,
+                "remark": req.body.remark
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -334,7 +336,8 @@ exports.treatmentPayment = async (req, res, next) => {
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
                 "relatedCash": req.body.relatedCash,
                 "createdBy": createdBy, //must be cash acc from accounting accs
-                "relatedBranch": req.mongoQuery.relatedBranch
+                "relatedBranch": req.mongoQuery.relatedBranch,
+                "remark": req.body.remark
 
             }
             let today = new Date().toISOString()

@@ -1,5 +1,7 @@
 'use strict';
 const SaleReturn = require('../models/saleReturn');
+const TreatmentSelection = require('../models/treatmentSelection');
+const TreatmentVoucher = require('../models/treatmentVoucher');
 
 exports.listAllSaleReturns = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -47,13 +49,22 @@ exports.getSaleReturn = async (req, res) => {
 
 exports.createSaleReturn = async (req, res, next) => {
     let newBody = req.body;
+    let { relatedTreatmentSelection, relatedSubTreatment } = req.body;
     try {
         const newSaleReturn = new SaleReturn(newBody);
         const result = await newSaleReturn.save();
+        if (relatedTreatmentSelection && relatedSubTreatment) {
+            var selecUpdate = await TreatmentSelection.updateMany(
+                { _id: { $in: [relatedTreatmentSelection, relatedSubTreatment] } },
+                { saleReturnFlag: true },
+                { new: true }
+            );
+        }
         res.status(200).send({
             message: 'SaleReturn create success',
             success: true,
-            data: result
+            data: result,
+            selecUpdate: selecUpdate
         });
     } catch (error) {
         // console.log(error )
