@@ -308,7 +308,7 @@ exports.getwithExactDate = async (req, res) => {
     const date = new Date(exact);
     const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()); // Set start date to the beginning of the day
     const endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1); // Set end date to the beginning of the next day
-    let result = await MedicineSale.find({ createdAt: { $gte: startDate, $lt: endDate } }).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy')
+    let result = await MedicineSale.find({ createdAt: { $gte: startDate, $lt: endDate } }).populate('relatedPatient relatedTransaction relatedCash').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy')
     if (result.length === 0) return res.status(404).send({ error: true, message: 'Not Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (error) {
