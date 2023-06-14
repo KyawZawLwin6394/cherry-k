@@ -22,7 +22,7 @@ let SaleReturnSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Appointments'
     },
-    tptalAmount: {
+    totalAmount: {
         type: Number,
     },
     leftoverAmount: {

@@ -23,7 +23,9 @@ let UsageSchema = new Schema({
     },
     stock: Number,
     actual: Number,
-    remark: String
+    remark: String,
+    quantity: Number,
+    perUsageQTY: Number
   }],
   procedureAccessory: [{
     item_id: {
@@ -32,7 +34,9 @@ let UsageSchema = new Schema({
     },
     stock: Number,
     actual: Number,
-    remark: String
+    remark: String,
+    quantity: Number,
+    perUsageQTY: Number
   }],
   machine: [{
     item_id: {
@@ -41,7 +45,9 @@ let UsageSchema = new Schema({
     },
     stock: Number,
     actual: Number,
-    remark: String
+    remark: String,
+    quantity: Number,
+    perUsageQTY: Number
   }],
   isDeleted: {
     type: Boolean,
@@ -52,15 +58,39 @@ let UsageSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
   },
-  machineError: {
-    type: Array
-  },
-  procedureItemsError: {
-    type: Array
-  },
-  accessoryItemsError: {
-    type: Array
-  },
+  machineError: [{
+    item_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'FixedAssets'
+    },
+    stock: Number,
+    actual: Number,
+    remark: String,
+    quantity: Number,
+    perUsageQTY: Number
+  }],
+  procedureItemsError: [{
+    item_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ProcedureItems'
+    },
+    stock: Number,
+    actual: Number,
+    remark: String,
+    quantity: Number,
+    perUsageQTY: Number
+  }],
+  accessoryItemsError: [{
+    item_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'AccessoryItems'
+    },
+    stock: Number,
+    actual: Number,
+    remark: String,
+    quantity: Number,
+    perUsageQTY: Number
+  }],
   usageStatus: {
     type: String,
     enum: ['Pending', 'In Progress', 'Finished']
