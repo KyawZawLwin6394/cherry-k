@@ -15,7 +15,14 @@ exports.listAllMembers = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await Member.find(query).populate('relatedDiscount')
+        let result = await Member.find(query).populate('relatedDiscount').populate({
+            path: 'relatedDiscount',
+            model: 'Discounts',
+            populate: {
+                path: 'relatedFOCID',
+                model: 'Treatments'
+            }
+        })
         count = await Member.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
