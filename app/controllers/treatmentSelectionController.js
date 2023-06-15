@@ -192,6 +192,13 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedTransaction": fTransResult._id,
                 "createdBy": createdBy
             });
+            var fTransUpdate = await Transaction.findOneAndUpdate(
+                { _id: fTransResult._id },
+                {
+                    relatedTransaction: secTransResult._id
+                },
+                { new: true }
+            )
             if (req.body.relatedBank) {
                 var amountUpdate = await Accounting.findOneAndUpdate(
                     { _id: req.body.relatedBank },
@@ -301,7 +308,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
             // treatmentVoucherResult:treatmentVoucherResult
         }
         if (treatmentVoucherResult) response.treatmentVoucherResult = treatmentVoucherResult
-        if (fTransResult) response.fTransResult = fTransResult
+        if (fTransUpdate) response.fTransResult = fTransUpdate
         if (fTransResult) response.secTransResult = secTransResult
         res.status(200).send(response);
     } catch (error) {
@@ -409,6 +416,13 @@ exports.treatmentPayment = async (req, res, next) => {
                 "createdBy": createdBy,
                 "relatedBranch": req.mongoQuery.relatedBranch
             });
+            var fTransUpdate = await Transaction.findOneAndUpdate(
+                { _id: fTransResult._id },
+                {
+                    relatedTransaction: secTransResult._id
+                },
+                { new: true }
+            )
             if (req.body.relatedBank) {
                 var amountUpdate = await Accounting.findOneAndUpdate(
                     { _id: req.body.relatedBank },
@@ -461,12 +475,19 @@ exports.treatmentPayment = async (req, res, next) => {
                 "createdBy": createdBy,
                 "relatedBranch": req.mongoQuery.relatedBranch
             })
+            var fTransUpdate = await Transaction.findOneAndUpdate(
+                { _id: fTransResult._id },
+                {
+                    relatedTransaction: secTransResult._id
+                },
+                { new: true }
+            )
         }
         let response = {
             success: true,
             data: result,
             //appointmentAutoGenerate: appointmentResult,
-            // fTransResult: fTransResult,
+            fTransResult: fTransUpdate,
             // secTransResult: secTransResult,
             // treatmentVoucherResult:treatmentVoucherResult
         }
@@ -533,11 +554,18 @@ exports.createTreatmentTransaction = async (req, res) => {
                 "relatedBranch": req.mongoQuery.relatedBranch
             }
         )
+        var fTransUpdate = await Transaction.findOneAndUpdate(
+            { _id: fTransResult._id },
+            {
+                relatedTransaction: secTransResult._id
+            },
+            { new: true }
+        )
         const secTransResult = await secTransaction.save()
         res.status(200).send({
             message: 'MedicineSale Transaction success',
             success: true,
-            fTrans: fTransResult,
+            fTrans: fTransUpdate,
             sTrans: secTransResult
         });
     } catch (error) {

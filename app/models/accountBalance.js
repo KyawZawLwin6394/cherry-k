@@ -24,6 +24,10 @@ let AccountBalance = new Schema({
     remark: {
         type: String,
     },
+    relatedBranch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branches'
+    },
     isDeleted: {
         type: Boolean,
         required: true,

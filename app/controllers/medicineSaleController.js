@@ -109,6 +109,13 @@ exports.createMedicineSale = async (req, res, next) => {
       }
     )
     const secTransResult = await secTransaction.save();
+    var fTransUpdate = await Transaction.findOneAndUpdate(
+      { _id: fTransResult._id },
+      {
+        relatedTransaction: secTransResult._id
+      },
+      { new: true }
+    )
     if (req.body.relatedBankAccount) {
       var amountUpdate = await Accounting.findOneAndUpdate(
         { _id: req.body.relatedBankAccount },
@@ -137,7 +144,7 @@ exports.createMedicineSale = async (req, res, next) => {
     res.status(200).send({
       message: 'MedicineSale Transaction success',
       success: true,
-      fTrans: fTransResult,
+      fTrans: fTransUpdate,
       sTrans: secTransResult,
       accResult: accResult,
       data: medicineSaleResult
@@ -185,6 +192,13 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
       }
     )
     const secTransResult = await secTransaction.save();
+    var fTransUpdate = await Transaction.findOneAndUpdate(
+      { _id: fTransResult._id },
+      {
+        relatedTransaction: secTransResult._id
+      },
+      { new: true }
+    )
     if (req.body.relatedBankAccount) {
       var amountUpdate = await Accounting.findOneAndUpdate(
         { _id: req.body.relatedBankAccount },
@@ -213,7 +227,7 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
     res.status(200).send({
       message: 'MedicineSale Transaction success',
       success: true,
-      fTrans: fTransResult,
+      fTrans: fTransUpdate,
       sTrans: secTransResult,
       accResult: accResult,
       data: medicineSaleResult
@@ -325,6 +339,6 @@ exports.searchMedicineSale = async (req, res, next) => {
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (err) {
-    return res.status(500).send({ error: true, message: error.message })
+    return res.status(500).send({ error: true, message: err.message })
   }
 }

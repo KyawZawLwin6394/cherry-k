@@ -75,11 +75,109 @@ exports.activateJournal = async (req, res, next) => {
     }
 };
 
+exports.updateJournal = async (req, res, next) => {
+    console.log('journal')
+    let { remark, firstTransId, secondTransId, fromPreAcc, toPreAcc, fromCurAcc, toCurAcc, preAmount, curAmount, date, fromPreAccType, toPreAccType, fromPreAccNature, toPreAccNature, fromCurAccType, toCurAccType, fromCurAccNature, toCurAccNature } = req.body;
+    try {
+
+        const firstUpdateTrans = await Transaction.findOneAndUpdate(
+            { _id: firstTransId },
+            { relatedAccounting: fromCurAcc, amount: curAmount, date: date, remark: remark, type: fromCurAccType },
+            { new: true },
+        );
+
+        if (fromPreAccType === fromPreAccNature) {
+
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: fromPreAcc },
+                { $inc: { amount: -preAmount } },
+                { new: true },
+            );
+        } else {
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: fromPreAcc },
+                { $inc: { amount: preAmount } },
+                { new: true },
+            );
+        }
+
+        if (fromCurAccType === fromCurAccNature) {
+
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: fromCurAcc },
+                { $inc: { amount: curAmount } },
+                { new: true },
+            );
+        } else {
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: fromCurAcc },
+                { $inc: { amount: -curAmount } },
+                { new: true },
+            );
+        }
+
+        const secondUpdateTrans = await Transaction.findOneAndUpdate(
+            { _id: secondTransId },
+            { relatedAccounting: toCurAcc, amount: curAmount, date: date, remark: remark, type: toCurAccType, relatedTransaction: firstUpdateTrans._id },
+            { new: true },
+        );
+
+        const relatedTrans = await Transaction.updateOne(
+            { _id: firstUpdateTrans._id },
+            {
+                $set:
+                {
+                    relatedTransaction: secondUpdateTrans._id,
+                }
+            }
+        )
+
+        if (toPreAccType === toPreAccNature) {
+
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: toPreAcc },
+                { $inc: { amount: -preAmount } },
+                { new: true },
+            );
+        } else {
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: toPreAcc },
+                { $inc: { amount: preAmount } },
+                { new: true },
+            );
+        }
+
+        if (toCurAccType === toCurAccNature) {
+
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: toCurAcc },
+                { $inc: { amount: curAmount } },
+                { new: true },
+            );
+        } else {
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: toCurAcc },
+                { $inc: { amount: -curAmount } },
+                { new: true },
+            );
+        }
+
+        res.status(200).send({
+            message: 'Journal create success',
+            success: true,
+            firstTrans: firstUpdateTrans,
+            secondTrans: secondUpdateTrans
+        });
+    } catch (error) {
+        return res.status(500).send({ "error": true, message: error.message })
+    }
+};
+
 exports.createJournal = async (req, res, next) => {
     console.log('journal')
-    let { remark, fromAcc, toAcc, amount, date, fromAccType, toAccType } = req.body;
+    let { remark, fromAcc, toAcc, amount, date, fromAccType, toAccType, fromAccNature, toAccNature } = req.body;
     try {
-        const creditTrans = await Transaction.create({
+        const firstTrans = await Transaction.create({
             relatedAccounting: fromAcc,
             amount: amount,
             date: date,
@@ -87,33 +185,66 @@ exports.createJournal = async (req, res, next) => {
             type: fromAccType,
             JEFlag: true
         })
-        if (fromAcc) {
-            let amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: fromAcc },
-                { $inc: { amount: -amount } }
-            )
-        }
-        if (toAcc) {
-            let amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: toAcc },
-                { $inc: { amount: amount } }
-            )
+
+
+        if (fromAccType === fromAccNature) {
+
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: firstTrans.relatedAccounting._id },
+                { $inc: { amount: firstTrans.amount } },
+                { new: true },
+            );
+        } else {
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: firstTrans.relatedAccounting._id },
+                { $inc: { amount: -firstTrans.amount } },
+                { new: true },
+            );
         }
 
-        const debitTrans = await Transaction.create({
+
+        const secondTrans = await Transaction.create({
             relatedAccounting: toAcc,
             amount: amount,
             date: date,
             remark: remark,
             type: toAccType,
+            relatedTransaction: firstTrans._id,
             JEFlag: true
         })
+
+        const relatedTrans = await Transaction.updateOne(
+            { _id: firstTrans._id },
+            {
+                $set:
+                {
+                    relatedTransaction: secondTrans._id,
+                }
+            }
+        )
+
+        const secondAccount = await AccList.find({ _id: toAcc, isDeleted: false })
+
+
+        if (toAccType === toAccNature) {
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: secondTrans.relatedAccounting._id },
+                { $inc: { amount: secondTrans.amount } },
+                { new: true },
+            );
+        } else {
+            const accUpdate = await AccList.findOneAndUpdate(
+                { _id: secondTrans.relatedAccounting._id },
+                { $inc: { amount: -secondTrans.amount } },
+                { new: true },
+            );
+        }
 
         res.status(200).send({
             message: 'Journal create success',
             success: true,
-            creditTrans: creditTrans,
-            debitTrans: debitTrans
+            firstTrans: firstTrans,
+            secondTrans: secondTrans
         });
     } catch (error) {
         return res.status(500).send({ "error": true, message: error.message })

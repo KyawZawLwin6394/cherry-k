@@ -93,6 +93,13 @@ exports.createExpense = async (req, res, next) => {
             }
             const secTrans = new Transaction(secondTransaction)
             var secTransResult = await secTrans.save();
+            var fTransUpdate = await Transaction.findOneAndUpdate(
+                { _id: fTransResult._id },
+                {
+                    relatedTransaction: secTransResult._id
+                },
+                { new: true }
+            )
 
         } else {
             //bank or cash
@@ -116,6 +123,13 @@ exports.createExpense = async (req, res, next) => {
 
             const secTrans = new Transaction(secondTransaction)
             var secTransResult = await secTrans.save();
+            var fTransUpdate = await Transaction.findOneAndUpdate(
+                { _id: fTransResult._id },
+                {
+                    relatedTransaction: secTransResult._id
+                },
+                { new: true }
+            )
             if (newBody.relatedBankAccount) {
                 var amountUpdate = await Accounting.findOneAndUpdate(
                     { _id: newBody.relatedBankAccount },
@@ -133,7 +147,7 @@ exports.createExpense = async (req, res, next) => {
             message: 'Expense create success',
             success: true,
             data: populatedResult,
-            firstTrans: fTransResult,
+            firstTrans: fTransUpdate,
             secTrans: secTransResult
         });
     } catch (error) {

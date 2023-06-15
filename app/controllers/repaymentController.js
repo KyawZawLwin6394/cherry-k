@@ -79,6 +79,13 @@ exports.createRepayment = async (req, res, next) => {
       }
     )
     const secTransResult = await secTransaction.save();
+    var fTransUpdate = await Transaction.findOneAndUpdate(
+      { _id: fTransResult._id },
+      {
+        relatedTransaction: secTransResult._id
+      },
+      { new: true }
+    )
     if (req.body.relatedBank) {
       var amountUpdate = await Accounting.findOneAndUpdate(
         { _id: req.body.relatedBank },
@@ -108,7 +115,7 @@ exports.createRepayment = async (req, res, next) => {
       success: true,
       data: result,
       patientTreatment: patientTreatmentResults,
-      fTrans: fTransResult,
+      fTrans: fTransUpdate,
       sTrans: secTransResult
     });
   } catch (error) {
@@ -163,10 +170,10 @@ exports.getRepayRecord = async (req, res) => {
       path: 'relatedTreatmentSelection',
       model: 'TreatmentSelections',
       populate: {
-          path: 'relatedTreatment',
-          model: 'Treatments'
+        path: 'relatedTreatment',
+        model: 'Treatments'
       }
-  })
+    })
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Records Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (error) {

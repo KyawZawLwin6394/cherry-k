@@ -70,12 +70,19 @@ exports.createSellEnd = async (req, res, next) => {
     }
     const secTrans = new Transaction(secondTransaction)
     var secTransResult = await secTrans.save();
+    var fTransUpdate = await Transaction.findOneAndUpdate(
+      { _id: fTransResult._id },
+      {
+        relatedTransaction: secTransResult._id
+      },
+      { new: true }
+    )
     res.status(200).send({
       message: 'SellEnd create success',
       success: true,
       data: result,
-      fTransaction:fTransaction,
-      secondTransaction:secTransResult
+      fTransaction: fTransUpdate,
+      secondTransaction: secTransResult
     });
 
   } catch (error) {

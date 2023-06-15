@@ -9,7 +9,7 @@ exports.listAllPatientTreatments = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 20; //limit
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -38,21 +38,21 @@ exports.listAllPatientTreatments = async (req, res) => {
 };
 
 exports.getPatientTreatment = async (req, res) => {
-  const result = await PatientTreatment.find({ _id: req.params.id,isDeleted:false }).populate('relatedPatient').populate('relatedTreatment')
+  const result = await PatientTreatment.find({ _id: req.params.id, isDeleted: false }).populate('relatedPatient').populate('relatedTreatment')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.getOutstandingPatientTreatment = async (req, res) => {
-  const result = await PatientTreatment.find({ fullyPaid: false,isDeleted:false }).populate('relatedPatient').populate('relatedTreatment')
+  const result = await PatientTreatment.find({ fullyPaid: false, isDeleted: false }).populate('relatedPatient').populate('relatedTreatment')
   if (result.length == 0)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.getWellDonePatientTreatment = async (req, res) => {
-  const result = await PatientTreatment.find({ fullyPaid:true ,isDeleted:false }).populate('relatedPatient').populate('relatedTreatment')
+  const result = await PatientTreatment.find({ fullyPaid: true, isDeleted: false }).populate('relatedPatient').populate('relatedTreatment')
   if (result.length == 0)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -61,10 +61,10 @@ exports.getWellDonePatientTreatment = async (req, res) => {
 exports.createPatientTreatment = async (req, res, next) => {
   try {
     let data = req.body
-    if (data.leftOverAmount==0) data = {...data, fullyPaid:true}
+    if (data.leftOverAmount == 0) data = { ...data, fullyPaid: true }
 
-     //first transaction 
-     const fTransaction = new Transaction({
+    //first transaction 
+    const fTransaction = new Transaction({
       "amount": req.body.paidAmount,
       "date": Date.now(),
       "remark": req.body.remark,
@@ -83,6 +83,13 @@ exports.createPatientTreatment = async (req, res, next) => {
       }
     )
     const secTransResult = await secTransaction.save();
+    var fTransUpdate = await Transaction.findOneAndUpdate(
+      { _id: fTransResult._id },
+      {
+        relatedTransaction: secTransResult._id
+      },
+      { new: true }
+    )
     const newBody = data;
     const newPatientTreatment = new PatientTreatment(newBody);
     const result = await newPatientTreatment.save();
@@ -90,8 +97,8 @@ exports.createPatientTreatment = async (req, res, next) => {
       message: 'PatientTreatment create success',
       success: true,
       data: result,
-      fTrans:fTransResult,
-      sTrans:secTransResult
+      fTrans: fTransUpdate,
+      sTrans: secTransResult
     });
   } catch (error) {
     //console.log(error )
@@ -102,7 +109,7 @@ exports.createPatientTreatment = async (req, res, next) => {
 exports.updatePatientTreatment = async (req, res, next) => {
   try {
     let data = req.body;
-    if (data.leftOverAmount==0) data = {...data, fullyPaid:false}
+    if (data.leftOverAmount == 0) data = { ...data, fullyPaid: false }
     const result = await PatientTreatment.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
