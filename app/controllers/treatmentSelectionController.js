@@ -6,6 +6,7 @@ const Patient = require('../models/patient');
 const TreatmentVoucher = require('../models/treatmentVoucher');
 const Repay = require('../models/repayRecord');
 const Accounting = require('../models/accountingList');
+const Attachment = require('../models/attachment');
 
 exports.listAllTreatmentSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -115,6 +116,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
     let relatedAppointments = []
     let tvcCreate = false;
     let createdBy = req.credentials.id
+    let files = req.files
     try {
         if (req.body.originalDate === undefined) return res.status(500).send({ error: true, message: 'Original Date is required' })
         const appointmentConfig = {
@@ -124,7 +126,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
             phone: req.body.phone,
             relatedBranch: req.body.relatedBranch
         };
-
+        console.log(appointmentConfig)
         const numTreatments = req.body.treatmentTimes;
         const dataconfigs = [];
 
@@ -138,6 +140,19 @@ exports.createTreatmentSelection = async (req, res, next) => {
         appointmentResult.map(function (element, index) {
             relatedAppointments.push(element._id)
         })
+
+        if (files.payment) {
+            for (const element of files.payment) {
+                let imgPath = element.path.split('cherry-k')[1];
+                const attachData = {
+                    fileName: element.originalname,
+                    imgUrl: imgPath,
+                    image: imgPath.split('\\')[2]
+                };
+                const attachResult = await Attachment.create(attachData);
+                var attachID = attachResult._id.toString()
+            }
+        }
 
         const patientUpdate = await Patient.findOneAndUpdate(
             { _id: req.body.relatedPatient },
@@ -209,7 +224,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedCash": req.body.relatedCash, //must be cash acc from accounting accs
                 "createdBy": createdBy,
                 "relatedBranch": req.body.relatedBranch,
-                "remark": req.body.remark
+                "remark": req.body.remark,
+                "payment": attachID
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -235,7 +251,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedCash": req.body.relatedCash, //must be cash acc from accounting accs
                 "createdBy": createdBy,
                 "relatedBranch": req.body.relatedBranch,
-                "remark": req.body.remark
+                "remark": req.body.remark,
+                "payment": attachID
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -314,6 +331,7 @@ exports.updateTreatmentSelection = async (req, res, next) => {
 exports.treatmentPayment = async (req, res, next) => {
     let data = req.body;
     let createdBy = req.credentials.id;
+    let files = req.files;
     try {
         let { paidAmount } = data;
         const treatmentSelectionQuery = await TreatmentSelection.find({ _id: req.body.id, isDeleted: false }).populate('relatedTreatment').populate('relatedAppointments');
@@ -322,6 +340,18 @@ exports.treatmentPayment = async (req, res, next) => {
             { $inc: { leftOverAmount: -paidAmount }, paidAmount: paidAmount },
             { new: true },
         ).populate('relatedTreatment');
+        if (files.payment) {
+            for (const element of files.payment) {
+                let imgPath = element.path.split('cherry-k')[1];
+                const attachData = {
+                    fileName: element.originalname,
+                    imgUrl: imgPath,
+                    image: imgPath.split('\\')[2]
+                };
+                const attachResult = await Attachment.create(attachData);
+                var attachID = attachResult._id.toString()
+            }
+        }
         if (result.paymentMethod === 'Credit') { //
             let dataTVC = {
                 "relatedBranch": req.body.relatedBranch,
@@ -337,7 +367,8 @@ exports.treatmentPayment = async (req, res, next) => {
                 "relatedCash": req.body.relatedCash,
                 "createdBy": createdBy, //must be cash acc from accounting accs
                 "relatedBranch": req.body.relatedBranch,
-                "remark": req.body.remark
+                "remark": req.body.remark,
+                "payment": attachID
 
             }
             let today = new Date().toISOString()

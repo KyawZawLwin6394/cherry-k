@@ -14,8 +14,7 @@ let MedicineSaleSchema = new Schema({
     ref:'Users'
   },
   createdAt: {
-    type:Date,
-    default:Date.now()
+    type:Date
   },
   relatedTreatment: {
     type: mongoose.Schema.Types.ObjectId,

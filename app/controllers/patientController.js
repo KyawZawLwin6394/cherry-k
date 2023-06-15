@@ -95,6 +95,7 @@ exports.getPatient = async (req, res) => {
 exports.createPatient = async (req, res, next) => {
   let data = req.body;
   let files = req.files;
+  console.log(req.body)
   try {
     //prepare CUS-ID
     const latestDocument = await Patient.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();

@@ -81,6 +81,10 @@ let TreatmentVoucherSchema = new Schema({
     },
     remark: {
         type: String
+    },
+    payment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Attachments'
     }
 });
 

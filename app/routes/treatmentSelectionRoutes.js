@@ -4,11 +4,12 @@ const treatmentSelection = require("../controllers/treatmentSelectionController"
 const { catchError } = require("../lib/errorHandler");
 const verifyToken = require('../lib/verifyToken');
 const treatment = require("../models/treatment");
+const upload = require('../lib/fieldUploader').upload;
 
 module.exports = (app) => {
 
     app.route('/api/treatment-selection')
-        .post(verifyToken, catchError(treatmentSelection.createTreatmentSelection))
+        .post(verifyToken, upload, catchError(treatmentSelection.createTreatmentSelection))
         .put(verifyToken, catchError(treatmentSelection.updateTreatmentSelection))
 
     app.route('/api/treatment-selection/:id')
@@ -20,7 +21,7 @@ module.exports = (app) => {
 
     app.route('/api/treatment-selections/transaction').post(verifyToken, catchError(treatmentSelection.createTreatmentTransaction))
     app.route('/api/treatment-selections/treatment/:id').get(verifyToken, catchError(treatmentSelection.getTreatementSelectionByTreatmentID))
-    app.route('/api/treatment-selections/payment').put(verifyToken, catchError(treatmentSelection.treatmentPayment))
+    app.route('/api/treatment-selections/payment').put(verifyToken, upload, catchError(treatmentSelection.treatmentPayment))
     app.route('/api/treatment-selections/filter').post(verifyToken, catchError(treatmentSelection.getRelatedTreatmentSelections))
     app.route('/api/treatment-selections/search').post(verifyToken, catchError(treatmentSelection.searchTreatmentSelections))
     app.route('/api/treatment-selections/code').get(verifyToken, catchError(treatmentSelection.createTreatmentSelectionCode))
