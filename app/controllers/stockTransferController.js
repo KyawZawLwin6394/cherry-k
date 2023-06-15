@@ -4,6 +4,7 @@ const Stock = require('../models/stock');
 const ProcedureMedicine = require('../models/procedureItem');
 const MedicineLists = require('../models/medicineItem');
 const ProcedureAccessory = require('../models/accessoryItem');
+const Branch = require('../models/branch');
 
 exports.listAllStockTransfers = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -97,73 +98,95 @@ exports.createStockTransfer = async (req, res, next) => {
   const medicineListsRes = medicineLists.reduce((total, sale) => total + sale.purchasePrice, 0);
   const procedureAccessoryRes = procedureAccessory.reduce((total, sale) => total + sale.purchasePrice, 0);
   console.log(procedureMedicineRes, medicineListsRes, procedureAccessoryRes)
+  const total = procedureAccessoryRes + medicineListsRes + procedureAccessoryRes;
+  console.log(total, 'total')
+  const firstTransaction =
+  {
+    "amount": total,
+    "date": Date.now(),
+    "remark": null,
+    "type": "Credit",
+    "treatmentFlag": false,
+    "relatedTransaction": null,
+    "relatedAccounting": "646733c359a9bc811d97ef09", //closing stock
+    "relatedBranch": req.body.relatedBranch
+  }
+  const newTrans = new Transaction(firstTransaction)
+  const fTransResult = await newTrans.save();
+  var amountUpdate = await Accounting.findOneAndUpdate(
+    { _id: "646733c359a9bc811d97ef09" },
+    { $inc: { amount: -total } }
+  )
+  const getBranch = await Branch.find({ _id: req.body.relatedBranch })
+  const branch = getBranch[0].name
+  let secID = ''
   try {
-    if (procedureMedicine !== undefined) {
-      procedureMedicine.map(async (e, i) => {
-        if (e.stockQty < e.transferQty) {
-          procedureMedicineError.push(e)
-        } else if (e.stockQty > e.transferQty) {
-          let min = e.stockQty - e.transferQty
-          try {
-            procedureMedicineFinished.push(e)
-            const stockResult = await Stock.findOneAndUpdate(
-              { relatedProcedureItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
-              { $inc: { currentQty: e.transferQty } }
-            )
-            const mainResult = await ProcedureMedicine.findOneAndUpdate(
-              { _id: e.item_id },
-              { $inc: { currentQuantity: -e.transferQty } }
-            )
-          } catch (error) {
-            procedureMedicineError.push(e)
-          }
-        }
-      })
-    }
-    if (medicineLists !== undefined) {
-      medicineLists.map(async (e, i) => {
-        if (e.stockQty < e.transferQty) {
-          medicineListsError.push(e)
-        } else if (e.stockQty > e.transferQty) {
-          let min = e.stockQty - e.transferQty
-          try {
-            medicineListsFinished.push(e)
-            const stockResult = await Stock.findOneAndUpdate(
-              { relatedMedicineItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
-              { $inc: { currentQty: e.transferQty } }
-            )
-            const mainResult = await MedicineLists.findOneAndUpdate(
-              { _id: e.item_id },
-              { $inc: { currentQuantity: -e.transferQty } }
-            )
-          } catch (error) {
-            medicineListsError.push(e)
-          }
-        }
-      })
-    }
-    if (procedureAccessory !== undefined) {
-      procedureAccessory.map(async (e, i) => {
-        if (e.stockQty < e.transferQty) {
-          procedureAccessoryError.push(e)
-        } else if (e.stockQty > e.transferQty) {
-          let min = e.stockQty - e.transferQty
-          try {
-            procedureAccessoryFinished.push(e)
-            const stockResult = await Stock.findOneAndUpdate(
-              { relatedAccessoryItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
-              { $inc: { currentQty: e.transferQty } }
-            )
-            const mainResult = await ProcedureAccessory.findOneAndUpdate(
-              { _id: e.item_id },
-              { $inc: { currentQuantity: -e.transferQty } }
-            )
-          } catch (error) {
-            procedureAccessoryError.push(e)
-          }
-        }
-      })
-    }
+    // if (procedureMedicine !== undefined) {
+    //   procedureMedicine.map(async (e, i) => {
+    //     if (e.stockQty < e.transferQty) {
+    //       procedureMedicineError.push(e)
+    //     } else if (e.stockQty > e.transferQty) {
+    //       let min = e.stockQty - e.transferQty
+    //       try {
+    //         procedureMedicineFinished.push(e)
+    //         const stockResult = await Stock.findOneAndUpdate(
+    //           { relatedProcedureItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
+    //           { $inc: { currentQty: e.transferQty } }
+    //         )
+    //         const mainResult = await ProcedureMedicine.findOneAndUpdate(
+    //           { _id: e.item_id },
+    //           { $inc: { currentQuantity: -e.transferQty } }
+    //         )
+    //       } catch (error) {
+    //         procedureMedicineError.push(e)
+    //       }
+    //     }
+    //   })
+    // }
+    // if (medicineLists !== undefined) {
+    //   medicineLists.map(async (e, i) => {
+    //     if (e.stockQty < e.transferQty) {
+    //       medicineListsError.push(e)
+    //     } else if (e.stockQty > e.transferQty) {
+    //       let min = e.stockQty - e.transferQty
+    //       try {
+    //         medicineListsFinished.push(e)
+    //         const stockResult = await Stock.findOneAndUpdate(
+    //           { relatedMedicineItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
+    //           { $inc: { currentQty: e.transferQty } }
+    //         )
+    //         const mainResult = await MedicineLists.findOneAndUpdate(
+    //           { _id: e.item_id },
+    //           { $inc: { currentQuantity: -e.transferQty } }
+    //         )
+    //       } catch (error) {
+    //         medicineListsError.push(e)
+    //       }
+    //     }
+    //   })
+    // }
+    // if (procedureAccessory !== undefined) {
+    //   procedureAccessory.map(async (e, i) => {
+    //     if (e.stockQty < e.transferQty) {
+    //       procedureAccessoryError.push(e)
+    //     } else if (e.stockQty > e.transferQty) {
+    //       let min = e.stockQty - e.transferQty
+    //       try {
+    //         procedureAccessoryFinished.push(e)
+    //         const stockResult = await Stock.findOneAndUpdate(
+    //           { relatedAccessoryItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
+    //           { $inc: { currentQty: e.transferQty } }
+    //         )
+    //         const mainResult = await ProcedureAccessory.findOneAndUpdate(
+    //           { _id: e.item_id },
+    //           { $inc: { currentQuantity: -e.transferQty } }
+    //         )
+    //       } catch (error) {
+    //         procedureAccessoryError.push(e)
+    //       }
+    //     }
+    //   })
+    // }
     const newStockTransfer = new StockTransfer(newBody);
     const result = await newStockTransfer.save();
 
