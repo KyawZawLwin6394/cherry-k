@@ -8,6 +8,7 @@ module.exports = (app) => {
 
     app.route('/api/journal')
         .post(verifyToken, catchError(journal.createJournal))
+        .put(verifyToken, catchError(journal.updateJournal))
 
     app.route('/api/journal/:id')
         .get(verifyToken, catchError(journal.getJournal))

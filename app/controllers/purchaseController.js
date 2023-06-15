@@ -2,7 +2,9 @@
 const Purchase = require('../models/purchase');
 const MedicineItems = require('../models/medicineItem');
 const ProcedureItems = require('../models/procedureItem');
-const AccessoryItems = require('../models/accessoryItem')
+const AccessoryItems = require('../models/accessoryItem');
+const Stock = require('../models/stock');
+const Transaction = require('../models/transaction');
 
 exports.listAllPurchases = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -48,30 +50,66 @@ exports.getPurchase = async (req, res) => {
 
 exports.createPurchase = async (req, res, next) => {
     let data = req.body
+    let { relatedBranch } = data
     try {
-        data.medicineItems.map(async function (element, index) {
-            const result = await MedicineItems.findOneAndUpdate(
-                { _id: element.item_id },
-                { $inc: { currentQuantity: element.qty  } },
-                { new: true },
-            ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id')
-        })
-        data.procedureItems.map(async function (element, index) {
-            const result = await ProcedureItems.findOneAndUpdate(
-                { _id: element.item_id },
-                { $inc: { currentQuantity: element.qty  } },
-                { new: true },
-            ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
-        })
-        data.accessoryItems.map(async function (element, index) {
-            const result = await AccessoryItems.findOneAndUpdate(
-                { _id: element.item_id },
-                { $inc: { currentQuantity: element.qty  } },
-                { new: true },
-            ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
-        })
+        if (relatedBranch !== undefined) {
+            data.medicineItems.map(async function (element, index) {
+                const result = await Stock.findOneAndUpdate(
+                    { _id: element.item_id, relatedBranch: relatedBranch },
+                    { $inc: { currentQuantity: element.qty } },
+                    { new: true },
+                ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id')
+            })
+            data.procedureItems.map(async function (element, index) {
+                const result = await Stock.findOneAndUpdate(
+                    { _id: element.item_id, relatedBranch: relatedBranch },
+                    { $inc: { currentQuantity: element.qty } },
+                    { new: true },
+                ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
+            })
+            data.accessoryItems.map(async function (element, index) {
+                const result = await Stock.findOneAndUpdate(
+                    { _id: element.item_id, relatedBranch: relatedBranch },
+                    { $inc: { currentQuantity: element.qty } },
+                    { new: true },
+                ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
+            })
+        } else if (relatedBranch === undefined) {
+            data.medicineItems.map(async function (element, index) {
+                const result = await MedicineItems.findOneAndUpdate(
+                    { _id: element.item_id },
+                    { $inc: { currentQuantity: element.qty } },
+                    { new: true },
+                ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id')
+            })
+            data.procedureItems.map(async function (element, index) {
+                const result = await ProcedureItems.findOneAndUpdate(
+                    { _id: element.item_id },
+                    { $inc: { currentQuantity: element.qty } },
+                    { new: true },
+                ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
+            })
+            data.accessoryItems.map(async function (element, index) {
+                const result = await AccessoryItems.findOneAndUpdate(
+                    { _id: element.item_id },
+                    { $inc: { currentQuantity: element.qty } },
+                    { new: true },
+                ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
+            })
+        }
+        data = { ...data, relatedBranch: relatedBranch }
         const newPurchase = new Purchase(data);
         const result = await newPurchase.save();
+
+        const transResult = await Transaction.create({
+            "amount": data.totalPrice,
+            "date": Date.now(),
+            "remark": data.remark,
+            "type": "Credit",
+            "relatedTransaction": null,
+            "relatedAccounting": "646733d659a9bc811d97efa9", //Opening Stock
+            "relatedBranch": newBody.relatedBranch
+        })
         res.status(200).send({
             message: 'Purchase create success',
             success: true,
