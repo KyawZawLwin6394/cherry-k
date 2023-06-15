@@ -8,7 +8,7 @@ exports.listAllTransactions = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -37,14 +37,21 @@ exports.listAllTransactions = async (req, res) => {
 };
 
 exports.getTransaction = async (req, res) => {
-  const result = await Transaction.find({ _id: req.params.id,isDeleted:false }).populate('createdBy relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+  const result = await Transaction.find({ _id: req.params.id, isDeleted: false }).populate('createdBy relatedAccounting').populate('relatedTreatment').populate('relatedBank').populate('relatedCash').populate({
+    path: 'relatedTransaction',
+    model: 'Transactions',
+    populate: {
+      path: 'relatedAccounting',
+      model: 'AccountingLists',
+    }
+  });
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
 
 exports.getRelatedTransaction = async (req, res) => {
-  const result = await Transaction.find({ relatedAccounting: req.params.id,isDeleted:false }).populate('createdBy relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
+  const result = await Transaction.find({ relatedAccounting: req.params.id, isDeleted: false }).populate('createdBy relatedAccounting').populate('relatedTreatment').populate('relatedTransaction').populate('relatedBank').populate('relatedCash');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -105,13 +112,13 @@ exports.activateTransaction = async (req, res, next) => {
   }
 };
 
-exports.trialBalance = async (req,res) => {
-  try{
-    const result = await Transaction.find({relatedAccounting:req.params.relatedAccounting, type:'Debit'}).populate('createdBy relatedAccounting relatedTreatment relatedBank relatedCash relatedTransaction relatedMedicineSale');
-    if (result.length === 0) return res.status(500).send({error:true, message:'Data Not Found!'})
-    return res.status(200).send({success:true, debit:result})
+exports.trialBalance = async (req, res) => {
+  try {
+    const result = await Transaction.find({ relatedAccounting: req.params.relatedAccounting, type: 'Debit' }).populate('createdBy relatedAccounting relatedTreatment relatedBank relatedCash relatedTransaction relatedMedicineSale');
+    if (result.length === 0) return res.status(500).send({ error: true, message: 'Data Not Found!' })
+    return res.status(200).send({ success: true, debit: result })
   } catch (err) {
-    return res.status(500).send({error:true, message:err.message})
+    return res.status(500).send({ error: true, message: err.message })
   }
-  
+
 }

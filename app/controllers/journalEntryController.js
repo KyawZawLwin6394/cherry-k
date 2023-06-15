@@ -84,14 +84,7 @@ exports.updateJournal = async (req, res, next) => {
             { _id: firstTransId },
             { relatedAccounting: fromCurAcc, amount: curAmount, date: date, remark: remark, type: fromCurAccType },
             { new: true },
-        ).populate({
-            path: 'relatedTransaction',
-            model: 'Transactions',
-            populate: {
-                path: 'relatedAccounting',
-                model: 'AccountingLists',
-            }
-        });
+        )
 
         if (fromPreAccType === fromPreAccNature) {
 
