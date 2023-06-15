@@ -88,13 +88,13 @@ exports.updateJournal = async (req, res, next) => {
 
         if (fromPreAccType === fromPreAccNature) {
 
-            const accUpdate = await AccList.findOneAndUpdate(
+            const accUpdate = await Accounting.findOneAndUpdate(
                 { _id: fromPreAcc },
                 { $inc: { amount: -preAmount } },
                 { new: true },
             );
         } else {
-            const accUpdate = await AccList.findOneAndUpdate(
+            const accUpdate = await Accounting.findOneAndUpdate(
                 { _id: fromPreAcc },
                 { $inc: { amount: preAmount } },
                 { new: true },
@@ -103,13 +103,13 @@ exports.updateJournal = async (req, res, next) => {
 
         if (fromCurAccType === fromCurAccNature) {
 
-            const accUpdate = await AccList.findOneAndUpdate(
+            const accUpdate = await Accounting.findOneAndUpdate(
                 { _id: fromCurAcc },
                 { $inc: { amount: curAmount } },
                 { new: true },
             );
         } else {
-            const accUpdate = await AccList.findOneAndUpdate(
+            const accUpdate = await Accounting.findOneAndUpdate(
                 { _id: fromCurAcc },
                 { $inc: { amount: -curAmount } },
                 { new: true },
@@ -134,13 +134,13 @@ exports.updateJournal = async (req, res, next) => {
 
         if (toPreAccType === toPreAccNature) {
 
-            const accUpdate = await AccList.findOneAndUpdate(
+            const accUpdate = await Accounting.findOneAndUpdate(
                 { _id: toPreAcc },
                 { $inc: { amount: -preAmount } },
                 { new: true },
             );
         } else {
-            const accUpdate = await AccList.findOneAndUpdate(
+            const accUpdate = await Accounting.findOneAndUpdate(
                 { _id: toPreAcc },
                 { $inc: { amount: preAmount } },
                 { new: true },
@@ -149,13 +149,13 @@ exports.updateJournal = async (req, res, next) => {
 
         if (toCurAccType === toCurAccNature) {
 
-            const accUpdate = await AccList.findOneAndUpdate(
+            const accUpdate = await Accounting.findOneAndUpdate(
                 { _id: toCurAcc },
                 { $inc: { amount: curAmount } },
                 { new: true },
             );
         } else {
-            const accUpdate = await AccList.findOneAndUpdate(
+            const accUpdate = await Accounting.findOneAndUpdate(
                 { _id: toCurAcc },
                 { $inc: { amount: -curAmount } },
                 { new: true },
@@ -188,13 +188,13 @@ exports.createJournal = async (req, res, next) => {
         if (fromAccNature) {
             if (fromAccType === fromAccNature) {
 
-                const accUpdate = await AccList.findOneAndUpdate(
+                const accUpdate = await Accounting.findOneAndUpdate(
                     { _id: firstTrans.relatedAccounting._id },
                     { $inc: { amount: firstTrans.amount } },
                     { new: true },
                 );
             } else {
-                const accUpdate = await AccList.findOneAndUpdate(
+                const accUpdate = await Accounting.findOneAndUpdate(
                     { _id: firstTrans.relatedAccounting._id },
                     { $inc: { amount: -firstTrans.amount } },
                     { new: true },
@@ -223,17 +223,17 @@ exports.createJournal = async (req, res, next) => {
             }
         )
 
-        const secondAccount = await AccList.find({ _id: toAcc, isDeleted: false })
+        const secondAccount = await Accounting.find({ _id: toAcc, isDeleted: false })
 
         if (toAccNature) {
             if (toAccType === toAccNature) {
-                const accUpdate = await AccList.findOneAndUpdate(
+                const accUpdate = await Accounting.findOneAndUpdate(
                     { _id: secondTrans.relatedAccounting._id },
                     { $inc: { amount: secondTrans.amount } },
                     { new: true },
                 );
             } else {
-                const accUpdate = await AccList.findOneAndUpdate(
+                const accUpdate = await Accounting.findOneAndUpdate(
                     { _id: secondTrans.relatedAccounting._id },
                     { $inc: { amount: -secondTrans.amount } },
                     { new: true },
