@@ -175,7 +175,7 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
     const fTransResult = await fTransaction.save()
     var amountUpdate = await Accounting.findOneAndUpdate(
       { _id: "6423eb395fb841d5566db36d" },
-      { $inc: { amount: -data.payAmount } }
+      { $inc: { amount: data.payAmount } }
     )
     //sec transaction
     const secTransaction = new Transaction(

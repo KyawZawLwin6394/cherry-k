@@ -84,7 +84,14 @@ exports.updateJournal = async (req, res, next) => {
             { _id: firstTransId },
             { relatedAccounting: fromCurAcc, amount: curAmount, date: date, remark: remark, type: fromCurAccType },
             { new: true },
-        );
+        ).populate({
+            path: 'relatedTransaction',
+            model: 'Transactions',
+            populate: {
+                path: 'relatedAccounting',
+                model: 'AccountingLists',
+            }
+        });
 
         if (fromPreAccType === fromPreAccNature) {
 
@@ -186,7 +193,6 @@ exports.createJournal = async (req, res, next) => {
             JEFlag: true
         })
 
-
         if (fromAccType === fromAccNature) {
 
             const accUpdate = await AccList.findOneAndUpdate(
@@ -201,7 +207,6 @@ exports.createJournal = async (req, res, next) => {
                 { new: true },
             );
         }
-
 
         const secondTrans = await Transaction.create({
             relatedAccounting: toAcc,

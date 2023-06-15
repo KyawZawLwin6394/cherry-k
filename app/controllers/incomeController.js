@@ -78,7 +78,7 @@ exports.createIncome = async (req, res, next) => {
     if (newBody.relatedAccounting) {
       var amountUpdate = await Accounting.findOneAndUpdate(
         { _id: newBody.relatedAccounting },
-        { $inc: { amount: -newBody.finalAmount } }
+        { $inc: { amount: newBody.finalAmount } }
       )
     }
     if (req.body.relatedCredit) {
