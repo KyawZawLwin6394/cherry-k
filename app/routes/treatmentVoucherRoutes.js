@@ -23,4 +23,5 @@ module.exports = (app) => {
     app.route('/api/treatment-vouchers/code').get(verifyToken, catchError(treatmentVoucher.getCode))
     app.route('/api/treatment-vouchers/today').get(verifyToken, catchError(treatmentVoucher.getTodaysTreatmentVoucher))
     app.route('/api/treatment-vouchers/get-date').get(verifyToken, catchError(treatmentVoucher.getwithExactDate))
+    app.route('/api/treatment-vouchers/treatment-selection/:id').get(verifyToken, catchError(treatmentVoucher.getTreatmentVoucherWithTreatmentID))
 };

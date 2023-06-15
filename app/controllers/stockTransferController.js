@@ -93,6 +93,10 @@ exports.createStockTransfer = async (req, res, next) => {
   let procedureMedicineFinished = []
   let medicineListsFinished = []
   let procedureAccessoryFinished = []
+  const procedureMedicineRes = procedureMedicine.reduce((total, sale) => total + sale.purchasePrice, 0);
+  const medicineListsRes = medicineLists.reduce((total, sale) => total + sale.purchasePrice, 0);
+  const procedureAccessoryRes = procedureAccessory.reduce((total, sale) => total + sale.purchasePrice, 0);
+  console.log(procedureMedicineRes, medicineListsRes, procedureAccessoryRes)
   try {
     if (procedureMedicine !== undefined) {
       procedureMedicine.map(async (e, i) => {
