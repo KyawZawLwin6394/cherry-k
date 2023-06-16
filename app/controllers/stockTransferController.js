@@ -166,10 +166,10 @@ exports.createStockTransfer = async (req, res, next) => {
           let min = e.stockQty - e.transferQty
           try {
             procedureMedicineFinished.push(e)
-            const stockResult = await Stock.findOneAndUpdate(
-              { relatedProcedureItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
-              { $inc: { currentQty: e.transferQty } }
-            )
+            // const stockResult = await Stock.findOneAndUpdate(
+            //   { relatedProcedureItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
+            //   { $inc: { currentQty: e.transferQty } }
+            // )
             const mainResult = await ProcedureMedicine.findOneAndUpdate(
               { _id: e.item_id },
               { $inc: { currentQuantity: -e.transferQty } }
@@ -188,10 +188,10 @@ exports.createStockTransfer = async (req, res, next) => {
           let min = e.stockQty - e.transferQty
           try {
             medicineListsFinished.push(e)
-            const stockResult = await Stock.findOneAndUpdate(
-              { relatedMedicineItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
-              { $inc: { currentQty: e.transferQty } }
-            )
+            // const stockResult = await Stock.findOneAndUpdate(
+            //   { relatedMedicineItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
+            //   { $inc: { currentQty: e.transferQty } }
+            // )
             const mainResult = await MedicineLists.findOneAndUpdate(
               { _id: e.item_id },
               { $inc: { currentQuantity: -e.transferQty } }
@@ -210,14 +210,17 @@ exports.createStockTransfer = async (req, res, next) => {
           let min = e.stockQty - e.transferQty
           try {
             procedureAccessoryFinished.push(e)
-            const stockResult = await Stock.findOneAndUpdate(
-              { relatedAccessoryItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
-              { $inc: { currentQty: e.transferQty } }
-            )
+            // const stockResult = await Stock.findOneAndUpdate(
+            //   { relatedAccessoryItems: e.item_id, relatedBranch: req.mongoQuery.relatedBranch },
+            //   { $inc: { currentQty: e.transferQty } }
+            // )
             const mainResult = await ProcedureAccessory.findOneAndUpdate(
               { _id: e.item_id },
               { $inc: { currentQuantity: -e.transferQty } }
             )
+            // const log = await Log.create({
+
+            // })
           } catch (error) {
             procedureAccessoryError.push(e)
           }

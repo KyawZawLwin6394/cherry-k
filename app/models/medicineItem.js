@@ -20,9 +20,6 @@ let MedicineItemSchema = new Schema({
   currentQuantity: {
     type: Number
   },
-  reOrderQuantity: {
-    type: Number,
-  },
   purchasePrice: {
     type: Number
   },

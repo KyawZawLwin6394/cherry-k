@@ -42,6 +42,9 @@ let StockSchema = new Schema({
   totalUnit: {
     type: Number
   },
+  reOrderQuantity: {
+    type: Number
+  },
   isDeleted: {
     type: Boolean,
     required: true,

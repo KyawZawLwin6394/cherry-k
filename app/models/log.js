@@ -53,6 +53,10 @@ let LogSchema = new Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users'
+    },
+    type: {
+        type: String,
+        enum: ['Stock Transfer', 'Usage', 'Request Recieved', 'Stock Update', 'Medicine Sale']
     }
 });
 
