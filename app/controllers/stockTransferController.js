@@ -89,6 +89,7 @@ exports.getStockTransfer = async (req, res) => {
 };
 
 exports.createStockTransfer = async (req, res, next) => {
+  let createdBy = req.credentials.id
   let newBody = req.body;
   const { procedureMedicine, medicineLists, procedureAccessory } = req.body;
   let procedureMedicineError = []

@@ -23,5 +23,6 @@ module.exports = (app) => {
         .get(verifyToken, catchError(stock.copyStock))
 
     app.route('/api/stocks/reorder').get(verifyToken, catchError(stock.checkReorder))
+    app.route('/api/stocks/recieved').put(verifyToken, catchError(stock.stockRecieved))
 
 };

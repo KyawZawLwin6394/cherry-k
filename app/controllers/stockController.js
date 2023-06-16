@@ -4,7 +4,7 @@ const ProcedureItems = require('../models/procedureItem');
 const MedicineItems = require('../models/medicineItem');
 const AccessoryItems = require('../models/accessoryItem');
 const Branch = require('../models/branch');
-const branch = require('../models/branch');
+const Log = require('../models/log');
 
 exports.listAllStocks = async (req, res) => {
     let query = req.mongoQuery
@@ -209,7 +209,8 @@ exports.checkReorder = async (req, res) => {
 
 exports.stockRecieved = async (req, res) => {
     try {
-        const { stock_id, relatedBranch, recievedQty } = req.body
+        let createdBy = req.credentials.id
+        const { stock_id, relatedBranch, recievedQty, currentQty, actual } = req.body
         const result = await Stock.findOneAndUpdate(
             { _id: stock_id, relatedBranch: relatedBranch },
             {
@@ -219,14 +220,14 @@ exports.stockRecieved = async (req, res) => {
         ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
         const logResult = await Log.create({
             "relatedStock": stock_id,
-            "currentQty": e.stock,
-            "actualQty": e.actual,
-            "finalQty": min,
-            "type": "Stock Transfer",
+            "currentQty": currentQty,
+            "actualQty": actual,
+            "finalQty": recievedQty,
+            "type": "Request Recieved",
             "relatedBranch": relatedBranch,
             "createdBy": createdBy
         })
-        return res.status(200).send({ success: true, data: result })
+        return res.status(200).send({ success: true, data: result, log: logResult })
     } catch (error) {
         return res.status(500).send({ error: true, message: error.message })
     }

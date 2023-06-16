@@ -8,13 +8,11 @@ const Schema = mongoose.Schema;
 let LogSchema = new Schema({
     relatedTreatmentSelection: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'TreatmentSelections',
-        required: true
+        ref: 'TreatmentSelections'
     },
     relatedAppointment: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Appointments',
-        required: true
+        ref: 'Appointments'
     },
     date: {
         type: Date,
