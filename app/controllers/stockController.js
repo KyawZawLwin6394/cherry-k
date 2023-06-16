@@ -93,7 +93,7 @@ exports.copyStock = async (req, res) => {
         for (let i = 0; i < procedureItems.length; i++) {
             console.log('here')
             for (let b = 0; b < branches.length; b++) {
-            console.log('here2')
+                console.log('here2')
                 var stockResult = await Stock.create(
                     {
                         "relatedBranch": branches[b]._id,
@@ -111,7 +111,7 @@ exports.copyStock = async (req, res) => {
         for (let i = 0; i < medicineItems.length; i++) {
             console.log('here')
             for (let b = 0; b < branches.length; b++) {
-            console.log('here2')
+                console.log('here2')
                 var stockResult = await Stock.create(
                     {
                         "relatedBranch": branches[b]._id,
@@ -129,7 +129,7 @@ exports.copyStock = async (req, res) => {
         for (let i = 0; i < accessoryItems.length; i++) {
             console.log('here')
             for (let b = 0; b < branches.length; b++) {
-            console.log('here2')
+                console.log('here2')
                 var stockResult = await Stock.create(
                     {
                         "relatedBranch": branches[b]._id,
@@ -148,4 +148,8 @@ exports.copyStock = async (req, res) => {
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
     }
+}
+
+exports.checkReorder = async (req, res) => {
+    let { relatedBranch } = req.query
 }
