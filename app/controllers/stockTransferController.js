@@ -181,9 +181,9 @@ exports.createStockTransfer = async (req, res, next) => {
             )
             const logResult = await Log.create({
               "relatedProcedureItems": e.item_id,
-              "currentQty": e.stock,
-              "actualQty": e.actual,
-              "finalQty": min,
+              "currentQty": e.stockQty,
+              "actualQty": e.transferQty,
+              "finalQty": currentQty,
               "type": "Stock Transfer",
               "relatedBranch": relatedBranch,
               "createdBy": createdBy
@@ -216,9 +216,9 @@ exports.createStockTransfer = async (req, res, next) => {
             )
             const logResult = await Log.create({
               "relatedMedicineItems": e.item_id,
-              "currentQty": e.stock,
-              "actualQty": e.actual,
-              "finalQty": min,
+              "currentQty": e.stockQty,
+              "actualQty": e.transferQty,
+              "finalQty": currentQty,
               "type": "Stock Transfer",
               "relatedBranch": relatedBranch,
               "createdBy": createdBy
@@ -251,9 +251,9 @@ exports.createStockTransfer = async (req, res, next) => {
             )
             const logResult = await Log.create({
               "relatedAccessoryItems": e.item_id,
-              "currentQty": e.stock,
-              "actualQty": e.actual,
-              "finalQty": min,
+              "currentQty": e.stockQty,
+              "actualQty": e.transferQty,
+              "finalQty": currentQty,
               "type": "Stock Transfer",
               "relatedBranch": relatedBranch,
               "createdBy": createdBy
