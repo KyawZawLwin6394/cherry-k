@@ -38,9 +38,6 @@ let procedureItemSchema = new Schema({
   toUnit: {
     type: Number
   },
-  totalUnit: {
-    type: Number
-  },
   updatedAt: {
     type: Date
   },

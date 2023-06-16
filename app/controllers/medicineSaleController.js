@@ -232,14 +232,15 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
           medicineItemError.push(e)
         } else if (e.stock > e.quantity) {
           const result = await Stock.find({ _id: e.item_id, relatedBranch: relatedBranch })
+          let totalUnit = e.stock - e.quantity
           let from = result[0].fromUnit
           let to = result[0].toUnit
-          let totalUnit = (to * e.quantity) / from //totalunit calculation
+          let currentQty = (from * totalUnit) / to
           try {
             medicineItemFinished.push(e)
             const result = await Stock.findOneAndUpdate(
               { _id: e.item_id, relatedBranch: relatedBranch },
-              { totalUnit: totalUnit },
+              { totalUnit: totalUnit, currentQty: currentQty },
               { new: true },
             )
 

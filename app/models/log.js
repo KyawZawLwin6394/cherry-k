@@ -41,6 +41,10 @@ let LogSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'FixedAssets'
     },
+    relatedMedicineItems: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MedicineItems'
+    },
     isDeleted: {
         type: Boolean,
         required: true,

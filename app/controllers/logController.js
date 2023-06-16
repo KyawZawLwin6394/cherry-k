@@ -182,15 +182,16 @@ exports.createUsage = async (req, res) => {
           if (e.stock < e.actual) {
             procedureItemsError.push(e)
           } else if (e.stock > e.actual) {
+            let totalUnit = e.stock - e.actual
             const result = await Stock.find({ _id: e.item_id, relatedBranch: relatedBranch })
             const from = result[0].fromUnit
             const to = result[0].toUnit
-            let totalUnit = (to * e.actual) / from
+            const currentQty = (from * totalUnit) / to
             try {
               procedureItemsFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
-                { totalUnit: totalUnit },
+                { totalUnit: min, currentQty: currentQty },
                 { new: true },
               )
 
@@ -219,15 +220,16 @@ exports.createUsage = async (req, res) => {
           if (e.stock < e.actual) {
             accessoryItemsError.push(e)
           } else if (e.stock > e.actual) {
+            let totalUnit = e.stock - e.actual
             const result = await Stock.find({ _id: e.item_id, relatedBranch: relatedBranch })
             const from = result[0].fromUnit
             const to = result[0].toUnit
-            let totalUnit = (to * e.actual) / from
+            const currentQty = (from * totalUnit) / to
             try {
               accessoryItemsFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
-                { totalUnit: totalUnit },
+                { totalUnit: totalUnit, currentQty: currentQty },
                 { new: true },
               )
 
@@ -256,15 +258,16 @@ exports.createUsage = async (req, res) => {
           if (e.stock < e.actual) {
             machineError.push(e)
           } else if (e.stock > e.actual) {
+            let totalUnit = e.stock - e.actual
             const result = await Stock.find({ _id: e.item_id, relatedBranch: relatedBranch })
             const from = result[0].fromUnit
             const to = result[0].toUnit
-            let totalUnit = (to * e.actual) / from
+            const currentQty = (from * totalUnit) / to
             try {
               machineFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
-                { totalUnit: totalUnit },
+                { totalUnit: totalUnit, currentQty: currentQty },
                 { new: true },
               )
 
