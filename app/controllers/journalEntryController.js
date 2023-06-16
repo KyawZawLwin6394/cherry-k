@@ -169,6 +169,7 @@ exports.updateJournal = async (req, res, next) => {
             secondTrans: secondUpdateTrans
         });
     } catch (error) {
+        console.log(error)
         return res.status(500).send({ "error": true, message: error.message })
     }
 };
