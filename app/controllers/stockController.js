@@ -190,9 +190,9 @@ exports.checkReorder = async (req, res) => {
             .lean()
             .exec();
 
-        const ProcedureItems = items.filter(item => item.relatedProcedureItems && item.currentQty <= item.reOrderQuantity);
-        const AccessoryItems = items.filter(item => item.relatedAccessoryItems && item.currentQty <= item.reOrderQuantity);
-        const MedicineItems = items.filter(item => item.relatedMedicineItems && item.currentQty <= item.reOrderQuantity);
+        const ProcedureItems = items.filter(item => item.relatedProcedureItems && item.totalUnit <= item.reOrderQuantity);
+        const AccessoryItems = items.filter(item => item.relatedAccessoryItems && item.totalUnit <= item.reOrderQuantity);
+        const MedicineItems = items.filter(item => item.relatedMedicineItems && item.totalUnit <= item.reOrderQuantity);
 
         return res.status(200).send({
             success: true,
