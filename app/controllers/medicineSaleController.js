@@ -2,7 +2,8 @@
 const MedicineSale = require('../models/medicineSale');
 const Transaction = require('../models/transaction');
 const Accounting = require('../models/accountingList');
-const Patient = require('../models/patient')
+const Patient = require('../models/patient');
+const Stock = require('../models/stock');
 
 exports.listAllMedicineSales = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -160,6 +161,8 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
   try {
     let createdBy = req.credentials.id
     let relatedBranch = req.body.relatedBranch
+    let medicineItemError = []
+    let medicineItemFinished = []
     //first transaction 
     const fTransaction = new Transaction({
       "amount": req.body.amount,
@@ -222,6 +225,41 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
     )
     req.body = { ...req.body, createdBy: createdBy, relatedBranch: relatedBranch }
     console.log(req.body)
+    let { medicineItems } = req.body
+    if (medicineItems !== undefined) {
+      medicineItems.map(async (e, i) => {
+        if (e.stock < e.quantity) {
+          medicineItemError.push(e)
+        } else if (e.stock > e.quantity) {
+          const result = await Stock.find({ _id: e.item_id, relatedBranch: relatedBranch })
+          let from = result[0].fromUnit
+          let to = result[0].toUnit
+          let totalUnit = (to * e.quantity) / from //totalunit calculation
+          try {
+            medicineItemFinished.push(e)
+            const result = await Stock.findOneAndUpdate(
+              { _id: e.item_id, relatedBranch: relatedBranch },
+              { totalUnit: totalUnit },
+              { new: true },
+            )
+
+          } catch (error) {
+            medicineItemError.push(e);
+          }
+          const logResult = await Log.create({
+            "relatedTreatmentSelection": relatedTreatmentSelection,
+            "relatedAppointment": relatedAppointment,
+            "relatedProcedureItems": e.item_id,
+            "currentQty": e.stock,
+            "actualQty": e.quantity,
+            "finalQty": min,
+            "relatedBranch": relatedBranch,
+            "type": "Medicine Sale",
+            "createdBy": createdBy
+          })
+        }
+      })
+    }
     const newMedicineSale = new MedicineSale(req.body)
     const medicineSaleResult = newMedicineSale.save()
     res.status(200).send({
@@ -230,7 +268,9 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
       fTrans: fTransUpdate,
       sTrans: secTransResult,
       accResult: accResult,
-      data: medicineSaleResult
+      data: medicineSaleResult,
+      medicineItemFinished: medicineItemFinished,
+      medicineItemError: medicineItemError
     });
 
 

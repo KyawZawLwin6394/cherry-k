@@ -172,7 +172,6 @@ exports.createUsage = async (req, res) => {
   let createdBy = req.credentials.id
   try {
 
-
     const appResult = await Appointment.find({ _id: req.body.relatedAppointment })
     console.log(appResult[0].relatedUsage)
     let status;
@@ -203,6 +202,7 @@ exports.createUsage = async (req, res) => {
               "actualQty": e.actual,
               "finalQty": min,
               "relatedBranch": relatedBranch,
+              "type": "Usage",
               "createdBy": createdBy
             })
           }
@@ -235,6 +235,7 @@ exports.createUsage = async (req, res) => {
               "currentQty": e.stock,
               "actualQty": e.actual,
               "finalQty": min,
+              "type": "Usage",
               "relatedBranch": relatedBranch,
               "createdBy": createdBy
             })
@@ -268,6 +269,7 @@ exports.createUsage = async (req, res) => {
               "currentQty": e.stock,
               "actualQty": e.actual,
               "finalQty": min,
+              "type": "Usage",
               "relatedBranch": relatedBranch,
               "createdBy": createdBy
             })
@@ -341,6 +343,7 @@ exports.createUsage = async (req, res) => {
               "currentQty": e.stock,
               "actualQty": e.actual,
               "finalQty": min,
+              "type": "Usage",
               "relatedBranch": relatedBranch,
               "createdBy": createdBy
             })
@@ -374,6 +377,7 @@ exports.createUsage = async (req, res) => {
               "currentQty": e.stock,
               "actualQty": e.actual,
               "finalQty": min,
+              "type": "Usage",
               "relatedBranch": relatedBranch,
               "createdBy": createdBy
             })
@@ -407,6 +411,7 @@ exports.createUsage = async (req, res) => {
               "currentQty": e.stock,
               "actualQty": e.actual,
               "finalQty": min,
+              "type": "Usage",
               "relatedBranch": relatedBranch,
               "createdBy": createdBy
             })
@@ -444,8 +449,6 @@ exports.createUsage = async (req, res) => {
         procedureItemsError: procedureItemsError,
         accessoryItemsError: accessoryItemsError
       })
-
-
       // var usageRecordResult = await UsageRecords.findOneAndUpdate(
       //   { relatedUsage: appResult[0].relatedUsage },
       //   {

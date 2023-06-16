@@ -6,7 +6,8 @@ const MedicineLists = require('../models/medicineItem');
 const ProcedureAccessory = require('../models/accessoryItem');
 const Branch = require('../models/branch');
 const Transaction = require('../models/transaction');
-const Accounting = require('../models/accountingList')
+const Accounting = require('../models/accountingList');
+const Log = require('../models/log');
 
 exports.listAllStockTransfers = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -174,6 +175,15 @@ exports.createStockTransfer = async (req, res, next) => {
               { _id: e.item_id },
               { $inc: { currentQuantity: -e.transferQty } }
             )
+            const logResult = await Log.create({
+              "relatedMachine": e.item_id,
+              "currentQty": e.stock,
+              "actualQty": e.actual,
+              "finalQty": min,
+              "type": "Stock Transfer",
+              "relatedBranch": relatedBranch,
+              "createdBy": createdBy
+            })
           } catch (error) {
             procedureMedicineError.push(e)
           }
@@ -196,6 +206,15 @@ exports.createStockTransfer = async (req, res, next) => {
               { _id: e.item_id },
               { $inc: { currentQuantity: -e.transferQty } }
             )
+            const logResult = await Log.create({
+              "relatedMachine": e.item_id,
+              "currentQty": e.stock,
+              "actualQty": e.actual,
+              "finalQty": min,
+              "type": "Stock Transfer",
+              "relatedBranch": relatedBranch,
+              "createdBy": createdBy
+            })
           } catch (error) {
             medicineListsError.push(e)
           }
@@ -218,6 +237,15 @@ exports.createStockTransfer = async (req, res, next) => {
               { _id: e.item_id },
               { $inc: { currentQuantity: -e.transferQty } }
             )
+            const logResult = await Log.create({
+              "relatedMachine": e.item_id,
+              "currentQty": e.stock,
+              "actualQty": e.actual,
+              "finalQty": min,
+              "type": "Stock Transfer",
+              "relatedBranch": relatedBranch,
+              "createdBy": createdBy
+            })
             // const log = await Log.create({
 
             // })
