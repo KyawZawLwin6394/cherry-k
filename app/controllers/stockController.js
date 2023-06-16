@@ -151,5 +151,26 @@ exports.copyStock = async (req, res) => {
 }
 
 exports.checkReorder = async (req, res) => {
-    let { relatedBranch } = req.query
+    try {
+        let { relatedBranch } = req.query
+        const PIquery = { relatedProcedureItems: { $exists: true }, relatedBranch: relatedBranch };
+        const MIquery = { relatedMedicineItems: { $exists: true }, relatedBranch: relatedBranch };
+        const AIquery = { relatedAccessoryItems: { $exists: true }, relatedBranch: relatedBranch };
+        const relatedProcedureItems = await Stock.find(PIquery)
+        const relatedAccessoryItems = await Stock.find(AIquery)
+        const relatedMedicineItems = await Stock.find(MIquery)
+        const ProcedureItems = relatedProcedureItems.filter(item => item.currentQty <= item.reorderQty);
+        const AccessoryItems = relatedAccessoryItems.filter(item => item.currentQty <= item.reorderQty);
+        const MedicineItems = relatedMedicineItems.filter(item => item.currentQty <= item.reorderQty);
+
+        return res.status(200).send({
+            success: true, data: {
+                ProcedureItems: ProcedureItems,
+                AccessoryItems: AccessoryItems,
+                MedicineItems: MedicineItems
+            },
+        })
+    } catch (error) {
+        return res.status(500).send({ error: true, message: error.message })
+    }
 }
