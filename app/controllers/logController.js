@@ -182,12 +182,15 @@ exports.createUsage = async (req, res) => {
           if (e.stock < e.actual) {
             procedureItemsError.push(e)
           } else if (e.stock > e.actual) {
-            let min = e.stock - e.actual
+            const result = await Stock.find({ _id: e.item_id, relatedBranch: relatedBranch })
+            const from = result[0].fromUnit
+            const to = result[0].toUnit
+            let totalUnit = (to * e.actual) / from
             try {
               procedureItemsFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
-                { totalUnit: min },
+                { totalUnit: totalUnit },
                 { new: true },
               )
 
@@ -216,12 +219,15 @@ exports.createUsage = async (req, res) => {
           if (e.stock < e.actual) {
             accessoryItemsError.push(e)
           } else if (e.stock > e.actual) {
-            let min = e.stock - e.actual
+            const result = await Stock.find({ _id: e.item_id, relatedBranch: relatedBranch })
+            const from = result[0].fromUnit
+            const to = result[0].toUnit
+            let totalUnit = (to * e.actual) / from
             try {
               accessoryItemsFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
-                { totalUnit: min },
+                { totalUnit: totalUnit },
                 { new: true },
               )
 
@@ -250,12 +256,15 @@ exports.createUsage = async (req, res) => {
           if (e.stock < e.actual) {
             machineError.push(e)
           } else if (e.stock > e.actual) {
-            let min = e.stock - e.actual
+            const result = await Stock.find({ _id: e.item_id, relatedBranch: relatedBranch })
+            const from = result[0].fromUnit
+            const to = result[0].toUnit
+            let totalUnit = (to * e.actual) / from
             try {
               machineFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
-                { totalUnit: min },
+                { totalUnit: totalUnit },
                 { new: true },
               )
 
@@ -324,12 +333,15 @@ exports.createUsage = async (req, res) => {
           if (e.stock < e.actual) {
             procedureItemsError.push(e)
           } else if (e.stock > e.actual) {
-            let min = e.stock - e.actual
+            const result = await Stock.find({ _id: e.item_id, relatedBranch: relatedBranch })
+            const from = result[0].fromUnit
+            const to = result[0].toUnit
+            let totalUnit = (to * e.actual) / from
             try {
               procedureItemsFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
-                { totalUnit: min },
+                { totalUnit: totalUnit },
                 { new: true },
               )
 
@@ -358,12 +370,15 @@ exports.createUsage = async (req, res) => {
           if (e.stock < e.actual) {
             accessoryItemsError.push(e)
           } else if (e.stock > e.actual) {
-            let min = e.stock - e.actual
+            const result = await Stock.find({ _id: e.item_id, relatedBranch: relatedBranch })
+            const from = result[0].fromUnit
+            const to = result[0].toUnit
+            let totalUnit = (to * e.actual) / from
             try {
               accessoryItemsFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
-                { totalUnit: min },
+                { totalUnit: totalUnit },
                 { new: true },
               )
 
@@ -392,12 +407,15 @@ exports.createUsage = async (req, res) => {
           if (e.stock < e.actual) {
             machineError.push(e)
           } else if (e.stock > e.actual) {
-            let min = e.stock - e.actual
+            const result = await Stock.find({ _id: e.item_id, relatedBranch: relatedBranch })
+            const from = result[0].fromUnit
+            const to = result[0].toUnit
+            let totalUnit = (to * e.actual) / from
             try {
               machineFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { _id: e.item_id, relatedBranch: relatedBranch },
-                { totalUnit: min },
+                { totalUnit: totalUnit },
                 { new: true },
               )
 
@@ -449,39 +467,6 @@ exports.createUsage = async (req, res) => {
         procedureItemsError: procedureItemsError,
         accessoryItemsError: accessoryItemsError
       })
-      // var usageRecordResult = await UsageRecords.findOneAndUpdate(
-      //   { relatedUsage: appResult[0].relatedUsage },
-      //   {
-      //     $addToSet: {
-      //       procedureMedicine: {
-      //         $each: procedureItemsFinished,
-      //         $elemMatch: { item_id: { $ne: { $each: procedureItemsFinished.map(obj => obj.item_id) } } }
-      //       },
-      //       newPA: {
-      //         $each: accessoryItemsFinished,
-      //         $elemMatch: { item_id: { $ne: { $each: accessoryItemsFinished.map(obj => obj.item_id) } } }
-      //       },
-      //       machine: {
-      //         $each: machineFinished,
-      //         $elemMatch: { item_id: { $ne: { $each: machineFinished.map(obj => obj.item_id) } } }
-      //       },
-      //       machineError: {
-      //         $each: machineError,
-      //         $elemMatch: { item_id: { $ne: { $each: machineError.map(obj => obj.item_id) } } }
-      //       },
-      //       procedureItemsError: {
-      //         $each: procedureItemsError,
-      //         $elemMatch: { item_id: { $ne: { $each: procedureItemsError.map(obj => obj.item_id) } } }
-      //       },
-      //       accessoryItemsError: {
-      //         $each: accessoryItemsError,
-      //         $elemMatch: { item_id: { $ne: { $each: accessoryItemsError.map(obj => obj.item_id) } } }
-      //       },
-      //     },
-      //     usageStatus: status,
-      //   },
-      //   { new: true }
-      // )
     }
     //error handling
     let response = { success: true }

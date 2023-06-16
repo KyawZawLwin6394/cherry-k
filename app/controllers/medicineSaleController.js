@@ -247,12 +247,10 @@ exports.createMedicineSaleTransaction = async (req, res, next) => {
             medicineItemError.push(e);
           }
           const logResult = await Log.create({
-            "relatedTreatmentSelection": relatedTreatmentSelection,
-            "relatedAppointment": relatedAppointment,
             "relatedProcedureItems": e.item_id,
             "currentQty": e.stock,
             "actualQty": e.quantity,
-            "finalQty": min,
+            "finalQty": totalUnit,
             "relatedBranch": relatedBranch,
             "type": "Medicine Sale",
             "createdBy": createdBy
