@@ -207,3 +207,12 @@ exports.checkReorder = async (req, res) => {
     }
 };
 
+exports.stockRecieved = async (req, res) => {
+    const { item_id, relatedBranch, recievedQty } = req.body
+    const result = await Stock.findOneAndUpdate(
+        { _id: item_id, relatedBranch: relatedBranch },
+        {
+
+        }
+    )
+}

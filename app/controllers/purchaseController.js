@@ -108,7 +108,7 @@ exports.createPurchase = async (req, res, next) => {
             "type": "Credit",
             "relatedTransaction": null,
             "relatedAccounting": "646733d659a9bc811d97efa9", //Opening Stock
-            "relatedBranch": newBody.relatedBranch
+            "relatedBranch":relatedBranch
         })
         res.status(200).send({
             message: 'Purchase create success',
