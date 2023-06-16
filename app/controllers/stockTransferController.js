@@ -200,7 +200,7 @@ exports.createStockTransfer = async (req, res, next) => {
           medicineListsError.push(e)
         } else if (e.stockQty > e.transferQty) {
           let currentQty = e.stockQty - e.transferQty //both must be currentQty
-          const result = await ProcedureMedicine.find({ _id: e.item_id })
+          const result = await MedicineLists.find({ _id: e.item_id })
           const from = result[0].fromUnit
           const to = result[0].toUnit
           let totalUnit = (to * currentQty) / from
@@ -234,11 +234,11 @@ exports.createStockTransfer = async (req, res, next) => {
         if (e.stockQty < e.transferQty) {
           procedureAccessoryError.push(e)
         } else if (e.stockQty > e.transferQty) {
+          let currentQty = e.stockQty - e.transferQty //both must be currentQty
           const result = await ProcedureAccessory.find({ _id: e.item_id })
           const from = result[0].fromUnit
           const to = result[0].toUnit
-          const totalUnit = result[0].totalUnit
-          let currentQuantity = (from * totalUnit) / to
+          let totalUnit = (to * currentQty) / from
           try {
             procedureAccessoryFinished.push(e)
             // const stockResult = await Stock.findOneAndUpdate(
@@ -247,7 +247,7 @@ exports.createStockTransfer = async (req, res, next) => {
             // )
             const mainResult = await ProcedureAccessory.findOneAndUpdate(
               { _id: e.item_id },
-              { $inc: { currentQuantity: -currentQuantity } }
+              { currentQuantity: currentQty, totalUnit: totalUnit }
             )
             const logResult = await Log.create({
               "relatedAccessoryItems": e.item_id,
