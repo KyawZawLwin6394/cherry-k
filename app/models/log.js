@@ -29,6 +29,10 @@ let LogSchema = new Schema({
     finalQty: {
         type: Number,
     },
+    relatedStock: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Stocks'
+    },
     relatedProcedureItems: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ProcedureItems'

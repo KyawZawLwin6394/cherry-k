@@ -208,11 +208,26 @@ exports.checkReorder = async (req, res) => {
 };
 
 exports.stockRecieved = async (req, res) => {
-    const { item_id, relatedBranch, recievedQty } = req.body
-    const result = await Stock.findOneAndUpdate(
-        { _id: item_id, relatedBranch: relatedBranch },
-        {
-
-        }
-    )
+    try {
+        const { stock_id, relatedBranch, recievedQty } = req.body
+        const result = await Stock.findOneAndUpdate(
+            { _id: stock_id, relatedBranch: relatedBranch },
+            {
+                currentQty: recievedQty
+            },
+            { new: true }
+        ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+        const logResult = await Log.create({
+            "relatedStock": stock_id,
+            "currentQty": e.stock,
+            "actualQty": e.actual,
+            "finalQty": min,
+            "type": "Stock Transfer",
+            "relatedBranch": relatedBranch,
+            "createdBy": createdBy
+        })
+        return res.status(200).send({ success: true, data: result })
+    } catch (error) {
+        return res.status(500).send({ error: true, message: error.message })
+    }
 }

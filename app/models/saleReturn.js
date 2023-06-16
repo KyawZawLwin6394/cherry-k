@@ -35,6 +35,9 @@ let SaleReturnSchema = new Schema({
         type: String,
         enum: ['Full Cash', 'SubTreatment']
     },
+    cashBack: {
+        type: Number
+    },
     relatedSubTreatment: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'TreatmentSelections'
@@ -48,9 +51,9 @@ let SaleReturnSchema = new Schema({
         type: Date,
         default: Date.now()
     },
-    relatedBranch:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Branches'
+    relatedBranch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branches'
     }
 });
 
