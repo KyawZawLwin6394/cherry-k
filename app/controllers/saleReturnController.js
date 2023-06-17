@@ -49,8 +49,15 @@ exports.getSaleReturn = async (req, res) => {
 
 exports.createSaleReturn = async (req, res, next) => {
     let newBody = req.body;
-    let { relatedTreatmentSelection, relatedSubTreatment } = req.body;
+    let { relatedTreatmentSelection, relatedSubTreatment, returnType } = req.body;
     try {
+        if (returnType === 'Full Cash' && relatedTreatmentSelection) {
+            var selecUpdate = await TreatmentSelection.findOneAndUpdate(
+                { _id: relatedTreatmentSelection },
+                { saleReturnFlag: true },
+                { new: true }
+            )
+        }
         const newSaleReturn = new SaleReturn(newBody);
         const result = await newSaleReturn.save();
         if (relatedTreatmentSelection && relatedSubTreatment) {
