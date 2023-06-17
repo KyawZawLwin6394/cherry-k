@@ -61,8 +61,8 @@ exports.createSaleReturn = async (req, res, next) => {
         const newSaleReturn = new SaleReturn(newBody);
         const result = await newSaleReturn.save();
         if (relatedTreatmentSelection && relatedSubTreatment) {
-            var selecUpdate = await TreatmentSelection.updateMany(
-                { _id: { $in: [relatedTreatmentSelection, relatedSubTreatment] } },
+            var selecUpdate = await TreatmentSelection.findOneAndUpdate(
+                { _id: relatedTreatmentSelection },
                 { saleReturnFlag: true },
                 { new: true }
             );

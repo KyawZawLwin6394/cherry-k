@@ -98,7 +98,6 @@ exports.getTotalWithDateFilter = async (req, res) => {
         const currentDate = new Date();
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
-
         // let { weekName, monthName } = req.body;
         // Determine the start and end dates based on the weekName
         if (weekName) {
@@ -137,19 +136,15 @@ exports.getTotalWithDateFilter = async (req, res) => {
         if (start && end) {
             query.createdAt = { $gte: start, $lte: end }
             exquery.date = { $gte: start, $lte: end }
-            console.log('here1')
         }
         else if (weekName) {
             query.createdAt = { $gte: startDate, $lte: endDate }
             exquery.date = { $gte: startDate, $lte: endDate }
-            console.log('here2')
         }
         else if (monthName) {
             query.createdAt = { $gte: startedDate, $lte: endedDate }
             exquery.date = { $gte: startedDate, $lte: endedDate }
-            console.log('here3')
         }
-        console.log(query, exquery)
 
 
         const MedicineSaleResult = await MedicineSale.find(query).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment').populate({
@@ -176,7 +171,6 @@ exports.getTotalWithDateFilter = async (req, res) => {
             let ans = current * sale.finalAmount
             return total + ans
         }, 0);
-        console.log(exTotalAmount)
         const inTotalAmount = IncomeResult.reduce((total, sale) => {
             let cur = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
             let ans = cur * sale.finalAmount
