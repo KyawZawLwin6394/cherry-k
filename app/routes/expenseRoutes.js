@@ -18,4 +18,5 @@ module.exports = (app) => {
 
     app.route('/api/expenses').get(verifyToken, catchError(expense.listAllExpenses))
     app.route('/api/expenses/get-date').get(verifyToken, catchError(expense.getwithExactDate))
+    app.route('/api/expenses/filter').get(verifyToken, catchError(expense.expenseFilter))
 };

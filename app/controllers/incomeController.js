@@ -210,3 +210,43 @@ exports.getwithExactDate = async (req, res) => {
 
   }
 }
+
+exports.incomeFilter = async (req, res) => {
+  let query = { relatedBankAccount: { $exists: true } }
+  try {
+    const { start, end, relatedBranch, createdBy } = req.query
+    if (start && end) query.date = { $gte: start, $lt: end }
+    if (relatedBranch) query.relatedBranch = relatedBranch
+    if (createdBy) query.createdBy = createdBy
+    const bankResult = await Income.find(query).populate('relatedBankAccount')
+    const { relatedBankAccount, ...query2 } = query;
+    query2.relatedCashAccount = { $exists: true };
+    const cashResult = await Income.find(query2).populate('relatedCashAccount')
+    const BankNames = bankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
+      const { name } = relatedBankAccount;
+      result[name] = (result[name] || 0) + finalAmount;
+      return result;
+    }, {});
+    const CashNames = cashResult.reduce((result, { relatedCashAccount, finalAmount }) => {
+      const { name } = relatedCashAccount;
+      result[name] = (result[name] || 0) + finalAmount;
+      return result;
+    }, {});
+    const BankTotal = bankResult.reduce((total, sale) => total + sale.finalAmount, 0);
+    const CashTotal = cashResult.reduce((total, sale) => total + sale.finalAmount, 0);
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        BankList: bankResult,
+        CashList: cashResult,
+        BankNames: BankNames,
+        CashNames: CashNames,
+        BankTotal: BankTotal,
+        CashTotal: CashTotal
+      }
+    });
+  } catch (error) {
+    return res.status(500).send({ error: true, message: error.message })
+  }
+}

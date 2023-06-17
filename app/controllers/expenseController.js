@@ -2,6 +2,7 @@
 const Expense = require('../models/expense');
 const Transaction = require('../models/transaction');
 const Accounting = require('../models/accountingList');
+const expense = require('../models/expense');
 
 exports.listAllExpenses = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -49,7 +50,10 @@ exports.getExpense = async (req, res) => {
 
 exports.createExpense = async (req, res, next) => {
     try {
-        const newBody = req.body;
+
+        let newBody = req.body;
+        newBody = { ...newBody, createdBy: req.credentials.id }
+        console.log(newBody)
         const newExpense = new Expense(newBody);
         const result = await newExpense.save();
         const populatedResult = await Expense.find({ _id: result._id }).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
@@ -201,6 +205,48 @@ exports.getwithExactDate = async (req, res) => {
         let result = await Expense.find({ date: date }).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
         if (result.length === 0) return res.status(404).send({ error: true, message: 'Not Found!' })
         return res.status(200).send({ success: true, data: result })
+    } catch (error) {
+        return res.status(500).send({ error: true, message: error.message })
+    }
+}
+
+exports.expenseFilter = async (req, res) => {
+    let query = { relatedBankAccount: { $exists: true } }
+    try {
+        const { start, end, relatedBranch, createdBy } = req.query
+        if (start && end) query.date = { $gte: start, $lt: end }
+        if (relatedBranch) query.relatedBranch = relatedBranch
+        if (createdBy) query.createdBy = createdBy
+        const bankResult = await Expense.find(query).populate('relatedBankAccount')
+        const { relatedBankAccount, ...query2 } = query;
+        query2.relatedCashAccount = { $exists: true };
+        console.log(query2)
+        const cashResult = await Expense.find(query2).populate('relatedCashAccount')
+        const BankNames = bankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
+            const { name } = relatedBankAccount;
+            result[name] = (result[name] || 0) + finalAmount;
+            return result;
+        }, {});
+        const CashNames = cashResult.reduce((result, { relatedCashAccount, finalAmount }) => {
+            const { name } = relatedCashAccount;
+            result[name] = (result[name] || 0) + finalAmount;
+            return result;
+        }, {});
+        const BankTotal = bankResult.reduce((total, sale) => total + sale.finalAmount, 0);
+        const CashTotal = cashResult.reduce((total, sale) => total + sale.finalAmount, 0);
+        console.log(BankNames)
+
+        return res.status(200).send({
+            success: true,
+            data: {
+                BankList: bankResult,
+                CashList: cashResult,
+                BankNames: BankNames,
+                CashNames: CashNames,
+                BankTotal: BankTotal,
+                CashTotal: CashTotal
+            }
+        });
     } catch (error) {
         return res.status(500).send({ error: true, message: error.message })
     }
