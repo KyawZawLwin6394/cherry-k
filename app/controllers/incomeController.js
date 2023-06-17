@@ -50,7 +50,8 @@ exports.getIncome = async (req, res) => {
 
 exports.createIncome = async (req, res, next) => {
   try {
-    const newBody = req.body;
+    let newBody = req.body;
+    newBody = { ...newBody, createdBy: req.credentials.id }
     const newIncome = new Income(newBody);
     const result = await newIncome.save();
     const populatedResult = await Income.find({ _id: result._id }).populate('relatedBranch').populate('relatedAccounting').populate('relatedBankAccount').populate('relatedCashAccount')
