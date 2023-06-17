@@ -173,32 +173,29 @@ exports.createUsage = async (req, res) => {
   try {
     if (relatedBranch === undefined) return res.status(404).send({ error: true, message: 'Branch ID is required' })
     const appResult = await Appointment.find({ _id: req.body.relatedAppointment })
-    console.log(appResult[0].relatedUsage)
     let status;
     if (appResult[0].relatedUsage === undefined) {
 
       if (procedureMedicine !== undefined) {
-        console.log('here')
-        procedureMedicine.map(async (e, i) => {
+        for (const e of procedureMedicine) {
           if (e.stock < e.actual) {
-            procedureItemsError.push(e)
+            procedureItemsError.push(e);
           } else if (e.stock > e.actual) {
-            let totalUnit = e.stock - e.actual
-            const result = await Stock.find({ relatedProcedureItems: e.item_id, relatedBranch: relatedBranch })
-            const from = result[0].fromUnit
-            const to = result[0].toUnit
-            const currentQty = (from * totalUnit) / to
+            let totalUnit = e.stock - e.actual;
+            const result = await Stock.find({ relatedProcedureItems: e.item_id, relatedBranch: relatedBranch });
+            const from = result[0].fromUnit;
+            const to = result[0].toUnit;
+            const currentQty = (from * totalUnit) / to;
             try {
-              procedureItemsFinished.push(e)
               const result = await Stock.findOneAndUpdate(
                 { relatedProcedureItems: e.item_id, relatedBranch: relatedBranch },
-                { totalUnit: min, currentQty: currentQty },
-                { new: true },
-              )
-
+                { totalUnit: totalUnit, currentQty: currentQty },
+                { new: true }
+              );
             } catch (error) {
               procedureItemsError.push(e);
             }
+            procedureItemsFinished.push(e);
             const logResult = await Log.create({
               "relatedTreatmentSelection": relatedTreatmentSelection,
               "relatedAppointment": relatedAppointment,
@@ -209,15 +206,17 @@ exports.createUsage = async (req, res) => {
               "relatedBranch": relatedBranch,
               "type": "Usage",
               "createdBy": createdBy
-            })
+            });
           }
-        })
+        }
       }
+
+
 
       //procedureAccessory
 
       if (procedureAccessory !== undefined) {
-        procedureAccessory.map(async (e, i) => {
+        for (const e of procedureAccessory) {
           if (e.stock < e.actual) {
             accessoryItemsError.push(e)
           } else if (e.stock > e.actual) {
@@ -249,13 +248,13 @@ exports.createUsage = async (req, res) => {
               "createdBy": createdBy
             })
           }
-        })
+        }
       }
 
       //machine
 
       if (machine !== undefined) {
-        machine.map(async (e, i) => {
+        for (const e of machine) {
           if (e.stock < e.actual) {
             machineError.push(e)
           } else if (e.stock > e.actual) {
@@ -287,10 +286,9 @@ exports.createUsage = async (req, res) => {
               "createdBy": createdBy
             })
           }
-        })
+        }
       }
       //usage create
-
       if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
       if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
       req.body = { ...req.body, machineError: machineError, usageStatus: status, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError, procedureAccessory: accessoryItemsFinished, procedureMedicine: procedureItemsFinished, machine: machineFinished }
@@ -333,7 +331,7 @@ exports.createUsage = async (req, res) => {
       });
 
       if (newPM.length > 0) {
-        newPM.map(async (e, i) => {
+        for (const e of newPM) {
           if (e.stock < e.actual) {
             procedureItemsError.push(e)
           } else if (e.stock > e.actual) {
@@ -365,13 +363,13 @@ exports.createUsage = async (req, res) => {
               "createdBy": createdBy
             })
           }
-        })
+        }
       }
 
       //procedureAccessory
 
       if (newPA !== undefined) {
-        newPA.map(async (e, i) => {
+        for (const e of newPA) {
           if (e.stock < e.actual) {
             accessoryItemsError.push(e)
           } else if (e.stock > e.actual) {
@@ -403,13 +401,13 @@ exports.createUsage = async (req, res) => {
               "createdBy": createdBy
             })
           }
-        })
+        }
       }
 
       //machine
 
       if (newMachine !== undefined) {
-        newMachine.map(async (e, i) => {
+        for (const e of newMachine) {
           if (e.stock < e.actual) {
             machineError.push(e)
           } else if (e.stock > e.actual) {
@@ -441,12 +439,11 @@ exports.createUsage = async (req, res) => {
               "createdBy": createdBy
             })
           }
-        })
+        }
       }
       req.body = { ...req.body, machineError: machineError, procedureItemsError: procedureItemsError, accessoryItemsError: accessoryItemsError }
       if (machineError.length > 0 || procedureItemsError.length > 0 || accessoryItemsError.length > 0) status = 'In Progress'
       if (machineError.length === 0 && procedureItemsError.length === 0 && accessoryItemsError.length === 0) status = 'Finished'
-      console.log('finished', accessoryItemsFinished, procedureItemsFinished, machineFinished)
       var usageUpdate = await Usage.findOneAndUpdate(
         { _id: appResult[0].relatedUsage },
         {
