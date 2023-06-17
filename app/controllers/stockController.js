@@ -187,6 +187,9 @@ exports.checkReorder = async (req, res) => {
         const projection = { _id: 0, relatedBranch: 0 };
 
         const items = await Stock.find(query, projection)
+            .populate('relatedProcedureItems')
+            .populate('relatedAccessoryItems')
+            .populate('relatedMedicineItems')
             .lean()
             .exec();
 
@@ -210,14 +213,35 @@ exports.checkReorder = async (req, res) => {
 exports.stockRecieved = async (req, res) => {
     try {
         let createdBy = req.credentials.id
-        const { stock_id, relatedBranch, recievedQty, currentQty, actual } = req.body
-        const result = await Stock.findOneAndUpdate(
-            { _id: stock_id, relatedBranch: relatedBranch },
-            {
-                currentQty: recievedQty
-            },
-            { new: true }
-        ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+        const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, currentQty, actual } = req.body
+        if (procedureItemID) {
+            var result = await Stock.findOneAndUpdate(
+                { relatedProcedureItems: stock_id, relatedBranch: relatedBranch },
+                {
+                    currentQty: recievedQty
+                },
+                { new: true }
+            ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+        }
+        if (medicineItemID) {
+            var result = await Stock.findOneAndUpdate(
+                { relatedMedicineItems: stock_id, relatedBranch: relatedBranch },
+                {
+                    currentQty: recievedQty
+                },
+                { new: true }
+            ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+        }
+        if (accessoryItemID) {
+            var result = await Stock.findOneAndUpdate(
+                { relatedAccessoryItems: stock_id, relatedBranch: relatedBranch },
+                {
+                    currentQty: recievedQty
+                },
+                { new: true }
+            ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+        }
+
         const logResult = await Log.create({
             "relatedStock": stock_id,
             "currentQty": currentQty,

@@ -161,11 +161,6 @@ exports.createTreatmentSelection = async (req, res, next) => {
         )
 
         data = { ...data, relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments, createdBy: createdBy, relatedBranch: req.mongoQuery.relatedBranch }
-
-        if (data.paidAmount) {
-            data = { ...data, leftOverAmount: data.totalAmount - data.paidAmount } // leftOverAmount Calculation
-        }
-        if (data.paidAmount === 0) data = { ...data, leftOverAmount: data.totalAmount }
         console.log(data, 'data1')
         //first transaction 
         if (req.body.paymentMethod === 'Cash Down') {
