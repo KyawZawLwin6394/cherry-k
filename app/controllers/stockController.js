@@ -153,62 +153,62 @@ exports.copyStock = async (req, res) => {
     }
 }
 
-// exports.checkReorder = async (req, res) => {
-//     try {
-//         let { relatedBranch } = req.query
-//         const PIquery = { relatedProcedureItems: { $exists: true }, relatedBranch: relatedBranch };
-//         const MIquery = { relatedMedicineItems: { $exists: true }, relatedBranch: relatedBranch };
-//         const AIquery = { relatedAccessoryItems: { $exists: true }, relatedBranch: relatedBranch };
-//         const relatedProcedureItems = await Stock.find(PIquery)
-//         const relatedAccessoryItems = await Stock.find(AIquery)
-//         const relatedMedicineItems = await Stock.find(MIquery)
-//         const ProcedureItems = relatedProcedureItems.filter(item => item.currentQty <= item.reOrderQuantity);
-//         const AccessoryItems = relatedAccessoryItems.filter(item => item.currentQty <= item.reOrderQuantity);
-//         const MedicineItems = relatedMedicineItems.filter(item => item.currentQty <= item.reOrderQuantity);
-
-//         return res.status(200).send({
-//             success: true, data: {
-//                 ProcedureItems: ProcedureItems,
-//                 AccessoryItems: AccessoryItems,
-//                 MedicineItems: MedicineItems
-//             },
-//         })
-//     } catch (error) {
-//         return res.status(500).send({ error: true, message: error.message })
-//     }
-// }
-
-
 exports.checkReorder = async (req, res) => {
     try {
-        const { relatedBranch } = req.query;
-
-        const query = { relatedBranch };
-        const projection = { _id: 0, relatedBranch: 0 };
-
-        const items = await Stock.find(query, projection)
-            .populate('relatedProcedureItems')
-            .populate('relatedAccessoryItems')
-            .populate('relatedMedicineItems')
-            .lean()
-            .exec();
-
-        const ProcedureItems = items.filter(item => item.relatedProcedureItems && item.totalUnit <= item.reOrderQuantity);
-        const AccessoryItems = items.filter(item => item.relatedAccessoryItems && item.totalUnit <= item.reOrderQuantity);
-        const MedicineItems = items.filter(item => item.relatedMedicineItems && item.totalUnit <= item.reOrderQuantity);
+        let { relatedBranch } = req.query
+        const PIquery = { relatedProcedureItems: { $exists: true }, relatedBranch: relatedBranch };
+        const MIquery = { relatedMedicineItems: { $exists: true }, relatedBranch: relatedBranch };
+        const AIquery = { relatedAccessoryItems: { $exists: true }, relatedBranch: relatedBranch };
+        const relatedProcedureItems = await Stock.find(PIquery).populate('relatedProcedureItems')
+        const relatedAccessoryItems = await Stock.find(AIquery).populate('relatedAccessoryItems')
+        const relatedMedicineItems = await Stock.find(MIquery).populate('relatedMedicineItems')
+        const ProcedureItems = relatedProcedureItems.filter(item => item.currentQty <= item.reOrderQuantity);
+        const AccessoryItems = relatedAccessoryItems.filter(item => item.currentQty <= item.reOrderQuantity);
+        const MedicineItems = relatedMedicineItems.filter(item => item.currentQty <= item.reOrderQuantity);
 
         return res.status(200).send({
-            success: true,
-            data: {
-                ProcedureItems,
-                AccessoryItems,
-                MedicineItems
-            }
-        });
+            success: true, data: {
+                ProcedureItems: ProcedureItems,
+                AccessoryItems: AccessoryItems,
+                MedicineItems: MedicineItems
+            },
+        })
     } catch (error) {
-        return res.status(500).send({ error: true, message: error.message });
+        return res.status(500).send({ error: true, message: error.message })
     }
-};
+}
+
+
+// exports.checkReorder = async (req, res) => {
+//     try {
+//         const { relatedBranch } = req.query;
+
+//         const query = { relatedBranch };
+//         const projection = { _id: 0, relatedBranch: 0 };
+
+//         const items = await Stock.find(query, projection)
+//             .populate('relatedProcedureItems')
+//             .populate('relatedAccessoryItems')
+//             .populate('relatedMedicineItems')
+//             .lean()
+//             .exec();
+
+//         const ProcedureItems = items.filter(item => item.relatedProcedureItems && item.totalUnit <= item.reOrderQuantity);
+//         const AccessoryItems = items.filter(item => item.relatedAccessoryItems && item.totalUnit <= item.reOrderQuantity);
+//         const MedicineItems = items.filter(item => item.relatedMedicineItems && item.totalUnit <= item.reOrderQuantity);
+
+//         return res.status(200).send({
+//             success: true,
+//             data: {
+//                 ProcedureItems,
+//                 AccessoryItems,
+//                 MedicineItems
+//             }
+//         });
+//     } catch (error) {
+//         return res.status(500).send({ error: true, message: error.message });
+//     }
+// };
 
 exports.stockRecieved = async (req, res) => {
     try {
