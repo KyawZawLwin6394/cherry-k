@@ -211,10 +211,10 @@ exports.TreatmentVoucherFilter = async (req, res) => {
         if (start && end) query.date = { $gte: start, $lt: end }
         if (relatedBranch) query.relatedBranch = relatedBranch
         if (createdBy) query.createdBy = createdBy
-        const bankResult = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedBranch relatedAccounting payment')
+        const bankResult = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedBranch relatedAccounting payment createdBy')
         const { relatedBank, ...query2 } = query;
         query2.relatedCash = { $exists: true };
-        const cashResult = await TreatmentVoucher.find(query2).populate('relatedTreatment relatedAppointment relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedBranch relatedAccounting payment')
+        const cashResult = await TreatmentVoucher.find(query2).populate('relatedTreatment relatedAppointment relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedBranch relatedAccounting payment createdBy')
         const BankNames = bankResult.reduce((result, { relatedBank, amount }) => {
             const { name } = relatedBank;
             result[name] = (result[name] || 0) + amount;
