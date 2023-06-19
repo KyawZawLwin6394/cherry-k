@@ -47,12 +47,21 @@ exports.createStock = async (req, res, next) => {
 
 exports.updateStock = async (req, res, next) => {
     try {
+        const getResult = await Stock.find({ _id: req.body.id })
         const result = await Stock.findOneAndUpdate(
             { _id: req.body.id },
             req.body,
             { new: true },
         ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
-        return res.status(200).send({ success: true, data: result });
+        const logResult = await Log.create({
+            "relatedStock": req.body.id,
+            "currentQty": getResult[0].totalUnit,
+            "finalQty": req.body.totalUnit,
+            "type": "Stock Update",
+            "relatedBranch": req.mongoQuery.relatedBranch,
+            "createdBy": req.credentials.id
+        })
+        return res.status(200).send({ success: true, data: result, log: logResult });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
     }

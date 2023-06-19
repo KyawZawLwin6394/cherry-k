@@ -2,6 +2,7 @@
 const ProcedureItem = require('../models/procedureItem')
 const Branch = require('../models/branch');
 const Stock = require('../models/stock');
+const Log = require('../models/log');
 
 exports.listAllProcedureItems = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -68,7 +69,7 @@ exports.createProcedureItem = async (req, res, next) => {
         "fromUnit": 0,
         "toUnit": 0,
         "reorderQty": 0,
-        "relatedBranch":getAllBranches[i]._id //branch_id
+        "relatedBranch": getAllBranches[i]._id //branch_id
       })
     }
     res.status(200).send({
@@ -83,12 +84,21 @@ exports.createProcedureItem = async (req, res, next) => {
 
 exports.updateProcedureItem = async (req, res, next) => {
   try {
+    const getResult = await ProcedureItem.find({ _id: req.body.id })
     const result = await ProcedureItem.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
       { new: true },
     ).populate('name');
-    return res.status(200).send({ success: true, data: result });
+    const logResult = await Log.create({
+      "relatedProcedureItems": req.body.id,
+      "currentQty": getResult[0].totalUnit,
+      "finalQty": req.body.totalUnit,
+      "type": "Stock Update",
+      "relatedBranch": req.mongoQuery.relatedBranch,
+      "createdBy": req.credentials.id
+    })
+    return res.status(200).send({ success: true, data: result, log: logResult });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
   }

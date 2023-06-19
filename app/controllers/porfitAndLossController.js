@@ -87,9 +87,11 @@ exports.getTotal = async (req, res) => {
 
 exports.getTotalWithDateFilter = async (req, res) => {
     try {
-        let { start, end, weekName, monthName } = req.query
+        let { start, end, weekName, monthName, createdBy } = req.query
         let query = { ...req.mongoQuery }
         let exquery = { ...req.mongoQuery }
+        let filterQuery = { relatedBankAccount: { $exists: true } }
+        let filterQuery2 = { relatedBank: { $exists: true } }
         let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         let startDate, endDate;
 
@@ -136,16 +138,121 @@ exports.getTotalWithDateFilter = async (req, res) => {
         if (start && end) {
             query.createdAt = { $gte: start, $lte: end }
             exquery.date = { $gte: start, $lte: end }
+            filterQuery2.date = { $gte: start, $lt: end }
+            filterQuery.date = { $gte: start, $lt: end }
         }
         else if (weekName) {
             query.createdAt = { $gte: startDate, $lte: endDate }
             exquery.date = { $gte: startDate, $lte: endDate }
+            filterQuery2.date = { $gte: startDate, $lt: endDate }
+            filterQuery.date = { $gte: startDate, $lt: endDate }
         }
         else if (monthName) {
             query.createdAt = { $gte: startedDate, $lte: endedDate }
             exquery.date = { $gte: startedDate, $lte: endedDate }
+            filterQuery2.date = { $gte: startedDate, $lt: endedDate }
+            filterQuery.date = { $gte: startedDate, $lt: endedDate }
+        }
+        if (createdBy) {
+            filterQuery2.createdBy = createdBy
+            filterQuery.createdBy = createdBy
         }
 
+        const msFilterBankResult = await MedicineSale.find(filterQuery2).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment relatedBank relatedCash').populate({
+            path: 'relatedTransaction',
+            populate: [{
+                path: 'relatedAccounting',
+                model: 'AccountingLists'
+            }, {
+                path: 'relatedBank',
+                model: 'AccountingLists'
+            }, {
+                path: 'relatedCash',
+                model: 'AccountingLists'
+            }]
+        });
+        const tvFilterBankResult = await TreatmentVoucher.find(filterQuery2).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
+        const incomeFilterBankResult = await Income.find(filterQuery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+        const expenseFilterBankResult = await Expense.find(filterQuery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+
+        const { relatedBankAccount, ...filterQuerys } = filterQuery;
+        filterQuerys.relatedCashAccount = { $exists: true };
+
+        const { relatedBank, ...filterQuery3 } = filterQuery2;
+        filterQuery3.relatedCash = { $exists: true };
+
+        const msFilterCashResult = await MedicineSale.find(filterQuery3).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment relatedBank relatedCash').populate({
+            path: 'relatedTransaction',
+            populate: [{
+                path: 'relatedAccounting',
+                model: 'AccountingLists'
+            }, {
+                path: 'relatedBank',
+                model: 'AccountingLists'
+            }, {
+                path: 'relatedCash',
+                model: 'AccountingLists'
+            }]
+        });
+        const tvFilterCashResult = await TreatmentVoucher.find(filterQuery3).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
+        const incomeFilterCashResult = await Income.find(filterQuerys).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+        const expenseFilterCashResult = await Expense.find(filterQuerys).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+
+        //      Medicine Sale
+        const msBankNames = msFilterBankResult.reduce((result, { relatedBank, totalAmount }) => {
+            const { name } = relatedBank;
+            result[name] = (result[name] || 0) + totalAmount;
+            return result;
+        }, {});
+        const msCashNames = msFilterCashResult.reduce((result, { relatedCash, totalAmount }) => {
+            const { name } = relatedCash;
+            result[name] = (result[name] || 0) + totalAmount;
+            return result;
+        }, {});
+        const msBankTotal = msFilterBankResult.reduce((total, sale) => total + sale.totalAmount, 0);
+        const msCashTotal = msFilterCashResult.reduce((total, sale) => total + sale.totalAmount, 0);
+
+        //TreatmentVoucher
+        const tvBankNames = tvFilterBankResult.reduce((result, { relatedBank, amount }) => {
+            const { name } = relatedBank;
+            result[name] = (result[name] || 0) + amount;
+            return result;
+        }, {});
+        const tvCashNames = tvFilterCashResult.reduce((result, { relatedCash, amount }) => {
+            const { name } = relatedCash;
+            result[name] = (result[name] || 0) + amount;
+            return result;
+        }, {});
+        const tvBankTotal = tvFilterBankResult.reduce((total, sale) => total + sale.amount, 0);
+        const tvCashTotal = tvFilterCashResult.reduce((total, sale) => total + sale.amount, 0);
+
+        //Income
+        const incomeBankNames = incomeFilterBankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
+            const { name } = relatedBankAccount;
+            result[name] = (result[name] || 0) + finalAmount;
+            return result;
+        }, {});
+        const incomeCashNames = incomeFilterCashResult.reduce((result, { relatedCashAccount, finalAmount }) => {
+            const { name } = relatedCashAccount;
+            result[name] = (result[name] || 0) + finalAmount;
+            return result;
+        }, {});
+        const incomeBankTotal = incomeFilterBankResult.reduce((total, sale) => total + sale.finalAmount, 0);
+        const incomeCashTotal = incomeFilterCashResult.reduce((total, sale) => total + sale.finalAmount, 0);
+
+        //Expense
+        const expenseBankNames = expenseFilterBankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
+            const { name } = relatedBankAccount;
+            result[name] = (result[name] || 0) + finalAmount;
+            return result;
+        }, {});
+        const expenseCashNames = expenseFilterCashResult.reduce((result, { relatedCashAccount, finalAmount }) => {
+            const { name } = relatedCashAccount;
+            result[name] = (result[name] || 0) + finalAmount;
+            return result;
+        }, {});
+        const expenseBankTotal = expenseFilterBankResult.reduce((total, sale) => total + sale.finalAmount, 0);
+        const expenseCashTotal = expenseFilterCashResult.reduce((total, sale) => total + sale.finalAmount, 0);
 
         const MedicineSaleResult = await MedicineSale.find(query).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment').populate({
             path: 'relatedTransaction',
@@ -187,11 +294,52 @@ exports.getTotalWithDateFilter = async (req, res) => {
             return result;
         }, {});
 
-        // Printing the results
-        console.log(tvPaymentMethod);
-        console.log(msPaymentMethod);
+        return res.status(200).send({
+            succes: true,
+            income: {
+                bankResult: incomeFilterBankResult,
+                cashResult: incomeFilterCashResult,
+                BankNames: incomeBankNames,
+                CashNames: incomeCashNames,
+                BankTotal: incomeBankTotal,
+                CashTotal: incomeCashTotal
+            },
+            expense: {
+                bankResult: expenseFilterBankResult,
+                cashResult: expenseFilterCashResult,
+                BankNames: expenseBankNames,
+                CashNames: expenseCashNames,
+                BankTotal: expenseBankTotal,
+                CashTotal: expenseCashTotal
+            },
+            medicineSale: {
+                bankResult: msFilterBankResult,
+                cashResult: msFilterCashResult,
+                BankNames: msBankNames,
+                CashNames: msCashNames,
+                BankTotal: msBankTotal,
+                CashTotal: msCashTotal
+            },
 
-        return res.status(200).send({ succes: true, msPaymentMethod: msPaymentMethod, tvPaymentMethod: tvPaymentMethod, MedicineSaleResult: MedicineSaleResult, TreatmentVoucherResult: TreatmentVoucherResult, ExpenseResult: ExpenseResult, IncomeResult: IncomeResult, MSTotal: msTotalAmount, TVTotal: tvTotalAmount, expenseTotal: exTotalAmount, incomeTotal: inTotalAmount })
+            treatmentVoucher: {
+                bankResult: tvFilterBankResult,
+                cashResult: tvFilterCashResult,
+                BankNames: tvBankNames,
+                CashNames: tvCashNames,
+                BankTotal: tvBankTotal,
+                CashTotal: tvCashTotal
+            },
+            msPaymentMethod: msPaymentMethod,
+            tvPaymentMethod: tvPaymentMethod,
+            MedicineSaleResult: MedicineSaleResult,
+            TreatmentVoucherResult: TreatmentVoucherResult,
+            ExpenseResult: ExpenseResult,
+            IncomeResult: IncomeResult,
+            MSTotal: msTotalAmount,
+            TVTotal: tvTotalAmount,
+            expenseTotal: exTotalAmount,
+            incomeTotal: inTotalAmount
+        })
     } catch (error) {
         console.error(error);
         return res.status(500).send({ error: true, message: 'Internal Server Error!' });
