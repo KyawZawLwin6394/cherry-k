@@ -158,8 +158,9 @@ exports.getTotalWithDateFilter = async (req, res) => {
             filterQuery2.createdBy = createdBy
             filterQuery.createdBy = createdBy
         }
-
-        const COGS = await AccountingList.find({ code: { $gte: '6006', $lte: '6010' }, relatedBranch: req.query.relatedBranch }).populate('relatedType relatedHeader relatedTreatment relatedBank relatedBranch')
+        let cogsquery = { code: { $gte: '6006', $lte: '6010' }}
+        if (req.query.relatedBranch) cogsquery.relatedBranch = req.query.relatedBranch
+        const COGS = await AccountingList.find(cogsquery).populate('relatedType relatedHeader relatedTreatment relatedBank relatedBranch')
         const COGSTotal = COGS.reduce((total, sale) => total + sale.amount, 0);
 
         const msFilterBankResult = await MedicineSale.find(filterQuery2).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment relatedBank relatedCash').populate({
