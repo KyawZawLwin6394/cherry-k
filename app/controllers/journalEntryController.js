@@ -9,7 +9,7 @@ exports.getAllJournals = async (req, res) => {
     try {
         limit = +limit <= 100 ? +limit : 30; //limit
         skip = +skip || 0;
-        let query = { isDeleted: false },
+        let query = { isDeleted: false, JEFlag: true },
             regexKeyword;
         role ? (query['role'] = role.toUpperCase()) : '';
         keyword && /\w/.test(keyword)

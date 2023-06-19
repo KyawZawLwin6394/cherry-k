@@ -56,7 +56,7 @@ exports.updateStock = async (req, res, next) => {
         const logResult = await Log.create({
             "relatedStock": req.body.id,
             "currentQty": getResult[0].totalUnit,
-            "finalQty": req.body.totalUnit,
+            "finalQty": req.body.totalUnit,  
             "type": "Stock Update",
             "relatedBranch": req.mongoQuery.relatedBranch,
             "createdBy": req.credentials.id

@@ -5,6 +5,7 @@ const TreatmentVoucher = require('../models/treatmentVoucher');
 const Expense = require('../models/expense');
 const Income = require('../models/income');
 const Currency = require('../models/currency');
+const AccountingList = require('../models/accountingList');
 
 exports.getTotal = async (req, res) => {
     try {
@@ -157,6 +158,9 @@ exports.getTotalWithDateFilter = async (req, res) => {
             filterQuery2.createdBy = createdBy
             filterQuery.createdBy = createdBy
         }
+
+        const COGS = await AccountingList.find({ code: { $gte: '6006', $lte: '6010' } }).populate('relatedType relatedHeader relatedTreatment relatedBank relatedBranch')
+        const COGSTotal = COGS.reduce((total, sale) => total + sale.amount, 0);
 
         const msFilterBankResult = await MedicineSale.find(filterQuery2).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment relatedBank relatedCash').populate({
             path: 'relatedTransaction',
@@ -335,6 +339,8 @@ exports.getTotalWithDateFilter = async (req, res) => {
             TreatmentVoucherResult: TreatmentVoucherResult,
             ExpenseResult: ExpenseResult,
             IncomeResult: IncomeResult,
+            COGSResult: COGS,
+            COGSTotal: COGSTotal,
             MSTotal: msTotalAmount,
             TVTotal: tvTotalAmount,
             expenseTotal: exTotalAmount,
