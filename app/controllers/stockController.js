@@ -23,12 +23,43 @@ exports.listAllStocks = async (req, res) => {
 };
 
 exports.getStock = async (req, res) => {
-    let query = req.mongoQuery
-    if (req.params.id) query._id = req.params.id
-    const result = await Stock.find(query).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
-    if (!result)
-        return res.status(500).json({ error: true, message: 'No Record Found' });
-    return res.status(200).send({ success: true, data: result });
+    try {
+        let query = req.mongoQuery
+        if (req.params.id) query._id = req.params.id
+        const result = await Stock.find(query).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
+        if (!result)
+            return res.status(404).json({ error: true, message: 'No Record Found' });
+        return res.status(200).send({ success: true, data: result });
+    } catch (error) {
+        return res.status(500).send({ error: true, message: error.message })
+    }
+};
+
+exports.getStockByBranchID = async (req, res) => {
+    try {
+        console.log('here')
+        let procedurequery = { relatedProcedureItems: { $exists: true }, isDeleted: false }
+        let medicinequery = { relatedMedicineItems: { $exists: true }, isDeleted: false }
+        let accessoryquery = { relatedAccessoryItems: { $exists: true }, isDeleted: false }
+        procedurequery = { ...procedurequery, relatedBranch: req.query.relatedBranch }
+        medicinequery = { ...medicinequery, relatedBranch: req.query.relatedBranch }
+        accessoryquery = { ...accessoryquery, relatedBranch: req.query.relatedBranch }
+        console.log(procedurequery, medicinequery, accessoryquery)
+        const procedureResult = await Stock.find(procedurequery).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
+        const medicineResult = await Stock.find(medicinequery).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
+        const accessoryResult = await Stock.find(accessoryquery).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
+        return res.status(200).send({
+            success: true,
+            data: {
+                ProcedureItems: procedureResult,
+                MedicineItems: medicineResult,
+                AccessoryItems: accessoryResult
+            }
+        });
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send({ error: true, message: error.message })
+    }
 };
 
 exports.createStock = async (req, res, next) => {
@@ -56,7 +87,7 @@ exports.updateStock = async (req, res, next) => {
         const logResult = await Log.create({
             "relatedStock": req.body.id,
             "currentQty": getResult[0].totalUnit,
-            "finalQty": req.body.totalUnit,  
+            "finalQty": req.body.totalUnit,
             "type": "Stock Update",
             "relatedBranch": req.mongoQuery.relatedBranch,
             "createdBy": req.credentials.id
