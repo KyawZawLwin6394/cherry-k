@@ -5,6 +5,7 @@ const MedicineItems = require('../models/medicineItem');
 const AccessoryItems = require('../models/accessoryItem');
 const Branch = require('../models/branch');
 const Log = require('../models/log');
+const RecievedRecords = require('../models/recievedRecord');
 
 exports.listAllStocks = async (req, res) => {
     let query = req.mongoQuery
@@ -213,7 +214,7 @@ exports.checkReorder = async (req, res) => {
 exports.stockRecieved = async (req, res) => {
     try {
         let createdBy = req.credentials.id
-        const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, currentQty, actual } = req.body
+        const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, requestedQty } = req.body
         if (procedureItemID) {
             var result = await Stock.findOneAndUpdate(
                 { relatedProcedureItems: stock_id, relatedBranch: relatedBranch },
@@ -222,6 +223,14 @@ exports.stockRecieved = async (req, res) => {
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+            var RecievedRecordsResult = await RecievedRecords.create({
+                createdAt: Date.now(),
+                createdBy: createdBy,
+                relatedBranch: relatedBranch,
+                requestedQty: requestedQty,
+                recievedQty: recievedQty,
+                relatedProcedureItems: procedureItemID
+            })
         }
         if (medicineItemID) {
             var result = await Stock.findOneAndUpdate(
@@ -231,6 +240,14 @@ exports.stockRecieved = async (req, res) => {
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+            var RecievedRecordsResult = await RecievedRecords.create({
+                createdAt: Date.now(),
+                createdBy: createdBy,
+                relatedBranch: relatedBranch,
+                requestedQty: requestedQty,
+                recievedQty: recievedQty,
+                relatedMedicineItems: medicineItemID
+            })
         }
         if (accessoryItemID) {
             var result = await Stock.findOneAndUpdate(
@@ -240,18 +257,26 @@ exports.stockRecieved = async (req, res) => {
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+            var RecievedRecordsResult = await RecievedRecords.create({
+                createdAt: Date.now(),
+                createdBy: createdBy,
+                relatedBranch: relatedBranch,
+                requestedQty: requestedQty,
+                recievedQty: recievedQty,
+                relatedAccessoryItems: accessoryItemID
+            })
         }
 
         const logResult = await Log.create({
             "relatedStock": stock_id,
-            "currentQty": currentQty,
-            "actualQty": actual,
+            "currentQty": requestedQty,
+            "actualQty": recievedQty,
             "finalQty": recievedQty,
             "type": "Request Recieved",
             "relatedBranch": relatedBranch,
             "createdBy": createdBy
         })
-        return res.status(200).send({ success: true, data: result, log: logResult })
+        return res.status(200).send({ success: true, data: result, log: logResult, RecievedRecordsResult: RecievedRecordsResult })
     } catch (error) {
         return res.status(500).send({ error: true, message: error.message })
     }
