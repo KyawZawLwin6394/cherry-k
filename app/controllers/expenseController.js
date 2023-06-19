@@ -217,11 +217,11 @@ exports.expenseFilter = async (req, res) => {
         if (start && end) query.date = { $gte: start, $lt: end }
         if (relatedBranch) query.relatedBranch = relatedBranch
         if (createdBy) query.createdBy = createdBy
-        const bankResult = await Expense.find(query).populate('relatedBankAccount')
+        const bankResult = await Expense.find(query).populate('relatedBankAccount relatedAccounting relatedCredit relatedCashAccount relatedBranch').populate('createdBy', 'givenName')
         const { relatedBankAccount, ...query2 } = query;
         query2.relatedCashAccount = { $exists: true };
         console.log(query2)
-        const cashResult = await Expense.find(query2).populate('relatedCashAccount')
+        const cashResult = await Expense.find(query2).populate('relatedBankAccount relatedAccounting relatedCredit relatedCashAccount relatedBranch').populate('createdBy', 'givenName')
         const BankNames = bankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
             const { name } = relatedBankAccount;
             result[name] = (result[name] || 0) + finalAmount;
