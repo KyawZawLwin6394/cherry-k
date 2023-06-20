@@ -56,21 +56,21 @@ exports.createPurchase = async (req, res, next) => {
             data.medicineItems.map(async function (element, index) {
                 const result = await Stock.findOneAndUpdate(
                     { relatedMedicineItems: element.item_id, relatedBranch: relatedBranch },
-                    { $inc: { currentQuantity: element.qty } },
+                    { $inc: { currentQuantity: element.qty, totalUnit: element.totalUnit } },
                     { new: true },
                 ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id')
             })
             data.procedureItems.map(async function (element, index) {
                 const result = await Stock.findOneAndUpdate(
                     { relatedProcedureItems: element.item_id, relatedBranch: relatedBranch },
-                    { $inc: { currentQuantity: element.qty } },
+                    { $inc: { currentQuantity: element.qty, totalUnit: element.totalUnit } },
                     { new: true },
                 ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
             })
             data.accessoryItems.map(async function (element, index) {
                 const result = await Stock.findOneAndUpdate(
                     { relatedAccessoryItems: element.item_id, relatedBranch: relatedBranch },
-                    { $inc: { currentQuantity: element.qty } },
+                    { $inc: { currentQuantity: element.qty, totalUnit: element.totalUnit } },
                     { new: true },
                 ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
             })
@@ -78,21 +78,21 @@ exports.createPurchase = async (req, res, next) => {
             data.medicineItems.map(async function (element, index) {
                 const result = await MedicineItems.findOneAndUpdate(
                     { relatedMedicineItems: element.item_id },
-                    { $inc: { currentQuantity: element.qty } },
+                    { $inc: { currentQuantity: element.qty, totalUnit: element.totalUnit } },
                     { new: true },
                 ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id')
             })
             data.procedureItems.map(async function (element, index) {
                 const result = await ProcedureItems.findOneAndUpdate(
                     { relatedProcedureItems: element.item_id },
-                    { $inc: { currentQuantity: element.qty } },
+                    { $inc: { currentQuantity: element.qty, totalUnit: element.totalUnit } },
                     { new: true },
                 ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
             })
             data.accessoryItems.map(async function (element, index) {
                 const result = await AccessoryItems.findOneAndUpdate(
                     { relatedAccessoryItems: element.item_id },
-                    { $inc: { currentQuantity: element.qty } },
+                    { $inc: { currentQuantity: element.qty, totalUnit: element.totalUnit } },
                     { new: true },
                 ).populate('name').populate('relatedCategory').populate('relatedBrand').populate('relatedSubCategory')
             })
@@ -108,7 +108,7 @@ exports.createPurchase = async (req, res, next) => {
             "type": "Credit",
             "relatedTransaction": null,
             "relatedAccounting": "646733d659a9bc811d97efa9", //Opening Stock
-            "relatedBranch":relatedBranch
+            "relatedBranch": relatedBranch
         })
         res.status(200).send({
             message: 'Purchase create success',
