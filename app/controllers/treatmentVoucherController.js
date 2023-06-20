@@ -207,14 +207,19 @@ exports.getwithExactDate = async (req, res) => {
 exports.TreatmentVoucherFilter = async (req, res) => {
     let query = { relatedBank: { $exists: true } }
     try {
-        const { start, end, relatedBranch, createdBy } = req.query
+        const { start, end, relatedBranch, createdBy, purchaseType } = req.query
         if (start && end) query.date = { $gte: start, $lt: end }
         if (relatedBranch) query.relatedBranch = relatedBranch
         if (createdBy) query.createdBy = createdBy
-        const bankResult = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedBranch relatedAccounting payment createdBy')
+        let bankResult = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedBranch relatedAccounting payment createdBy')
         const { relatedBank, ...query2 } = query;
         query2.relatedCash = { $exists: true };
-        const cashResult = await TreatmentVoucher.find(query2).populate('relatedTreatment relatedAppointment relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedBranch relatedAccounting payment createdBy')
+        let cashResult = await TreatmentVoucher.find(query2).populate('relatedTreatment relatedAppointment relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedBranch relatedAccounting payment createdBy')
+        if (purchaseType) {
+            cashResult = cashResult.filter(item => item.relatedTreatmentSelection.purchaseType === purchaseType)
+            bankResult = bankResult.filter(item => item.relatedTreatmentSelection.purchaseType === purchaseType)
+        }
+        //filter solid beauty
         const BankNames = bankResult.reduce((result, { relatedBank, amount }) => {
             const { name } = relatedBank;
             result[name] = (result[name] || 0) + amount;
