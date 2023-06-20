@@ -142,6 +142,8 @@ mongoose.plugin((schema) => {
   schema.options.usePushEach = true;
 });
 
+
+
 //static files
 app.use('/static', express.static(path.join(__dirname, 'uploads')));
 app.use(relatedBranchMiddleware);
