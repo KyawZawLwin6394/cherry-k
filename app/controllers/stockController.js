@@ -254,12 +254,14 @@ exports.checkReorder = async (req, res) => {
 exports.stockRecieved = async (req, res) => {
     try {
         let createdBy = req.credentials.id
-        const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, requestedQty } = req.body
+        const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, requestedQty, fromUnit, toUnit } = req.body
+        let totalUnit = (toUnit * currentQty) / fromUnit
         if (procedureItemID) {
             var result = await Stock.findOneAndUpdate(
                 { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
                 {
-                    currentQty: recievedQty
+                    currentQty: recievedQty,
+                    totalUnit: totalUnit
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
@@ -276,7 +278,8 @@ exports.stockRecieved = async (req, res) => {
             var result = await Stock.findOneAndUpdate(
                 { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
                 {
-                    currentQty: recievedQty
+                    currentQty: recievedQty,
+                    totalUnit: totalUnit
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
@@ -293,7 +296,8 @@ exports.stockRecieved = async (req, res) => {
             var result = await Stock.findOneAndUpdate(
                 { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },
                 {
-                    currentQty: recievedQty
+                    currentQty: recievedQty,
+                    totalUnit: totalUnit
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
