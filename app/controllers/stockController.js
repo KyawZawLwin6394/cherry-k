@@ -260,8 +260,10 @@ exports.stockRecieved = async (req, res) => {
             var result = await Stock.findOneAndUpdate(
                 { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
                 {
-                    currentQty: recievedQty,
-                    totalUnit: totalUnit
+                    $inc: {
+                        currentQty: recievedQty,
+                        totalUnit: totalUnit
+                    }
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
@@ -278,8 +280,10 @@ exports.stockRecieved = async (req, res) => {
             var result = await Stock.findOneAndUpdate(
                 { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
                 {
-                    currentQty: recievedQty,
-                    totalUnit: totalUnit
+                    $inc: {
+                        currentQty: recievedQty,
+                        totalUnit: totalUnit
+                    }
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
@@ -296,8 +300,10 @@ exports.stockRecieved = async (req, res) => {
             var result = await Stock.findOneAndUpdate(
                 { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },
                 {
-                    currentQty: recievedQty,
-                    totalUnit: totalUnit
+                    $inc: {
+                        currentQty: recievedQty,
+                        totalUnit: totalUnit
+                    }
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
