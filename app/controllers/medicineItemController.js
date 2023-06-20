@@ -2,6 +2,7 @@
 const MedicineItem = require('../models/medicineItem');
 const Branch = require('../models/branch');
 const Stock = require('../models/stock');
+const Log = require('../models/log');
 
 exports.listAllMedicineItems = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;

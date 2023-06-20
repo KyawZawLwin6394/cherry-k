@@ -257,7 +257,7 @@ exports.stockRecieved = async (req, res) => {
         const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, requestedQty } = req.body
         if (procedureItemID) {
             var result = await Stock.findOneAndUpdate(
-                { relatedProcedureItems: stock_id, relatedBranch: relatedBranch },
+                { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
                 {
                     currentQty: recievedQty
                 },
@@ -274,7 +274,7 @@ exports.stockRecieved = async (req, res) => {
         }
         if (medicineItemID) {
             var result = await Stock.findOneAndUpdate(
-                { relatedMedicineItems: stock_id, relatedBranch: relatedBranch },
+                { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
                 {
                     currentQty: recievedQty
                 },
@@ -291,7 +291,7 @@ exports.stockRecieved = async (req, res) => {
         }
         if (accessoryItemID) {
             var result = await Stock.findOneAndUpdate(
-                { relatedAccessoryItems: stock_id, relatedBranch: relatedBranch },
+                { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },
                 {
                     currentQty: recievedQty
                 },
@@ -308,7 +308,7 @@ exports.stockRecieved = async (req, res) => {
         }
 
         const logResult = await Log.create({
-            "relatedStock": stock_id,
+            "relatedStock": result._id,
             "currentQty": requestedQty,
             "actualQty": recievedQty,
             "finalQty": recievedQty,
