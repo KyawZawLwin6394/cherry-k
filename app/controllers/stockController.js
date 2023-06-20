@@ -255,7 +255,7 @@ exports.stockRecieved = async (req, res) => {
     try {
         let createdBy = req.credentials.id
         const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, requestedQty, fromUnit, toUnit } = req.body
-        let totalUnit = (toUnit * currentQty) / fromUnit
+        let totalUnit = (toUnit * recievedQty) / fromUnit
         if (procedureItemID) {
             var result = await Stock.findOneAndUpdate(
                 { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
