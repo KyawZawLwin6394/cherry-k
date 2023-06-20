@@ -211,7 +211,7 @@ exports.getwithExactDate = async (req, res) => {
 }
 
 exports.expenseFilter = async (req, res) => {
-    let query = { relatedBankAccount: { $exists: true } }
+    let query = { relatedBankAccount: { $exists: true }, isDeleted: false }
     try {
         const { start, end, relatedBranch, createdBy } = req.query
         if (start && end) query.date = { $gte: start, $lt: end }

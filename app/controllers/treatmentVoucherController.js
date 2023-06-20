@@ -205,7 +205,7 @@ exports.getwithExactDate = async (req, res) => {
 };
 
 exports.TreatmentVoucherFilter = async (req, res) => {
-    let query = { relatedBank: { $exists: true } }
+    let query = { relatedBank: { $exists: true }, isDeleted: false }
     try {
         const { start, end, relatedBranch, createdBy, purchaseType } = req.query
         if (start && end) query.date = { $gte: start, $lt: end }
