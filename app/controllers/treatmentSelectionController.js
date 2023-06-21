@@ -212,11 +212,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
         if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
         console.log(data, 'data2')
         const result = await TreatmentSelection.create(data)
-        const freqUpdate = await Patient.findOneAndUpdate(
-            { _id: req.body.relatedPatient },
-            { $inc: { treatmentPackageQty: 1, totalAmount: req.body.totalAmount, totalAppointments: req.body.treatmentTimes, unfinishedAppointments: req.body.treatmentTimes } },
-            { new: true }
-        )
+
         if (req.body.paymentMethod === 'FOC') {
             let dataTVC = {
                 "relatedTreatmentSelection": result._id,
@@ -272,6 +268,54 @@ exports.createTreatmentSelection = async (req, res, next) => {
             }
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
+        //freq Update Start
+        const freqUpdate = await Patient.findOneAndUpdate(
+            { _id: req.body.relatedPatient },
+            { $inc: { treatmentPackageQty: 1, totalAmount: req.body.totalAmount, totalAppointments: req.body.treatmentTimes, unfinishedAppointments: req.body.treatmentTimes, advanceAmount: req.body.totalAmount } },
+            { new: true }
+        )
+        var freqfTransResult = await Transaction.create({
+            "amount": req.body.paidAmount,
+            "date": Date.now(),
+            "remark": null,
+            "relatedAccounting": "6467379159a9bc811d97f4d2", //Advance received from customer
+            "type": "Credit",
+            "createdBy": createdBy
+        })
+        var freqamountUpdate = await Accounting.findOneAndUpdate(
+            { _id: "6467379159a9bc811d97f4d2" },
+            { $inc: { amount: -req.body.paidAmount } }
+        )
+        //sec transaction
+        var freqSecTransResult = await Transaction.create({
+            "amount": req.body.paidAmount,
+            "date": Date.now(),
+            "remark": null,
+            "relatedBank": req.body.relatedBank,
+            "relatedCash": req.body.relatedCash,
+            "type": "Debit",
+            "relatedTransaction": fTransResult._id,
+            "createdBy": createdBy
+        });
+        var freqfTransUpdate = await Transaction.findOneAndUpdate(
+            { _id: fTransResult._id },
+            {
+                relatedTransaction: secTransResult._id
+            },
+            { new: true }
+        )
+        if (req.body.relatedBank) {
+            var freqSecamountUpdate = await Accounting.findOneAndUpdate(
+                { _id: req.body.relatedBank },
+                { $inc: { amount: req.body.paidAmount } }
+            )
+        } else if (req.body.relatedCash) {
+            var freqSecamountUpdate = await Accounting.findOneAndUpdate(
+                { _id: req.body.relatedCash },
+                { $inc: { amount: req.body.paidAmount } }
+            )
+        }
+        //Freq Update end
         const populatedResult = await TreatmentSelection.find({ _id: result._id }).populate('createdBy relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
             path: 'relatedTreatment',
             model: 'Treatments',
