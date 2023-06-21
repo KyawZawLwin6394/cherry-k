@@ -386,7 +386,7 @@ exports.MedicineSaleFilter = async (req, res) => {
   let query = { relatedBank: { $exists: true }, isDeleted: false }
   try {
     const { start, end, relatedBranch, createdBy } = req.query
-    if (start && end) query.date = { $gte: start, $lt: end }
+    if (start && end) query.createdAt = { $gte: start, $lt: end }
     if (relatedBranch) query.relatedBranch = relatedBranch
     if (createdBy) query.createdBy = createdBy
     const bankResult = await MedicineSale.find(query).populate('relatedBank relatedTreatment relatedPatient relatedAppointment medicineItems.item_id relatedCash relatedAccount relatedTransaction relatedBranch').populate('createdBy', 'givenName')
