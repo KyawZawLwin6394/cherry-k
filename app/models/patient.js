@@ -87,6 +87,21 @@ let PatientSchema = new Schema({
   conditionPackageQty: {
     type: Number
   },
+  treatmentPackageQty: {
+    type: Number
+  },
+  totalAmount: {
+    type: Number
+  },
+  totalAppointments: {
+    type: Number
+  },
+  finishedAppointments: {
+    type: Number
+  },
+  unfinishedAppointments: {
+    type: Number
+  },
 });
 const patient = mongoose.model('Patients', PatientSchema)
 module.exports = patient;

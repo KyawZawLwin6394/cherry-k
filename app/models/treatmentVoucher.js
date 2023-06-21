@@ -85,6 +85,10 @@ let TreatmentVoucherSchema = new Schema({
     payment: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Attachments'
+    },
+    relatedDiscount:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Discounts'
     }
 });
 
