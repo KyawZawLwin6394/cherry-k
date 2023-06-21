@@ -42,6 +42,9 @@ let Package = new Schema({
     },
     totalCount: {
         type: Number
+    },
+    status: {
+        type: String
     }
 });
 
