@@ -50,7 +50,7 @@ exports.getSaleReturn = async (req, res) => {
 
 exports.createSaleReturn = async (req, res, next) => {
     let newBody = req.body;
-    let { relatedTreatmentSelection, relatedSubTreatment, returnType } = req.body;
+    let { relatedTreatmentSelection, relatedSubTreatment, returnType, deferAmount, relatedBank, relatedCash } = req.body;
     try {
         if (returnType === 'Full Cash' && relatedTreatmentSelection) {
             var selecUpdate = await TreatmentSelection.findOneAndUpdate(
@@ -70,27 +70,27 @@ exports.createSaleReturn = async (req, res, next) => {
         }
         //Transaction
         var fTransResult = await Transaction.create({
-            "amount": req.body.paidAmount,
+            "amount": deferAmount,
             "date": Date.now(),
             "remark": null,
-            "relatedAccounting": "6467379159a9bc811d97f4d2", //Advance received from customer
+            "relatedAccounting": "6492cbb6dbf11808abf6685d", //Sales Income(Treatement)
             "type": "Credit",
-            "createdBy": createdBy
+            "createdBy": req.credentials.id
         })
         var amountUpdate = await Accounting.findOneAndUpdate(
-            { _id: "6467379159a9bc811d97f4d2" },
-            { $inc: { amount: req.body.paidAmount } }
+            { _id: "6492cbb6dbf11808abf6685d" }, //Sales Income(Treatement)
+            { $inc: { amount: -req.body.paidAmount } }
         )
         //sec transaction
         var secTransResult = await Transaction.create({
-            "amount": req.body.paidAmount,
+            "amount": deferAmount,
             "date": Date.now(),
             "remark": null,
-            "relatedBank": req.body.relatedBank,
-            "relatedCash": req.body.relatedCash,
+            "relatedBank": relatedBank,
+            "relatedCash": relatedCash,
             "type": "Debit",
             "relatedTransaction": fTransResult._id,
-            "createdBy": createdBy
+            "createdBy": req.credentials.id
         });
         var fTransUpdate = await Transaction.findOneAndUpdate(
             { _id: fTransResult._id },
@@ -99,15 +99,15 @@ exports.createSaleReturn = async (req, res, next) => {
             },
             { new: true }
         )
-        if (req.body.relatedBank) {
+        if (relatedBank) {
             var amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: req.body.relatedBank },
-                { $inc: { amount: req.body.paidAmount } }
+                { _id: relatedBank },
+                { $inc: { amount: deferAmount } }
             )
-        } else if (req.body.relatedCash) {
+        } else if (relatedCash) {
             var amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: req.body.relatedCash },
-                { $inc: { amount: req.body.paidAmount } }
+                { _id: relatedCash },
+                { $inc: { amount: deferAmount } }
             )
         }
         res.status(200).send({
