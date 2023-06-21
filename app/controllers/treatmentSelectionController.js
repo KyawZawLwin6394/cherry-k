@@ -212,7 +212,11 @@ exports.createTreatmentSelection = async (req, res, next) => {
         if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
         console.log(data, 'data2')
         const result = await TreatmentSelection.create(data)
-
+        const freqUpdate = await Patient.findOneAndUpdate(
+            { _id: req.body.relatedPatient },
+            { $inc: { treatmentPackageQty: 1, totalAmount: req.body.totalAmount, totalAppointments: req.body.treatmentTimes, unfinishedAppointments: req.body.treatmentTimes } },
+            { new: true }
+        )
         if (req.body.paymentMethod === 'FOC') {
             let dataTVC = {
                 "relatedTreatmentSelection": result._id,
@@ -301,6 +305,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
             success: true,
             data: populatedResult,
             appointmentAutoGenerate: appointmentResult,
+            patientFreqUpdate: freqUpdate
             // fTransResult: fTransResult,
             // secTransResult: secTransResult,
             // treatmentVoucherResult:treatmentVoucherResult
@@ -615,5 +620,28 @@ exports.searchTreatmentSelections = async (req, res, next) => {
         return res.status(200).send({ success: true, data: result })
     } catch (err) {
         return res.status(500).send({ error: true, message: err.message })
+    }
+}
+
+exports.TopTenFilter = async (req, res) => {
+    try {
+        let query = req.mongoQuery
+        const TreatmentResult = await TreatmentSelection.find(query).populate('relatedTreatment')
+        const TreatmentNames = TreatmentResult.reduce((result, { relatedTreatment }) => {
+            const { name } = relatedTreatment;
+            result[name] = (result[name] || 0) + 1; // Increment count by 1
+            return result;
+        }, {});
+        const sortedTreatmentNames = Object.entries(TreatmentNames)
+            .sort((a, b) => b[1] - a[1])
+            .reduce((sortedObj, [name, count]) => {
+                sortedObj[name] = count;
+                return sortedObj;
+            }, {}); //Descending
+
+        console.log(sortedTreatmentNames);
+        return res.status(200).send({ success: true, data: sortedTreatmentNames })
+    } catch (error) {
+        return res.status(500).send({ error: true, message: error.message })
     }
 }
