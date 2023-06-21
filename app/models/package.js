@@ -35,7 +35,13 @@ let Package = new Schema({
     isDeleted: {
         type: Boolean,
         default: false
-        
+
+    },
+    totalprice: {
+        type: Number
+    },
+    totalCount: {
+        type: Number
     }
 });
 
