@@ -37,7 +37,7 @@ let Package = new Schema({
         default: false
 
     },
-    totalprice: {
+    totalPrice: {
         type: Number
     },
     totalCost: {
