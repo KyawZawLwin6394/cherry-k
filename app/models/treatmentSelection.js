@@ -11,7 +11,7 @@ let TreatmentSelectionSchema = new Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['Credit', 'Cash Down', 'FOC']
+    enum: ['Credit', 'Cash Down', 'FOC', 'Advance']
   },
   paidAmount: {
     type: Number,
@@ -104,7 +104,8 @@ let TreatmentSelectionSchema = new Schema({
   },
   remark: {
     type: String
-  }
+  },
+
 
 });
 const patient = mongoose.model('TreatmentSelections', TreatmentSelectionSchema)
