@@ -302,13 +302,13 @@ exports.createTreatmentSelection = async (req, res, next) => {
             "relatedBank": req.body.relatedBank,
             "relatedCash": req.body.relatedCash,
             "type": "Debit",
-            "relatedTransaction": fTransResult._id,
+            "relatedTransaction": freqfTransResult._id,
             "createdBy": createdBy
         });
         var freqfTransUpdate = await Transaction.findOneAndUpdate(
-            { _id: fTransResult._id },
+            { _id: freqfTransResult._id },
             {
-                relatedTransaction: secTransResult._id
+                relatedTransaction: freqSecTransResult._id
             },
             { new: true }
         )
