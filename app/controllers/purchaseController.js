@@ -110,6 +110,17 @@ exports.createPurchase = async (req, res, next) => {
             "relatedAccounting": "646733d659a9bc811d97efa9", //Opening Stock
             "relatedBranch": relatedBranch
         })
+        const SectransResult = await Transaction.create({
+            "amount": data.totalPrice,
+            "date": Date.now(),
+            "remark": data.remark,
+            "type": "Debit",
+            "relatedTransaction": null,
+            "relatedBank": req.body.relatedBank, //Opening Stock
+            "relatedCash": req.body.relatedCash,
+            "relatedTransaction": transResult._id
+        })
+        const transUpdate = await Transaction.findOneAndUpdate({ _id: transResult._id }, { "relatedTransaction": SectransResult._id })
         res.status(200).send({
             message: 'Purchase create success',
             success: true,

@@ -15,7 +15,7 @@ exports.listAllAdvanceRecords = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await AdvanceRecord.find(query)
+        let result = await AdvanceRecord.find(query).populate('relatedPatient recievedPatient')
         count = await AdvanceRecord.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
@@ -40,7 +40,7 @@ exports.getAdvanceRecord = async (req, res) => {
     try {
         let query = req.mongoQuery
         if (req.params.id) query._id = req.params.id
-        const result = await AdvanceRecord.find(query)
+        const result = await AdvanceRecord.find(query).populate('relatedPatient recievedPatient')
         if (result.length === 0)
             return res.status(500).json({ error: true, message: 'No Record Found' });
         return res.status(200).send({ success: true, data: result });
@@ -72,7 +72,7 @@ exports.updateAdvanceRecord = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        )
+        ).populate('relatedPatient recievedPatient')
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
