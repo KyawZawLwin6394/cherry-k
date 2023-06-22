@@ -1,7 +1,6 @@
 'use strict';
 const Income = require('../models/income');
 const Transaction = require('../models/transaction')
-const Bank = require('../models/bank');
 const Accounting = require('../models/accountingList');
 
 exports.listAllIncomes = async (req, res) => {

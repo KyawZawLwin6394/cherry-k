@@ -2,7 +2,6 @@
 const Expense = require('../models/expense');
 const Transaction = require('../models/transaction');
 const Accounting = require('../models/accountingList');
-const expense = require('../models/expense');
 
 exports.listAllExpenses = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
