@@ -101,9 +101,6 @@ let PatientSchema = new Schema({
   },
   unfinishedAppointments: {
     type: Number
-  },
-  advanceAmount: {
-    type: Number
   }
 });
 const patient = mongoose.model('Patients', PatientSchema)

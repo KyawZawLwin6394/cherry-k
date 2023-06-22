@@ -7,6 +7,7 @@ const TreatmentVoucher = require('../models/treatmentVoucher');
 const Repay = require('../models/repayRecord');
 const Accounting = require('../models/accountingList');
 const Attachment = require('../models/attachment');
+const AdvanceRecords = require('../models/advanceRecord');
 
 exports.listAllTreatmentSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -268,10 +269,17 @@ exports.createTreatmentSelection = async (req, res, next) => {
             }
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
+        let advanceQuery = { $inc: { amount: -req.body.totalAmount } }
+        if (req.body.recievedPatient) advanceQuery.recievedPatient = req.body.recievedPatient
         //freq Update Start
+        const advanceResult = await AdvanceRecords.findOneAndUpdate(
+            { relatedPatient: req.body.relatedPatient },
+            advanceQuery,
+            { new: true }
+        )
         const freqUpdate = await Patient.findOneAndUpdate(
             { _id: req.body.relatedPatient },
-            { $inc: { treatmentPackageQty: 1, totalAmount: req.body.totalAmount, totalAppointments: req.body.treatmentTimes, unfinishedAppointments: req.body.treatmentTimes, advanceAmount: req.body.totalAmount } },
+            { $inc: { treatmentPackageQty: 1, totalAmount: req.body.totalAmount, totalAppointments: req.body.treatmentTimes, unfinishedAppointments: req.body.treatmentTimes } },
             { new: true }
         )
         var freqfTransResult = await Transaction.create({
