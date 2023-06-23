@@ -18,8 +18,14 @@ exports.listAllSaleReturns = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await SaleReturn.find(query).populate('relatedBranch relatedTreatmentVoucher relatedAppointment relatedSubTreatment relatedPatient').populate({
+        let result = await SaleReturn.find(query).populate('relatedBranch relatedTreatmentVoucher relatedAppointment relatedPatient').populate({
             path: 'relatedTreatmentSelection',
+            populate: [{
+              path: 'relatedTreatment',
+              model: 'Treatments'
+            }]
+          }).populate({
+            path: 'relatedSubTreatment',
             populate: [{
               path: 'relatedTreatment',
               model: 'Treatments'
