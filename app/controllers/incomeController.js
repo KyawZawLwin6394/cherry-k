@@ -2,6 +2,9 @@
 const Income = require('../models/income');
 const Transaction = require('../models/transaction')
 const Accounting = require('../models/accountingList');
+const MedicineSale = require('../models/medicineSale');
+const TreatmentVoucher = require('../models/treatmentVoucher');
+const Expense = require('../models/expense');
 
 exports.listAllIncomes = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -212,8 +215,21 @@ exports.getwithExactDate = async (req, res) => {
 }
 
 exports.totalIncome = async (req, res) => {
+  let { exactDate, relatedBranch } = req.query;
   let filterQuery = { relatedBankAccount: { $exists: true } }
   let filterQuery2 = { relatedBank: { $exists: true } }
+  const date = new Date(exactDate);
+  const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()); // Set start date to the beginning of the day
+  const endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);// Set end date to the beginning of the next day
+  if (exactDate) {
+    filterQuery2.createdAt = { $gte: startDate, $lt: endDate }
+    filterQuery.date = { $gte: startDate, $lt: endDate }
+  }
+  if (relatedBranch) {
+    filterQuery2.relatedBranch = relatedBranch
+    filterQuery.relatedBranch = relatedBranch
+  }
+  console.log(filterQuery, filterQuery2)
   const msFilterBankResult = await MedicineSale.find(filterQuery2).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment relatedBank relatedCash').populate({
     path: 'relatedTransaction',
     populate: [{
@@ -236,6 +252,8 @@ exports.totalIncome = async (req, res) => {
 
   const { relatedBank, ...filterQuery3 } = filterQuery2;
   filterQuery3.relatedCash = { $exists: true };
+
+  console.log(filterQuerys, filterQuery3)
 
   const msFilterCashResult = await MedicineSale.find(filterQuery3).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment relatedBank relatedCash').populate({
     path: 'relatedTransaction',

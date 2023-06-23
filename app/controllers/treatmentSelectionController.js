@@ -678,6 +678,8 @@ exports.searchTreatmentSelections = async (req, res, next) => {
 exports.TopTenFilter = async (req, res) => {
     try {
         let query = req.mongoQuery
+        let { start, end } = req.query
+        if (start, end) query.createdAt = { $gte: start, $lte: end }
         const TreatmentResult = await TreatmentSelection.find(query).populate('relatedTreatment')
         const TreatmentNames = TreatmentResult.reduce((result, { relatedTreatment }) => {
             const { name } = relatedTreatment;
@@ -690,8 +692,6 @@ exports.TopTenFilter = async (req, res) => {
                 sortedObj[name] = count;
                 return sortedObj;
             }, {}); //Descending
-
-        console.log(sortedTreatmentNames);
         return res.status(200).send({ success: true, data: sortedTreatmentNames })
     } catch (error) {
         return res.status(500).send({ error: true, message: error.message })
