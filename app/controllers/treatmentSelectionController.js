@@ -692,7 +692,7 @@ exports.TopTenFilter = async (req, res) => {
                 sortedObj[name] = count;
                 return sortedObj;
             }, {}); //Descending
-        return res.status(200).send({ success: true, data: sortedTreatmentNames })
+        return res.status(200).send({ success: true, data: sortedTreatmentNames, list: TreatmentResult })
     } catch (error) {
         return res.status(500).send({ error: true, message: error.message })
     }
