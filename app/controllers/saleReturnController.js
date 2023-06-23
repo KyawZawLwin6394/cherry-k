@@ -25,7 +25,10 @@ exports.listAllSaleReturns = async (req, res) => {
                 populate: [{
                     path: 'relatedTreatment',
                     model: 'Treatments',
-                    select: 'treatmentName' // Specify the field(s) you want to populate
+                    populate:{
+                        path:'treatmentName',
+                        model:'TreatmentLists'
+                    }
                 }]
             })
             .populate({
@@ -35,8 +38,6 @@ exports.listAllSaleReturns = async (req, res) => {
                     model: 'Treatments'
                 }]
             });
-
-        console.log(result);
 
         count = await SaleReturn.find(query).count();
         const division = count / limit;
