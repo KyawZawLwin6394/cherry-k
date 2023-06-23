@@ -675,25 +675,100 @@ exports.searchTreatmentSelections = async (req, res, next) => {
     }
 }
 
+// exports.TopTenFilter = async (req, res) => {
+//     try {
+//         let query = req.mongoQuery
+//         let { start, end } = req.query
+//         if (start, end) query.createdAt = { $gte: start, $lte: end }
+//         const TreatmentResult = await TreatmentSelection.find(query).populate('relatedTreatment').populate({
+//             path: 'relatedTreatment',
+//             populate: [{
+//                 path: 'treatmentName',
+//                 model: 'TreatmentLists',
+//                 // populate:{
+//                 //     path:'treatmentName',
+//                 //     model:'TreatmentLists'
+//                 // }
+//             }]
+//         })
+//         const TreatmentName = [];
+//         TreatmentResult.forEach(({ relatedTreatment }) => {
+//             const { name, treatmentName } = relatedTreatment;
+//             const tempObj = {
+//                 treatmentUnit: name,
+//                 treatment: treatmentName.name,
+//                 qty: 1
+//             };
+//             TreatmentName.push(tempObj);
+//         });
+//         const reducedTreatmentNames = TreatmentName.reduce((result, current) => {
+//             const existingItem = result.find(item => item.treatmentUnit === current.treatmentUnit);
+//             if (existingItem) {
+//                 existingItem.qty += current.qty;
+//             } else {
+//                 result.push(current);
+//             }
+//             return result;
+//         }, []);
+
+//         const sortedTreatmentNames = reducedTreatmentNames.sort((a, b) => b.qty - a.qty); //Descending
+//         console.log(sortedTreatmentNames);
+
+//         return res.status(200).send({ success: true, data: sortedTreatmentNames, list: TreatmentResult })
+//     } catch (error) {
+//         return res.status(500).send({ error: true, message: error.message })
+//     }
+// }
+
 exports.TopTenFilter = async (req, res) => {
     try {
-        let query = req.mongoQuery
-        let { start, end } = req.query
-        if (start, end) query.createdAt = { $gte: start, $lte: end }
-        const TreatmentResult = await TreatmentSelection.find(query).populate('relatedTreatment')
-        const TreatmentNames = TreatmentResult.reduce((result, { relatedTreatment }) => {
-            const { name } = relatedTreatment;
-            result[name] = (result[name] || 0) + 1; // Increment count by 1
+        let query = req.mongoQuery;
+        let { start, end } = req.query;
+        if (start, end) query.createdAt = { $gte: start, $lte: end };
+
+        const TreatmentResult = await TreatmentSelection.find(query)
+            .populate('relatedTreatment')
+            .populate({
+                path: 'relatedTreatment',
+                populate: {
+                    path: 'treatmentName',
+                    model: 'TreatmentLists',
+                }
+            });
+
+        const treatmentNameMap = TreatmentResult.reduce((result, { relatedTreatment }) => {
+            const { name, treatmentName } = relatedTreatment;
+            const treatmentUnit = name;
+            const treatment = treatmentName.name;
+
+            if (result.hasOwnProperty(treatmentUnit)) {
+                result[treatmentUnit].qty++;
+            } else {
+                result[treatmentUnit] = { treatmentUnit, treatment, qty: 1 };
+            }
+
             return result;
         }, {});
-        const sortedTreatmentNames = Object.entries(TreatmentNames)
-            .sort((a, b) => b[1] - a[1])
-            .reduce((sortedObj, [name, count]) => {
-                sortedObj[name] = count;
-                return sortedObj;
-            }, {}); //Descending
-        return res.status(200).send({ success: true, data: sortedTreatmentNames, list: TreatmentResult })
+
+        const reducedTreatmentNames = Object.values(treatmentNameMap);
+
+        const sortedTreatmentNames = reducedTreatmentNames.sort((a, b) => b.qty - a.qty); // Descending
+
+        return res.status(200).send({ success: true, data: sortedTreatmentNames, list: TreatmentResult });
     } catch (error) {
-        return res.status(500).send({ error: true, message: error.message })
+        return res.status(500).send({ error: true, message: error.message });
     }
-}
+};
+
+
+// const TreatmentNames = TreatmentResult.reduce((result, { relatedTreatment }) => {
+        //     const { name, treatmentName } = relatedTreatment;
+        //     result[name] = (result[name] || 0) + 1; // Increment count by 1
+        //     return result;
+        // }, []);
+        // const sortedTreatmentNames = Object.entries(TreatmentNames)
+        //     .sort((a, b) => b[1] - a[1])
+        //     .reduce((sortedObj, [name, count]) => {
+        //         sortedObj[name] = count;
+        //         return sortedObj;
+        //     }, {}); //Descending
