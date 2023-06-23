@@ -211,6 +211,141 @@ exports.getwithExactDate = async (req, res) => {
   }
 }
 
+exports.totalIncome = async (req, res) => {
+  let filterQuery = { relatedBankAccount: { $exists: true } }
+  let filterQuery2 = { relatedBank: { $exists: true } }
+  const msFilterBankResult = await MedicineSale.find(filterQuery2).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment relatedBank relatedCash').populate({
+    path: 'relatedTransaction',
+    populate: [{
+      path: 'relatedAccounting',
+      model: 'AccountingLists'
+    }, {
+      path: 'relatedBank',
+      model: 'AccountingLists'
+    }, {
+      path: 'relatedCash',
+      model: 'AccountingLists'
+    }]
+  });
+  const tvFilterBankResult = await TreatmentVoucher.find(filterQuery2).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
+  const incomeFilterBankResult = await Income.find(filterQuery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+  const expenseFilterBankResult = await Expense.find(filterQuery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+
+  const { relatedBankAccount, ...filterQuerys } = filterQuery;
+  filterQuerys.relatedCashAccount = { $exists: true };
+
+  const { relatedBank, ...filterQuery3 } = filterQuery2;
+  filterQuery3.relatedCash = { $exists: true };
+
+  const msFilterCashResult = await MedicineSale.find(filterQuery3).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment relatedBank relatedCash').populate({
+    path: 'relatedTransaction',
+    populate: [{
+      path: 'relatedAccounting',
+      model: 'AccountingLists'
+    }, {
+      path: 'relatedBank',
+      model: 'AccountingLists'
+    }, {
+      path: 'relatedCash',
+      model: 'AccountingLists'
+    }]
+  });
+  const tvFilterCashResult = await TreatmentVoucher.find(filterQuery3).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
+  const incomeFilterCashResult = await Income.find(filterQuerys).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+  const expenseFilterCashResult = await Expense.find(filterQuerys).populate('relatedAccounting relatedBankAccount relatedCashAccount')
+
+  //      Medicine Sale
+  const msBankNames = msFilterBankResult.reduce((result, { relatedBank, totalAmount }) => {
+    const { name } = relatedBank;
+    result[name] = (result[name] || 0) + totalAmount;
+    return result;
+  }, {});
+  const msCashNames = msFilterCashResult.reduce((result, { relatedCash, totalAmount }) => {
+    const { name } = relatedCash;
+    result[name] = (result[name] || 0) + totalAmount;
+    return result;
+  }, {});
+  const msBankTotal = msFilterBankResult.reduce((total, sale) => total + sale.totalAmount, 0);
+  const msCashTotal = msFilterCashResult.reduce((total, sale) => total + sale.totalAmount, 0);
+
+  //TreatmentVoucher
+  const tvBankNames = tvFilterBankResult.reduce((result, { relatedBank, amount }) => {
+    const { name } = relatedBank;
+    result[name] = (result[name] || 0) + amount;
+    return result;
+  }, {});
+  const tvCashNames = tvFilterCashResult.reduce((result, { relatedCash, amount }) => {
+    const { name } = relatedCash;
+    result[name] = (result[name] || 0) + amount;
+    return result;
+  }, {});
+  const tvBankTotal = tvFilterBankResult.reduce((total, sale) => total + sale.amount, 0);
+  const tvCashTotal = tvFilterCashResult.reduce((total, sale) => total + sale.amount, 0);
+
+  //Income
+  const incomeBankNames = incomeFilterBankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
+    const { name } = relatedBankAccount;
+    result[name] = (result[name] || 0) + finalAmount;
+    return result;
+  }, {});
+  const incomeCashNames = incomeFilterCashResult.reduce((result, { relatedCashAccount, finalAmount }) => {
+    const { name } = relatedCashAccount;
+    result[name] = (result[name] || 0) + finalAmount;
+    return result;
+  }, {});
+  const incomeBankTotal = incomeFilterBankResult.reduce((total, sale) => total + sale.finalAmount, 0);
+  const incomeCashTotal = incomeFilterCashResult.reduce((total, sale) => total + sale.finalAmount, 0);
+
+  //Expense
+  const expenseBankNames = expenseFilterBankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
+    const { name } = relatedBankAccount;
+    result[name] = (result[name] || 0) + finalAmount;
+    return result;
+  }, {});
+  const expenseCashNames = expenseFilterCashResult.reduce((result, { relatedCashAccount, finalAmount }) => {
+    const { name } = relatedCashAccount;
+    result[name] = (result[name] || 0) + finalAmount;
+    return result;
+  }, {});
+  const expenseBankTotal = expenseFilterBankResult.reduce((total, sale) => total + sale.finalAmount, 0);
+  const expenseCashTotal = expenseFilterCashResult.reduce((total, sale) => total + sale.finalAmount, 0);
+  return res.status(200).send({
+    succes: true,
+    Income: {
+      bankResult: incomeFilterBankResult,
+      cashResult: incomeFilterCashResult,
+      BankNames: incomeBankNames,
+      CashNames: incomeCashNames,
+      BankTotal: incomeBankTotal,
+      CashTotal: incomeCashTotal
+    },
+    Expense: {
+      bankResult: expenseFilterBankResult,
+      cashResult: expenseFilterCashResult,
+      BankNames: expenseBankNames,
+      CashNames: expenseCashNames,
+      BankTotal: expenseBankTotal,
+      CashTotal: expenseCashTotal
+    },
+    MedicineSale: {
+      bankResult: msFilterBankResult,
+      cashResult: msFilterCashResult,
+      BankNames: msBankNames,
+      CashNames: msCashNames,
+      BankTotal: msBankTotal,
+      CashTotal: msCashTotal
+    },
+    TreatmentVoucher: {
+      bankResult: tvFilterBankResult,
+      cashResult: tvFilterCashResult,
+      BankNames: tvBankNames,
+      CashNames: tvCashNames,
+      BankTotal: tvBankTotal,
+      CashTotal: tvCashTotal
+    },
+  })
+}
+
 exports.incomeFilter = async (req, res) => {
   let query = { relatedBankAccount: { $exists: true }, isDeleted: false }
   try {
