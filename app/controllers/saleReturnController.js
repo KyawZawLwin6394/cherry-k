@@ -18,19 +18,26 @@ exports.listAllSaleReturns = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await SaleReturn.find(query).populate('relatedBranch relatedTreatmentVoucher relatedAppointment relatedPatient').populate({
-            path: 'relatedTreatmentSelection',
-            populate: [{
-              path: 'relatedTreatment',
-              model: 'Treatments'
-            }]
-          }).populate({
-            path: 'relatedSubTreatment',
-            populate: [{
-              path: 'relatedTreatment',
-              model: 'Treatments'
-            }]
-          });
+        const result = await SaleReturn.find(query)
+            .populate('relatedBranch relatedTreatmentVoucher relatedAppointment relatedPatient')
+            .populate({
+                path: 'relatedTreatmentSelection',
+                populate: [{
+                    path: 'relatedTreatment',
+                    model: 'Treatments',
+                    select: 'treatmentName' // Specify the field(s) you want to populate
+                }]
+            })
+            .populate({
+                path: 'relatedSubTreatment',
+                populate: [{
+                    path: 'relatedTreatment',
+                    model: 'Treatments'
+                }]
+            });
+
+        console.log(result);
+
         count = await SaleReturn.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
