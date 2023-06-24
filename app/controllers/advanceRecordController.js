@@ -53,6 +53,7 @@ exports.getAdvanceRecord = async (req, res) => {
 
 exports.createAdvanceRecord = async (req, res, next) => {
     let newBody = req.body;
+    let createdBy = req.credentials.id
     newBody = { ...newBody, createdBy: req.credentials.id }
     try {
         const newAdvanceRecord = new AdvanceRecord(newBody);
