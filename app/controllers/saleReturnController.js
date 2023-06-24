@@ -101,7 +101,7 @@ exports.createSaleReturn = async (req, res, next) => {
             })
             var amountUpdate = await Accounting.findOneAndUpdate(
                 { _id: "6492cbb6dbf11808abf6685d" }, //Sales Income(Treatement)
-                { $inc: { amount: -req.body.paidAmount } }
+                { $inc: { amount: -deferAmount } }
             )
             //sec transaction
             var secTransResult = await Transaction.create({
