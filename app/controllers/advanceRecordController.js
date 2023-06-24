@@ -1,5 +1,7 @@
 'use strict';
 const AdvanceRecord = require('../models/advanceRecord');
+const Transaction = require('../models/transaction');
+const Accounting = require('../models/accountingList');
 
 exports.listAllAdvanceRecords = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -55,6 +57,47 @@ exports.createAdvanceRecord = async (req, res, next) => {
     try {
         const newAdvanceRecord = new AdvanceRecord(newBody);
         const result = await newAdvanceRecord.save();
+        var fTransResult = await Transaction.create({
+            "amount": req.body.paidAmount,
+            "date": Date.now(),
+            "remark": null,
+            "relatedAccounting": "6467379159a9bc811d97f4d2", //Advance received from customer
+            "type": "Credit",
+            "createdBy": createdBy
+        })
+        var amountUpdate = await Accounting.findOneAndUpdate(
+            { _id: "6467379159a9bc811d97f4d2" },
+            { $inc: { amount: req.body.paidAmount } }
+        )
+        //sec transaction
+        var secTransResult = await Transaction.create({
+            "amount": req.body.paidAmount,
+            "date": Date.now(),
+            "remark": null,
+            "relatedBank": req.body.relatedBank,
+            "relatedCash": req.body.relatedCash,
+            "type": "Debit",
+            "relatedTransaction": fTransResult._id,
+            "createdBy": createdBy
+        });
+        var fTransUpdate = await Transaction.findOneAndUpdate(
+            { _id: fTransResult._id },
+            {
+                relatedTransaction: secTransResult._id
+            },
+            { new: true }
+        )
+        if (req.body.relatedBank) {
+            var amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: req.body.relatedBank },
+                { $inc: { amount: req.body.paidAmount } }
+            )
+        } else if (req.body.relatedCash) {
+            var amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: req.body.relatedCash },
+                { $inc: { amount: req.body.paidAmount } }
+            )
+        }
         res.status(200).send({
             message: 'AdvanceRecord create success',
             success: true,
