@@ -17,7 +17,7 @@ exports.listAllAdvanceRecords = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await AdvanceRecord.find({ amount: { $gt: 0 }, isDeleted: false }).populate('relatedPatient recievedPatient')
+        let result = await AdvanceRecord.find({ amount: { $gt: 0 }, isDeleted: false }).populate('relatedPatient recievedPatient relatedBank relatedCash')
         count = await AdvanceRecord.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
@@ -42,7 +42,7 @@ exports.getAdvanceRecord = async (req, res) => {
     try {
         let query = req.mongoQuery
         if (req.params.id) query._id = req.params.id
-        const result = await AdvanceRecord.find(query).populate('relatedPatient recievedPatient')
+        const result = await AdvanceRecord.find(query).populate('relatedPatient recievedPatient relatedBank relatedCash')
         if (result.length === 0)
             return res.status(500).json({ error: true, message: 'No Record Found' });
         return res.status(200).send({ success: true, data: result });
@@ -116,7 +116,7 @@ exports.updateAdvanceRecord = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        ).populate('relatedPatient recievedPatient')
+        ).populate('relatedPatient recievedPatient relatedBank relatedCash')
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
