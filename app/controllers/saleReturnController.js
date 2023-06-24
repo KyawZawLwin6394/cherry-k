@@ -89,47 +89,49 @@ exports.createSaleReturn = async (req, res, next) => {
                 { new: true }
             );
         }
-        //Transaction
-        var fTransResult = await Transaction.create({
-            "amount": deferAmount,
-            "date": Date.now(),
-            "remark": null,
-            "relatedAccounting": "6492cbb6dbf11808abf6685d", //Sales Income(Treatement)
-            "type": "Credit",
-            "createdBy": req.credentials.id
-        })
-        var amountUpdate = await Accounting.findOneAndUpdate(
-            { _id: "6492cbb6dbf11808abf6685d" }, //Sales Income(Treatement)
-            { $inc: { amount: -req.body.paidAmount } }
-        )
-        //sec transaction
-        var secTransResult = await Transaction.create({
-            "amount": deferAmount,
-            "date": Date.now(),
-            "remark": null,
-            "relatedBank": relatedBank,
-            "relatedCash": relatedCash,
-            "type": "Debit",
-            "relatedTransaction": fTransResult._id,
-            "createdBy": req.credentials.id
-        });
-        var fTransUpdate = await Transaction.findOneAndUpdate(
-            { _id: fTransResult._id },
-            {
-                relatedTransaction: secTransResult._id
-            },
-            { new: true }
-        )
-        if (relatedBank) {
+        if (deferAmount) {
+            //Transaction
+            var fTransResult = await Transaction.create({
+                "amount": deferAmount,
+                "date": Date.now(),
+                "remark": null,
+                "relatedAccounting": "6492cbb6dbf11808abf6685d", //Sales Income(Treatement)
+                "type": "Credit",
+                "createdBy": req.credentials.id
+            })
             var amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: relatedBank },
-                { $inc: { amount: deferAmount } }
+                { _id: "6492cbb6dbf11808abf6685d" }, //Sales Income(Treatement)
+                { $inc: { amount: -req.body.paidAmount } }
             )
-        } else if (relatedCash) {
-            var amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: relatedCash },
-                { $inc: { amount: deferAmount } }
+            //sec transaction
+            var secTransResult = await Transaction.create({
+                "amount": deferAmount,
+                "date": Date.now(),
+                "remark": null,
+                "relatedBank": relatedBank,
+                "relatedCash": relatedCash,
+                "type": "Debit",
+                "relatedTransaction": fTransResult._id,
+                "createdBy": req.credentials.id
+            });
+            var fTransUpdate = await Transaction.findOneAndUpdate(
+                { _id: fTransResult._id },
+                {
+                    relatedTransaction: secTransResult._id
+                },
+                { new: true }
             )
+            if (relatedBank) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: relatedBank },
+                    { $inc: { amount: deferAmount } }
+                )
+            } else if (relatedCash) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: relatedCash },
+                    { $inc: { amount: deferAmount } }
+                )
+            }
         }
         res.status(200).send({
             message: 'SaleReturn create success',
