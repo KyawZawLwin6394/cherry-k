@@ -456,7 +456,7 @@ exports.treatmentPayment = async (req, res, next) => {
             if (result.relatedTreatment.relatedAccount) {
                 var amountUpdate = await Accounting.findOneAndUpdate(
                     { _id: result.relatedTreatment.relatedAccount },
-                    { $inc: { amount: -req.body.paidAmount } }
+                    { $inc: { amount: req.body.paidAmount } }
                 )
             }
             //sec transaction
