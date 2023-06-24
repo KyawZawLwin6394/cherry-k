@@ -58,7 +58,7 @@ exports.createAdvanceRecord = async (req, res, next) => {
         const newAdvanceRecord = new AdvanceRecord(newBody);
         const result = await newAdvanceRecord.save();
         var fTransResult = await Transaction.create({
-            "amount": req.body.paidAmount,
+            "amount": req.body.amount,
             "date": Date.now(),
             "remark": null,
             "relatedAccounting": "6467379159a9bc811d97f4d2", //Advance received from customer
@@ -67,11 +67,11 @@ exports.createAdvanceRecord = async (req, res, next) => {
         })
         var amountUpdate = await Accounting.findOneAndUpdate(
             { _id: "6467379159a9bc811d97f4d2" },
-            { $inc: { amount: req.body.paidAmount } }
+            { $inc: { amount: req.body.amount } }
         )
         //sec transaction
         var secTransResult = await Transaction.create({
-            "amount": req.body.paidAmount,
+            "amount": req.body.amount,
             "date": Date.now(),
             "remark": null,
             "relatedBank": req.body.relatedBank,
@@ -90,12 +90,12 @@ exports.createAdvanceRecord = async (req, res, next) => {
         if (req.body.relatedBank) {
             var amountUpdate = await Accounting.findOneAndUpdate(
                 { _id: req.body.relatedBank },
-                { $inc: { amount: req.body.paidAmount } }
+                { $inc: { amount: req.body.amount } }
             )
         } else if (req.body.relatedCash) {
             var amountUpdate = await Accounting.findOneAndUpdate(
                 { _id: req.body.relatedCash },
-                { $inc: { amount: req.body.paidAmount } }
+                { $inc: { amount: req.body.amount } }
             )
         }
         res.status(200).send({

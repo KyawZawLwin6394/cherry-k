@@ -8,6 +8,7 @@ const Repay = require('../models/repayRecord');
 const Accounting = require('../models/accountingList');
 const Attachment = require('../models/attachment');
 const AdvanceRecords = require('../models/advanceRecord');
+const Treatment = require('../models/treatment');
 
 exports.listAllTreatmentSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -164,6 +165,87 @@ exports.createTreatmentSelection = async (req, res, next) => {
 
         data = { ...data, relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments, createdBy: createdBy, relatedBranch: req.mongoQuery.relatedBranch }
         console.log(data, 'data1')
+
+        if (req.body.paymentMethod === 'Advance') {
+            const treatmentResult = await Treatment.find({ _id: req.body.relatedTreatment })
+            const ARUpdate = await AdvanceRecords.findOneAndUpdate(
+                { _id: req.body.advanceID },
+                { $inc: { amount: req.body.totalAmount } },
+                { new: true }
+            )
+            var fTransResult = await Transaction.create({
+                "amount": req.body.totalAmount,
+                "date": Date.now(),
+                "remark": null,
+                "relatedAccounting": "6467379159a9bc811d97f4d2", //Advance received from customer
+                "type": "Debit",
+                "createdBy": createdBy
+            })
+            var amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: "6467379159a9bc811d97f4d2" },
+                { $inc: { amount: -req.body.totalAmount } }
+            )
+            if (req.body.deferAmount) {
+                //sec transaction
+                var secTransResult = await Transaction.create({
+                    "amount": req.body.totalAmount,
+                    "date": Date.now(),
+                    "remark": null,
+                    "relatedBank": req.body.relatedBank,
+                    "relatedCash": req.body.relatedCash,
+                    "type": "Debit",
+                    "relatedTransaction": fTransResult._id,
+                    "createdBy": createdBy
+                });
+                var fTransUpdate = await Transaction.findOneAndUpdate(
+                    { _id: fTransResult._id },
+                    {
+                        relatedTransaction: secTransResult._id
+                    },
+                    { new: true }
+                )
+                if (req.body.relatedBank) {
+                    var freqSecamountUpdate = await Accounting.findOneAndUpdate(
+                        { _id: req.body.relatedBank },
+                        { $inc: { amount: req.body.totalAmount } }
+                    )
+                } else if (req.body.relatedCash) {
+                    var freqSecamountUpdate = await Accounting.findOneAndUpdate(
+                        { _id: req.body.relatedCash },
+                        { $inc: { amount: req.body.totalAmount } }
+                    )
+
+                }
+                const ARUpdate = await AdvanceRecords.findOneAndUpdate(
+                    { _id: req.body.advanceID },
+                    { amount: 0 },
+                    { new: true }
+                )
+            } else if (req.body.deferAmount === undefined) {
+                //sec transaction
+                var secTransResult = await Transaction.create({
+                    "amount": req.body.totalAmount,
+                    "date": Date.now(),
+                    "remark": null,
+                    "relatedAccounting": treatmentResult[0].relatedAccount,
+                    "type": "Credit",
+                    "relatedTransaction": fTransResult._id,
+                    "createdBy": createdBy
+                });
+                var fTransUpdate = await Transaction.findOneAndUpdate(
+                    { _id: fTransResult._id },
+                    {
+                        relatedTransaction: secTransResult._id
+                    },
+                    { new: true }
+                )
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: treatmentResult[0].relatedAccount },
+                    { $inc: { amount: req.body.totalAmount } }
+                )
+            }
+            tvcCreate = true;
+        }
         //first transaction 
         if (req.body.paymentMethod === 'Cash Down') {
             var fTransResult = await Transaction.create({
@@ -352,7 +434,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 { new: true }
             )
         }
-        let populatedTV = await TreatmentVoucher.find({_id:treatmentVoucherResult._id}).populate('relatedDiscount')
+        let populatedTV = await TreatmentVoucher.find({ _id: treatmentVoucherResult._id }).populate('relatedDiscount')
         let response = {
             message: 'Treatment Selection create success',
             success: true,
