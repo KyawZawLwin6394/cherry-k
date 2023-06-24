@@ -15,7 +15,7 @@ exports.listAllAdvanceRecords = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await AdvanceRecord.find(query).populate('relatedPatient recievedPatient')
+        let result = await AdvanceRecord.find({ amount: { $gt: 0 }, isDeleted: false }).populate('relatedPatient recievedPatient')
         count = await AdvanceRecord.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
