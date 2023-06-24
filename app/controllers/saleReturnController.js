@@ -3,6 +3,7 @@ const SaleReturn = require('../models/saleReturn');
 const TreatmentSelection = require('../models/treatmentSelection');
 const TreatmentVoucher = require('../models/treatmentVoucher');
 const Transaction = require('../models/transaction');
+const Accounting = require('../models/accountingList');
 
 exports.listAllSaleReturns = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -25,9 +26,9 @@ exports.listAllSaleReturns = async (req, res) => {
                 populate: [{
                     path: 'relatedTreatment',
                     model: 'Treatments',
-                    populate:{
-                        path:'treatmentName',
-                        model:'TreatmentLists'
+                    populate: {
+                        path: 'treatmentName',
+                        model: 'TreatmentLists'
                     }
                 }]
             })
