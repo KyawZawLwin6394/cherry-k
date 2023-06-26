@@ -6,6 +6,7 @@ const MedicineSale = require('../models/medicineSale');
 const TreatmentVoucher = require('../models/treatmentVoucher');
 const Expense = require('../models/expense');
 const mergeAndSum = require('../lib/userUtil').mergeAndSum;
+const Currency = require('../models/currency');
 
 
 exports.listAllIncomes = async (req, res) => {
@@ -217,6 +218,7 @@ exports.getwithExactDate = async (req, res) => {
 }
 
 exports.totalIncome = async (req, res) => {
+  let currencyList = await Currency.find({});
   let { exactDate, relatedBranch } = req.query;
   let filterQuery = { relatedBankAccount: { $exists: true } }
   let filterQuery2 = { relatedBank: { $exists: true } }
@@ -313,8 +315,16 @@ exports.totalIncome = async (req, res) => {
     result[name] = (result[name] || 0) + finalAmount;
     return result;
   }, {});
-  const incomeBankTotal = incomeFilterBankResult.reduce((total, sale) => total + sale.finalAmount, 0);
-  const incomeCashTotal = incomeFilterCashResult.reduce((total, sale) => total + sale.finalAmount, 0);
+  const incomeBankTotal = incomeFilterBankResult.reduce((total, sale) => {
+    let cur = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+    let ans = cur * sale.finalAmount
+    return total + ans
+  }, 0);
+  const incomeCashTotal = incomeFilterCashResult.reduce((total, sale) => {
+    let cur = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+    let ans = cur * sale.finalAmount
+    return total + ans
+  }, 0);
 
   const finalResult = await mergeAndSum({
     Income: {
@@ -343,6 +353,7 @@ exports.totalIncome = async (req, res) => {
 exports.incomeFilter = async (req, res) => {
   let query = { relatedBankAccount: { $exists: true }, isDeleted: false }
   try {
+    const currencyList = await Currency.find({})
     const { start, end, relatedBranch, createdBy } = req.query
     if (start && end) query.date = { $gte: start, $lt: end }
     if (relatedBranch) query.relatedBranch = relatedBranch
@@ -361,8 +372,16 @@ exports.incomeFilter = async (req, res) => {
       result[name] = (result[name] || 0) + finalAmount;
       return result;
     }, {});
-    const BankTotal = bankResult.reduce((total, sale) => total + sale.finalAmount, 0);
-    const CashTotal = cashResult.reduce((total, sale) => total + sale.finalAmount, 0);
+    const BankTotal = bankResult.reduce((total, sale) => {
+      let cur = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+      let ans = cur * sale.finalAmount
+      return total + ans
+    }, 0);
+    const CashTotal = cashResult.reduce((total, sale) => {
+      let cur = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+      let ans = cur * sale.finalAmount
+      return total + ans
+    }, 0);
 
     return res.status(200).send({
       success: true,

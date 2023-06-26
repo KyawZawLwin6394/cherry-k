@@ -231,8 +231,16 @@ exports.expenseFilter = async (req, res) => {
             result[name] = (result[name] || 0) + finalAmount;
             return result;
         }, {});
-        const BankTotal = bankResult.reduce((total, sale) => total + sale.finalAmount, 0);
-        const CashTotal = cashResult.reduce((total, sale) => total + sale.finalAmount, 0);
+        const BankTotal = bankResult.reduce((total, sale) => {
+            let current = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+            let ans = current * sale.finalAmount
+            return total + ans
+        }, 0);
+        const CashTotal = cashResult.reduce((total, sale) => {
+            let current = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+            let ans = current * sale.finalAmount
+            return total + ans
+        }, 0);
         console.log(BankNames)
 
         return res.status(200).send({
