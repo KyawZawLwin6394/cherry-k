@@ -350,6 +350,185 @@ exports.totalIncome = async (req, res) => {
   return res.status(200).send({ success: true, data: finalResult })
 }
 
+// exports.totalIncome = async (req, res) => {
+//   try {
+//     const { exactDate, relatedBranch } = req.query;
+//     const startDate = getStartDate(exactDate);
+//     const endDate = getEndDate(exactDate);
+//     const currencyList = await Currency.find({});
+
+//     const msFilterBankResult = await getMedicineSaleData({ startDate, endDate, relatedBranch });
+//     const tvFilterBankResult = await getTreatmentVoucherData({ startDate, endDate, relatedBranch });
+//     const incomeFilterBankResult = await getIncomeData({ startDate, endDate, relatedBranch });
+
+//     const msFilterCashResult = await getMedicineSaleData({ startDate, endDate, relatedBankAccount: true });
+//     const tvFilterCashResult = await getTreatmentVoucherData({ startDate, endDate, relatedBankAccount: true });
+//     const incomeFilterCashResult = await getIncomeData({ startDate, endDate, relatedBankAccount: true });
+
+//     const finalResult = await mergeAndSum({
+//       Income: {
+//         BankData: incomeFilterBankResult,
+//         CashData: incomeFilterCashResult,
+//         currencyList
+//       },
+//       MedicineSale: {
+//         BankData: msFilterBankResult,
+//         CashData: msFilterCashResult,
+//         currencyList
+//       },
+//       TreatmentVoucher: {
+//         BankData: tvFilterBankResult,
+//         CashData: tvFilterCashResult,
+//         currencyList
+//       },
+//     });
+
+//     return res.status(200).send({ success: true, data: finalResult });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).send({ success: false, error: "An error occurred while calculating total income." });
+//   }
+// }
+
+// function getStartDate(exactDate) {
+//   if (exactDate) {
+//     const date = new Date(exactDate);
+//     return new Date(date.getFullYear(), date.getMonth(), date.getDate()); // Set start date to the beginning of the day
+//   }
+//   return null;
+// }
+
+// function getEndDate(exactDate) {
+//   if (exactDate) {
+//     const date = new Date(exactDate);
+//     return new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1); // Set end date to the beginning of the next day
+//   }
+//   return null;
+// }
+
+// async function getMedicineSaleData({ startDate, endDate, relatedBranch, relatedBankAccount }) {
+//   const filterQuery = { relatedBank: { $exists: true } };
+
+//   if (startDate && endDate) {
+//     filterQuery.createdAt = { $gte: startDate, $lt: endDate };
+//   }
+
+//   if (relatedBranch) {
+//     filterQuery.relatedBranch = relatedBranch;
+//   }
+
+//   if (relatedBankAccount) {
+//     filterQuery.relatedBankAccount = { $exists: true };
+//   }
+
+//   return await MedicineSale.find(filterQuery)
+//     .populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment relatedBank relatedCash')
+//     .populate({
+//       path: 'relatedTransaction',
+//       populate: [{
+//         path: 'relatedAccounting',
+//         model: 'AccountingLists'
+//       }, {
+//         path: 'relatedBank',
+//         model: 'AccountingLists'
+//       }, {
+//         path: 'relatedCash',
+//         model: 'AccountingLists'
+//       }]
+//     });
+// }
+
+// async function getTreatmentVoucherData({ startDate, endDate, relatedBranch, relatedBankAccount }) {
+//   const filterQuery = { relatedBank: { $exists: true } };
+
+//   if (startDate && endDate) {
+//     filterQuery.createdAt = { $gte: startDate, $lt: endDate };
+//   }
+
+//   if (relatedBranch) {
+//     filterQuery.relatedBranch = relatedBranch;
+//   }
+
+//   if (relatedBankAccount) {
+//     filterQuery.relatedBankAccount = { $exists: true };
+//   }
+
+//   return await TreatmentVoucher.find(filterQuery)
+//     .populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash');
+// }
+
+// async function getIncomeData({ startDate, endDate, relatedBranch, relatedBankAccount }) {
+//   const filterQuery = { relatedBankAccount: { $exists: true } };
+
+//   if (startDate && endDate) {
+//     filterQuery.date = { $gte: startDate, $lt: endDate };
+//   }
+
+//   if (relatedBranch) {
+//     filterQuery.relatedBranch = relatedBranch;
+//   }
+
+//   if (relatedBankAccount) {
+//     filterQuery.relatedBankAccount = { $exists: true };
+//   }
+
+//   return await Income.find(filterQuery).populate('relatedAccounting relatedBankAccount relatedCashAccount');
+// }
+
+// async function mergeAndSum(data) {
+//   const bankNames = {};
+//   const cashNames = {};
+//   let bankTotal = 0;
+//   let cashTotal = 0;
+
+//   for (const [key, value] of Object.entries(data)) {
+//     const { BankData, CashData, currencyList } = value;
+
+//     if (BankData) {
+//       for (const sale of BankData) {
+//         const { relatedBank, totalAmount } = sale;
+//         const { name } = relatedBank;
+//         bankNames[name] = (bankNames[name] || 0) + totalAmount;
+//       }
+//     }
+
+//     if (CashData) {
+//       for (const sale of CashData) {
+//         const { relatedCash, totalAmount } = sale;
+//         const { name } = relatedCash;
+//         cashNames[name] = (cashNames[name] || 0) + totalAmount;
+//       }
+//     }
+
+//     bankTotal += BankData ? BankData.reduce((total, sale) => total + sale.totalAmount, 0) : 0;
+//     cashTotal += CashData ? CashData.reduce((total, sale) => total + sale.totalAmount, 0) : 0;
+//   }
+
+//   const bankTotalConverted = convertCurrency(bankTotal, currencyList);
+//   const cashTotalConverted = convertCurrency(cashTotal, currencyList);
+
+//   return {
+//     BankNames: bankNames,
+//     CashNames: cashNames,
+//     BankTotal: bankTotalConverted,
+//     CashTotal: cashTotalConverted,
+//   };
+// }
+
+// function convertCurrency(amount, currencyList) {
+//   let convertedAmount = 0;
+
+//   for (const currency of currencyList) {
+//     if (currency.code === sale.finalCurrency) {
+//       convertedAmount = currency.exchangeRate * amount;
+//       break;
+//     }
+//   }
+
+//   return convertedAmount;
+// }
+
+
 exports.incomeFilter = async (req, res) => {
   let query = { relatedBankAccount: { $exists: true }, isDeleted: false }
   try {
