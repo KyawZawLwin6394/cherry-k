@@ -460,7 +460,10 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 { new: true }
             )
         }
-        let populatedTV = await TreatmentVoucher.find({ _id: treatmentVoucherResult._id }).populate('relatedDiscount')
+        if (treatmentVoucherResult) {
+            var populatedTV = await TreatmentVoucher.find({ _id: treatmentVoucherResult._id }).populate('relatedDiscount')
+        }
+
         let response = {
             message: 'Treatment Selection create success',
             success: true,
