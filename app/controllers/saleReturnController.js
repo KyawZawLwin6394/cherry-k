@@ -71,112 +71,49 @@ exports.getSaleReturn = async (req, res) => {
 
 exports.createSaleReturn = async (req, res, next) => {
     let newBody = req.body;
-    let { relatedTreatmentSelection, relatedSubTreatment, returnType, deferAmount, relatedBank, relatedCash, paidAmount, totalAmount } = req.body;
+    let { relatedTreatmentSelection, relatedSubTreatment, returnType, deferAmount, relatedBank, relatedCash, paidAmount, totalAmount, cashBack } = req.body;
     try {
+        const TSResult = await TreatmentSelection.find({ _id: relatedTreatmentSelection }).populate('relatedTreatment')
         if (returnType === 'Full Cash' && relatedTreatmentSelection) {
             var selecUpdate = await TreatmentSelection.findOneAndUpdate(
                 { _id: relatedTreatmentSelection },
                 { saleReturnFlag: true },
                 { new: true }
             )
+            if (cashBack > 0) {
+                // new expense acc(Debit) PLUS - fTrans (cashBack)
+                //     Bank or cash(credit) MINUS - secTrans (cashBack)
+                //----------------------------------------------------------
+            }
         }
-        const newSaleReturn = new SaleReturn(newBody);
-        const result = await newSaleReturn.save();
-        if (relatedTreatmentSelection && relatedSubTreatment) {
+        else if (returnType === 'SubTreatment' && relatedSubTreatment) {
             var selecUpdate = await TreatmentSelection.findOneAndUpdate(
                 { _id: relatedTreatmentSelection },
                 { saleReturnFlag: true },
                 { new: true }
             );
-        }
-        if (deferAmount) {
-            //Transaction
-            var fTransResult = await Transaction.create({
-                "amount": deferAmount,
-                "date": Date.now(),
-                "remark": null,
-                "relatedAccounting": "6492cbb6dbf11808abf6685d", //Sales Income(Treatement)
-                "type": "Credit",
-                "createdBy": req.credentials.id
-            })
-            var amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: "6492cbb6dbf11808abf6685d" }, //Sales Income(Treatement)
-                { $inc: { amount: -deferAmount } }
-            )
-            //sec transaction
-            var secTransResult = await Transaction.create({
-                "amount": deferAmount,
-                "date": Date.now(),
-                "remark": null,
-                "relatedBank": relatedBank,
-                "relatedCash": relatedCash,
-                "type": "Debit",
-                "relatedTransaction": fTransResult._id,
-                "createdBy": req.credentials.id
-            });
-            var fTransUpdate = await Transaction.findOneAndUpdate(
-                { _id: fTransResult._id },
-                {
-                    relatedTransaction: secTransResult._id
-                },
-                { new: true }
-            )
-            if (relatedBank) {
-                var amountUpdate = await Accounting.findOneAndUpdate(
-                    { _id: relatedBank },
-                    { $inc: { amount: deferAmount } }
-                )
-            } else if (relatedCash) {
-                var amountUpdate = await Accounting.findOneAndUpdate(
-                    { _id: relatedCash },
-                    { $inc: { amount: deferAmount } }
-                )
+            if (cashBack > 0) { //cashback for extra amount
+                // new expense acc (Debit) PLUS - ftrans (cashBack)
+                // bank/cash (Credit) MINUS -sTrans (cashBack)
+                //----------------------------------------------------------
             }
+
         }
-        if (paidAmount) {
-            //Transaction
-            var fTransResult = await Transaction.create({
-                "amount": totalAmount,
-                "date": Date.now(),
-                "remark": null,
-                "relatedAccounting": "6492cbb6dbf11808abf6685d", //Sales Income(Treatement)
-                "type": "Credit",
-                "createdBy": req.credentials.id
-            })
-            var amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: "6492cbb6dbf11808abf6685d" }, //Sales Income(Treatement)
-                { $inc: { amount: -totalAmount } }
-            )
-            //sec transaction
-            var secTransResult = await Transaction.create({
-                "amount": paidAmount,
-                "date": Date.now(),
-                "remark": null,
-                "relatedBank": relatedBank,
-                "relatedCash": relatedCash,
-                "type": "Debit",
-                "relatedTransaction": fTransResult._id,
-                "createdBy": req.credentials.id
-            });
-            var fTransUpdate = await Transaction.findOneAndUpdate(
-                { _id: fTransResult._id },
-                {
-                    relatedTransaction: secTransResult._id
-                },
-                { new: true }
-            )
-            if (relatedBank) {
-                var amountUpdate = await Accounting.findOneAndUpdate(
-                    { _id: relatedBank },
-                    { $inc: { amount: paidAmount } }
-                )
-            } else if (relatedCash) {
-                var amountUpdate = await Accounting.findOneAndUpdate(
-                    { _id: relatedCash },
-                    { $inc: { amount: paidAmount } }
-                )
-            }
-        }
+        var thirdTransResult = await Transaction.create({
+            "amount": totalAmount,
+            "date": Date.now(),
+            "remark": null,
+            "relatedAccounting": TSResult[0].relatedTreatment.relatedAccount, //relatedTreamentSelection.relatedTreatment.relatedAccount 
+            "type": "Debit",
+            "createdBy": req.credentials.id
+        })
+        var amountUpdate = await Accounting.findOneAndUpdate(
+            { _id: TSResult[0].relatedTreatment.relatedAccount },  //relatedTreamentSelection.relatedTreatment.relatedAccount 
+            { $inc: { amount: -totalAmount } }
+        )
+        const newSaleReturn = new SaleReturn(newBody);
+        const result = await newSaleReturn.save();
+
         res.status(200).send({
             message: 'SaleReturn create success',
             success: true,
