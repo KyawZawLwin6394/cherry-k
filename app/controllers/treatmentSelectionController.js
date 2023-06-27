@@ -255,12 +255,12 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 if (req.body.relatedBank) {
                     var freqSecamountUpdate = await Accounting.findOneAndUpdate(
                         { _id: req.body.relatedBank },
-                        { $inc: { amount: req.body.totalAmount } }
+                        { $inc: { amount: req.body.paidAmount } }
                     )
                 } else if (req.body.relatedCash) {
                     var freqSecamountUpdate = await Accounting.findOneAndUpdate(
                         { _id: req.body.relatedCash },
-                        { $inc: { amount: req.body.totalAmount } }
+                        { $inc: { amount: req.body.paidAmount } }
                     )
 
                 }
