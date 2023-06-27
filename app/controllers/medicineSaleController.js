@@ -69,7 +69,7 @@ exports.createMedicineSale = async (req, res, next) => {
   let data = req.body;
   let createdBy = req.credentials.id
   try {
-    let { medicineItems } = data
+    let { medicineItems, relatedBranch } = data
     //prepare CUS-ID
     const latestDocument = await MedicineSale.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
     if (latestDocument.length == 0) data = { ...data, seq: 1, voucherCode: "MVC-1" } // if seq is undefined set initial patientID and seq
@@ -147,7 +147,7 @@ exports.createMedicineSale = async (req, res, next) => {
       for (const e of medicineItems) {
 
         let totalUnit = e.stock - e.quantity
-        const result = await Stock.find({ relatedAccessoryItems: e.item_id, relatedBranch: relatedBranch })
+        const result = await Stock.find({ relatedMedicineItems: e.item_id, relatedBranch: relatedBranch })
         const from = result[0].fromUnit
         const to = result[0].toUnit
         const currentQty = (from * totalUnit) / to
@@ -161,8 +161,8 @@ exports.createMedicineSale = async (req, res, next) => {
           return res.status(500).send({ error: true, message: error.message })
         }
         const logResult = await Log.create({
-          "relatedTreatmentSelection": relatedTreatmentSelection,
-          "relatedAppointment": relatedAppointment,
+          "relatedTreatmentSelection": null,
+          "relatedAppointment": null,
           "relatedAccessoryItems": e.item_id,
           "currentQty": e.stock,
           "actualQty": e.actual,
@@ -185,7 +185,7 @@ exports.createMedicineSale = async (req, res, next) => {
     });
 
   } catch (error) {
-    //console.log(error)
+    console.log(error)
     return res.status(500).send({ "error": true, message: error.message })
   }
 };
