@@ -4,6 +4,7 @@ const Transaction = require('../models/transaction');
 const Accounting = require('../models/accountingList');
 const Patient = require('../models/patient');
 const Stock = require('../models/stock');
+const Log = require('../models/log')
 
 exports.listAllMedicineSales = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -68,6 +69,7 @@ exports.createMedicineSale = async (req, res, next) => {
   let data = req.body;
   let createdBy = req.credentials.id
   try {
+    let { medicineItems } = data
     //prepare CUS-ID
     const latestDocument = await MedicineSale.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
     if (latestDocument.length == 0) data = { ...data, seq: 1, voucherCode: "MVC-1" } // if seq is undefined set initial patientID and seq
@@ -140,6 +142,37 @@ exports.createMedicineSale = async (req, res, next) => {
     )
     data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.body.relatedBranch }
     console.log(data)
+
+    if (medicineItems !== undefined) {
+      for (const e of medicineItems) {
+
+        let totalUnit = e.stock - e.quantity
+        const result = await Stock.find({ relatedAccessoryItems: e.item_id, relatedBranch: relatedBranch })
+        const from = result[0].fromUnit
+        const to = result[0].toUnit
+        const currentQty = (from * totalUnit) / to
+        try {
+          const result = await Stock.findOneAndUpdate(
+            { relatedMedicineItems: e.item_id, relatedBranch: relatedBranch },
+            { totalUnit: totalUnit, currentQty: currentQty },
+            { new: true },
+          )
+        } catch (error) {
+          return res.status(500).send({ error: true, message: error.message })
+        }
+        const logResult = await Log.create({
+          "relatedTreatmentSelection": relatedTreatmentSelection,
+          "relatedAppointment": relatedAppointment,
+          "relatedAccessoryItems": e.item_id,
+          "currentQty": e.stock,
+          "actualQty": e.actual,
+          "finalQty": totalUnit,
+          "type": "Medicine Sale",
+          "relatedBranch": relatedBranch,
+          "createdBy": createdBy
+        })
+      }
+    }
     const newMedicineSale = new MedicineSale(data)
     const medicineSaleResult = await newMedicineSale.save()
     res.status(200).send({
