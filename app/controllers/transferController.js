@@ -47,7 +47,7 @@ exports.createTransfer = async (req, res, next) => {
       { new: true },
     );
     const toAccUpdate = await AccList.findOneAndUpdate(
-      { _id: req.body.fromAcc },
+      { _id: req.body.toAcc },
       { $inc: { amount: req.body.amount } },
       { new: true },
     );
