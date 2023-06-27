@@ -257,13 +257,16 @@ exports.stockRecieved = async (req, res) => {
         let createdBy = req.credentials.id
         const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, requestedQty, fromUnit, toUnit, stockRequestID } = req.body
         let totalUnit = (toUnit * recievedQty) / fromUnit
-        const sqResult = await StockRequest.find({
-            $or: [
-                { procedureMedicine: { $elemMatch: { item_id: procedureItemID } } },
-                { medicineLists: { $elemMatch: { item_id: medicineItemID } } },
-                { procedureAccessory: { $elemMatch: { item_id: accessoryItemID } } }
-            ]
-        })
+        const sqResult = await StockRequest.exists({
+            "procedureMedicine.item_id": procedureItemID
+          });
+        // const sqResult = await StockRequest.exists({
+        //     $or: [
+        //         { procedureMedicine: { $elemMatch: { item_id: procedureItemID } } },
+        //         { medicineLists: { $elemMatch: { item_id: medicineItemID } } },
+        //         { procedureAccessory: { $elemMatch: { item_id: accessoryItemID } } }
+        //     ]
+        // })
         console.log(sqResult)
         // if (procedureItemID) {
         //     var result = await Stock.findOneAndUpdate(
