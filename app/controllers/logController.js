@@ -149,6 +149,14 @@ exports.filterLogs = async (req, res, next) => {
 //   }
 // };
 
+exports.getStockTotalUnit = async (req, res) => {
+  try {
+    
+  } catch (error) {
+
+  }
+}
+
 exports.getUsage = async (req, res) => {
   try {
     const result = await Usage.find({ _id: req.params.id }).populate('procedureMedicine.item_id procedureAccessory.item_id machine.item_id machineError.item_id procedureItemsError.item_id accessoryItemsError.item_id')
@@ -258,8 +266,8 @@ exports.createUsage = async (req, res) => {
           if (e.stock < e.actual) {
             machineError.push(e)
           } else if (e.stock > e.actual) {
-            let totalUnit = e.stock - e.actual
             const result = await Stock.find({ relatedMachine: e.item_id, relatedBranch: relatedBranch })
+            let totalUnit = e.stock - e.actual
             const from = result[0].fromUnit
             const to = result[0].toUnit
             const currentQty = (from * totalUnit) / to
