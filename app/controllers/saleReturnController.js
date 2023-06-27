@@ -81,6 +81,48 @@ exports.createSaleReturn = async (req, res, next) => {
                 { new: true }
             )
             if (cashBack > 0) {
+                //649a4fbd23608d77fb20afb6
+                var fTransResult = await Transaction.create({
+                    "amount": cashBack,
+                    "date": Date.now(),
+                    "remark": null,
+                    "relatedAccounting": "649a4fbd23608d77fb20afb6", //Sales Cash Back
+                    "type": "Debit",
+                    "createdBy": createdBy
+                })
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: "649a4fbd23608d77fb20afb6" },  //Sales Cash Back
+                    { $inc: { amount: cashBack } }
+                )
+                //sec transaction
+                var secTransResult = await Transaction.create({
+                    "amount": cashBack,
+                    "date": Date.now(),
+                    "remark": null,
+                    "relatedBank": req.body.relatedBank,
+                    "relatedCash": req.body.relatedCash,
+                    "type": "Credit",
+                    "relatedTransaction": fTransResult._id,
+                    "createdBy": createdBy
+                });
+                var fTransUpdate = await Transaction.findOneAndUpdate(
+                    { _id: fTransResult._id },
+                    {
+                        relatedTransaction: secTransResult._id
+                    },
+                    { new: true }
+                )
+                if (req.body.relatedBank) {
+                    var amountUpdate = await Accounting.findOneAndUpdate(
+                        { _id: req.body.relatedBank },
+                        { $inc: { amount: -cashBack } }
+                    )
+                } else if (req.body.relatedCash) {
+                    var amountUpdate = await Accounting.findOneAndUpdate(
+                        { _id: req.body.relatedCash },
+                        { $inc: { amount: -cashBack } }
+                    )
+                }
                 // new expense acc(Debit) PLUS - fTrans (cashBack)
                 //     Bank or cash(credit) MINUS - secTrans (cashBack)
                 //----------------------------------------------------------
@@ -92,7 +134,49 @@ exports.createSaleReturn = async (req, res, next) => {
                 { saleReturnFlag: true },
                 { new: true }
             );
-            if (cashBack > 0) { //cashback for extra amount
+            if (cashBack > 0) {
+                var fTransResult = await Transaction.create({
+                    "amount": cashBack,
+                    "date": Date.now(),
+                    "remark": null,
+                    "relatedAccounting": "649a4fbd23608d77fb20afb6", //Sales Cash Back
+                    "type": "Debit",
+                    "createdBy": createdBy
+                })
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: "649a4fbd23608d77fb20afb6" },  //Sales Cash Back
+                    { $inc: { amount: cashBack } }
+                )
+                //sec transaction
+                var secTransResult = await Transaction.create({
+                    "amount": cashBack,
+                    "date": Date.now(),
+                    "remark": null,
+                    "relatedBank": req.body.relatedBank,
+                    "relatedCash": req.body.relatedCash,
+                    "type": "Credit",
+                    "relatedTransaction": fTransResult._id,
+                    "createdBy": createdBy
+                });
+                var fTransUpdate = await Transaction.findOneAndUpdate(
+                    { _id: fTransResult._id },
+                    {
+                        relatedTransaction: secTransResult._id
+                    },
+                    { new: true }
+                )
+                if (req.body.relatedBank) {
+                    var amountUpdate = await Accounting.findOneAndUpdate(
+                        { _id: req.body.relatedBank },
+                        { $inc: { amount: -cashBack } }
+                    )
+                } else if (req.body.relatedCash) {
+                    var amountUpdate = await Accounting.findOneAndUpdate(
+                        { _id: req.body.relatedCash },
+                        { $inc: { amount: -cashBack } }
+                    )
+                }
+                //cashback for extra amount
                 // new expense acc (Debit) PLUS - ftrans (cashBack)
                 // bank/cash (Credit) MINUS -sTrans (cashBack)
                 //----------------------------------------------------------
