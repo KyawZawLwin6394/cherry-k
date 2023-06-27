@@ -163,7 +163,7 @@ exports.createMedicineSale = async (req, res, next) => {
         const logResult = await Log.create({
           "relatedTreatmentSelection": null,
           "relatedAppointment": null,
-          "relatedAccessoryItems": e.item_id,
+          "relatedMedicineItems": e.item_id,
           "currentQty": e.stock,
           "actualQty": e.actual,
           "finalQty": totalUnit,
