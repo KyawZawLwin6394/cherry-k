@@ -67,7 +67,14 @@ exports.listAllPatients = async (req, res) => {
 exports.getPatient = async (req, res) => {
   let query = req.mongoQuery
   if (req.params.id) query._id = req.params.id
-  const result = await Patient.find(query).populate('img').populate('relatedMember').populate({
+  const result = await Patient.find(query).populate('img').populate({
+    path: 'relatedMember',
+    model: 'Members',
+    populate: {
+      path: 'relatedDiscount',
+      model: 'Discounts'
+    }
+  }).populate({
     path: 'relatedTreatmentSelection',
     model: 'TreatmentSelections',
     populate: {
