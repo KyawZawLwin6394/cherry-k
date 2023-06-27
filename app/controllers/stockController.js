@@ -6,6 +6,7 @@ const AccessoryItems = require('../models/accessoryItem');
 const Branch = require('../models/branch');
 const Log = require('../models/log');
 const RecievedRecords = require('../models/recievedRecord');
+const StockRequest = require('../models/stockRequest');
 
 exports.listAllStocks = async (req, res) => {
     let query = req.mongoQuery
@@ -254,79 +255,88 @@ exports.checkReorder = async (req, res) => {
 exports.stockRecieved = async (req, res) => {
     try {
         let createdBy = req.credentials.id
-        const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, requestedQty, fromUnit, toUnit } = req.body
+        const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, requestedQty, fromUnit, toUnit, stockRequestID } = req.body
         let totalUnit = (toUnit * recievedQty) / fromUnit
-        if (procedureItemID) {
-            var result = await Stock.findOneAndUpdate(
-                { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
-                {
-                    $inc: {
-                        currentQty: recievedQty,
-                        totalUnit: totalUnit
-                    }
-                },
-                { new: true }
-            ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
-            var RecievedRecordsResult = await RecievedRecords.create({
-                createdAt: Date.now(),
-                createdBy: createdBy,
-                relatedBranch: relatedBranch,
-                requestedQty: requestedQty,
-                recievedQty: recievedQty,
-                relatedProcedureItems: procedureItemID
-            })
-        }
-        if (medicineItemID) {
-            var result = await Stock.findOneAndUpdate(
-                { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
-                {
-                    $inc: {
-                        currentQty: recievedQty,
-                        totalUnit: totalUnit
-                    }
-                },
-                { new: true }
-            ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
-            var RecievedRecordsResult = await RecievedRecords.create({
-                createdAt: Date.now(),
-                createdBy: createdBy,
-                relatedBranch: relatedBranch,
-                requestedQty: requestedQty,
-                recievedQty: recievedQty,
-                relatedMedicineItems: medicineItemID
-            })
-        }
-        if (accessoryItemID) {
-            var result = await Stock.findOneAndUpdate(
-                { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },
-                {
-                    $inc: {
-                        currentQty: recievedQty,
-                        totalUnit: totalUnit
-                    }
-                },
-                { new: true }
-            ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
-            var RecievedRecordsResult = await RecievedRecords.create({
-                createdAt: Date.now(),
-                createdBy: createdBy,
-                relatedBranch: relatedBranch,
-                requestedQty: requestedQty,
-                recievedQty: recievedQty,
-                relatedAccessoryItems: accessoryItemID
-            })
-        }
-
-        const logResult = await Log.create({
-            "relatedStock": result._id,
-            "currentQty": requestedQty,
-            "actualQty": recievedQty,
-            "finalQty": recievedQty,
-            "type": "Request Recieved",
-            "relatedBranch": relatedBranch,
-            "createdBy": createdBy
+        const sqResult = await StockRequest.find({
+            $or: [
+                { procedureMedicine: { $elemMatch: { item_id: procedureItemID } } },
+                { medicineLists: { $elemMatch: { item_id: medicineItemID } } },
+                { procedureAccessory: { $elemMatch: { item_id: accessoryItemID } } }
+            ]
         })
-        return res.status(200).send({ success: true, data: result, log: logResult, RecievedRecordsResult: RecievedRecordsResult })
+        console.log(sqResult)
+        // if (procedureItemID) {
+        //     var result = await Stock.findOneAndUpdate(
+        //         { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
+        //         {
+        //             $inc: {
+        //                 currentQty: recievedQty,
+        //                 totalUnit: totalUnit
+        //             }
+        //         },
+        //         { new: true }
+        //     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+        //     var RecievedRecordsResult = await RecievedRecords.create({
+        //         createdAt: Date.now(),
+        //         createdBy: createdBy,
+        //         relatedBranch: relatedBranch,
+        //         requestedQty: requestedQty,
+        //         recievedQty: recievedQty,
+        //         relatedProcedureItems: procedureItemID
+        //     })
+        // }
+        // if (medicineItemID) {
+        //     var result = await Stock.findOneAndUpdate(
+        //         { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
+        //         {
+        //             $inc: {
+        //                 currentQty: recievedQty,
+        //                 totalUnit: totalUnit
+        //             }
+        //         },
+        //         { new: true }
+        //     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+        //     var RecievedRecordsResult = await RecievedRecords.create({
+        //         createdAt: Date.now(),
+        //         createdBy: createdBy,
+        //         relatedBranch: relatedBranch,
+        //         requestedQty: requestedQty,
+        //         recievedQty: recievedQty,
+        //         relatedMedicineItems: medicineItemID
+        //     })
+        // }
+        // if (accessoryItemID) {
+        //     var result = await Stock.findOneAndUpdate(
+        //         { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },
+        //         {
+        //             $inc: {
+        //                 currentQty: recievedQty,
+        //                 totalUnit: totalUnit
+        //             }
+        //         },
+        //         { new: true }
+        //     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+        //     var RecievedRecordsResult = await RecievedRecords.create({
+        //         createdAt: Date.now(),
+        //         createdBy: createdBy,
+        //         relatedBranch: relatedBranch,
+        //         requestedQty: requestedQty,
+        //         recievedQty: recievedQty,
+        //         relatedAccessoryItems: accessoryItemID
+        //     })
+        // }
+
+        // const logResult = await Log.create({
+        //     "relatedStock": result._id,
+        //     "currentQty": requestedQty,
+        //     "actualQty": recievedQty,
+        //     "finalQty": recievedQty,
+        //     "type": "Request Recieved",
+        //     "relatedBranch": relatedBranch,
+        //     "createdBy": createdBy
+        // })
+        //return res.status(200).send({ success: true, data: result, log: logResult, RecievedRecordsResult: RecievedRecordsResult })
+        return res.status(200).send({ success: true, sqResult: sqResult })
     } catch (error) {
         return res.status(500).send({ error: true, message: error.message })
     }

@@ -152,10 +152,10 @@ exports.filterLogs = async (req, res, next) => {
 exports.getStockTotalUnit = async (req, res) => {
   try {
     let data = req.body;
-    if (data.procedureItems) var procedureItems = await Stock.find({ relatedProcedureItems: { $in: data.procedureItems } }).populate('relatedProcedureItems')
+    if (data.procedureItems) var procedureItems = await Stock.find({ relatedProcedureItems: { $in: data.procedureItems }, relatedBranch: data.relatedBranch }).populate('relatedProcedureItems')
     if (data.medicineItems) var medicineItems = await Stock.find({ relatedMedicineItems: { $in: data.medicineItems }, relatedBranch: data.relatedBranch }).populate('relatedAccessoryItems')
     if (data.accessoryItems) var accessoryItems = await Stock.find({ relatedAccessoryItems: { $in: data.accessoryItems }, relatedBranch: data.relatedBranch }).populate('relatedAccessoryItems')
-    if (data.machine) var machine = await Stock.find({ relatedMachine: { $in: data.machine } }).populate('relatedMachine')
+    if (data.machine) var machine = await Stock.find({ relatedMachine: { $in: data.machine }, relatedBranch: data.relatedBranch }).populate('relatedMachine')
     return res.status(200).send({
       success: true,
       procedureItems: procedureItems,

@@ -12,7 +12,10 @@ let StockRequestSchema = new Schema({
         },
         stockQty: Number,
         requestedQty: Number,
-        purchasePrice: Number
+        purchasePrice: Number,
+        flag: {
+            default: false
+        }
     }],
     medicineLists: [{
         item_id: {
@@ -21,7 +24,10 @@ let StockRequestSchema = new Schema({
         },
         stockQty: Number,
         requestedQty: Number,
-        purchasePrice: Number
+        purchasePrice: Number,
+        flag: {
+            default: false
+        }
     }],
     procedureAccessory: [{
         item_id: {
@@ -30,7 +36,10 @@ let StockRequestSchema = new Schema({
         },
         stockQty: Number,
         requestedQty: Number,
-        purchasePrice: Number
+        purchasePrice: Number,
+        flag: {
+            default: false
+        }
     }],
     relatedBranch: {
         type: mongoose.Schema.Types.ObjectId,
