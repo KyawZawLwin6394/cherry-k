@@ -43,7 +43,14 @@ exports.listAllPatients = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await Patient.find(query).skip(skip).populate('img');
+    let result = await Patient.find(query).skip(skip).populate('img').populate({
+      path: 'relatedMember',
+      model: 'Members',
+      populate: {
+        path: 'relatedDiscount',
+        model: 'Discounts'
+      }
+    });
     count = await Patient.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
