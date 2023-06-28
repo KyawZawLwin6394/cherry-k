@@ -296,7 +296,7 @@ exports.stockRecieved = async (req, res) => {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
             }
             var result = await Stock.findOneAndUpdate(
-                { relatedMedicineItems: procedureItemID, relatedBranch: relatedBranch },
+                { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
                 {
                     $inc: {
                         currentQty: parseInt(recievedQty),
