@@ -3,7 +3,7 @@ const User = require('../models/user');
 exports.createUser = async (req, res) => {
   let data = req.body;
   try {
-    data = {...data, isUser:true} // set user role
+    data = { ...data, isUser: true } // set user role
     const newUser = new User(data);
     let result = await newUser.save();
     res.status(200).send({
@@ -11,11 +11,6 @@ exports.createUser = async (req, res) => {
       data: result,
     });
   } catch (e) {
-    const duplicateKey = Object.keys(e.keyValue)
-    if (e.code === 11000)
-      return res
-        .status(500)
-        .send({ error: true, message: `${duplicateKey} is already registered!` });
     return res.status(500).send({ error: true, message: e.message });
   }
 };
@@ -23,7 +18,7 @@ exports.createUser = async (req, res) => {
 exports.createDoctor = async (req, res) => {
   let data = req.body;
   try {
-    data = {...data, isDoctor:true} // set doctor role
+    data = { ...data, isDoctor: true } // set doctor role
     const newUser = new User(data);
     let result = await newUser.save();
     res.status(200).send({
@@ -43,7 +38,7 @@ exports.createDoctor = async (req, res) => {
 exports.createAdmin = async (req, res) => {
   let data = req.body;
   try {
-    data = {...data, isAdmin:true} // set admin role
+    data = { ...data, isAdmin: true } // set admin role
     const newUser = new User(data);
     let result = await newUser.save();
     res.status(200).send({
@@ -67,7 +62,7 @@ exports.listAllUsers = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10;
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -111,8 +106,8 @@ exports.updateUser = async (req, res, next) => {
   let data = req.body;
   try {
 
-    const {password, ...preparation} = data //removes password field from data
-    let result = await User.findByIdAndUpdate(req.body.id, {$set:preparation}, {
+    const { password, ...preparation } = data //removes password field from data
+    let result = await User.findByIdAndUpdate(req.body.id, { $set: preparation }, {
       new: true,
     });
     return res.status(200).send({ success: true, data: result });
