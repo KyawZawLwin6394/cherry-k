@@ -257,37 +257,67 @@ exports.stockRecieved = async (req, res) => {
         let createdBy = req.credentials.id
         const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, requestedQty, fromUnit, toUnit, stockRequestID } = req.body
         let totalUnit = (toUnit * recievedQty) / fromUnit
-        const sqResult = await StockRequest.exists({
-            "procedureMedicine.item_id": procedureItemID
-          });
-        // const sqResult = await StockRequest.exists({
-        //     $or: [
-        //         { procedureMedicine: { $elemMatch: { item_id: procedureItemID } } },
-        //         { medicineLists: { $elemMatch: { item_id: medicineItemID } } },
-        //         { procedureAccessory: { $elemMatch: { item_id: accessoryItemID } } }
-        //     ]
-        // })
-        console.log(sqResult)
-        // if (procedureItemID) {
-        //     var result = await Stock.findOneAndUpdate(
-        //         { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
-        //         {
-        //             $inc: {
-        //                 currentQty: recievedQty,
-        //                 totalUnit: totalUnit
-        //             }
-        //         },
-        //         { new: true }
-        //     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
-        //     var RecievedRecordsResult = await RecievedRecords.create({
-        //         createdAt: Date.now(),
-        //         createdBy: createdBy,
-        //         relatedBranch: relatedBranch,
-        //         requestedQty: requestedQty,
-        //         recievedQty: recievedQty,
-        //         relatedProcedureItems: procedureItemID
-        //     })
-        // }
+        const sqResult = await StockRequest.find({
+            _id: stockRequestID, isDeleted: false
+        });
+        if (procedureItemID) {
+            const flag = sqResult[0].procedureMedicine.filter(item => item.item_id.toString() === procedureItemID)
+            if (flag.length === 0) return res.status(500).send({ error: true, message: 'This procedure item does not exists in the stock reqeust!' })
+            if (flag[0].flag === true) {
+                return res.status(500).send({ error: true, message: 'Already Recieved' })
+            }
+            var result = await Stock.findOneAndUpdate(
+                { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
+                {
+                    $inc: {
+                        currentQty: parseInt(recievedQty),
+                        totalUnit: parseInt(totalUnit)
+                    }
+                },
+                { new: true }
+            ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+            var RecievedRecordsResult = await RecievedRecords.create({
+                createdAt: Date.now(),
+                createdBy: createdBy,
+                relatedBranch: relatedBranch,
+                requestedQty: parseInt(flag[0].requestedQty),
+                recievedQty: parseInt(recievedQty),
+                relatedProcedureItems: procedureItemID
+            })
+            const srresult = await StockRequest.findOneAndUpdate(
+                { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
+                { $set: { 'procedureMedicine.$.flag': true } }
+            );
+        }
+        if (medicineItemID) {
+            const flag = sqResult[0].medicineLists.filter(item => item.item_id.toString() === medicineItemID)
+            if (flag.length === 0) return res.status(500).send({ error: true, message: 'This medicine item does not exists in the stock reqeust!' })
+            if (flag[0].flag === true) {
+                return res.status(500).send({ error: true, message: 'Already Recieved' })
+            }
+            var result = await Stock.findOneAndUpdate(
+                { relatedMedicineItems: procedureItemID, relatedBranch: relatedBranch },
+                {
+                    $inc: {
+                        currentQty: parseInt(recievedQty),
+                        totalUnit: parseInt(totalUnit)
+                    }
+                },
+                { new: true }
+            ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+            var RecievedRecordsResult = await RecievedRecords.create({
+                createdAt: Date.now(),
+                createdBy: createdBy,
+                relatedBranch: relatedBranch,
+                requestedQty: parseInt(flag[0].requestedQty),
+                recievedQty: parseInt(recievedQty),
+                relatedMedicineItems: medicineItemID
+            })
+            const srresult = await StockRequest.findOneAndUpdate(
+                { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
+                { $set: { 'medicineLists.$.flag': true } }
+            );
+        }
         // if (medicineItemID) {
         //     var result = await Stock.findOneAndUpdate(
         //         { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
@@ -308,6 +338,35 @@ exports.stockRecieved = async (req, res) => {
         //         relatedMedicineItems: medicineItemID
         //     })
         // }
+        if (accessoryItemID) {
+            const flag = sqResult[0].procedureAccessory.filter(item => item.item_id.toString() === accessoryItemID)
+            if (flag.length === 0) return res.status(500).send({ error: true, message: 'This accessory item does not exists in the stock reqeust!' })
+            if (flag[0].flag === true) {
+                return res.status(500).send({ error: true, message: 'Already Recieved' })
+            }
+            var result = await Stock.findOneAndUpdate(
+                { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },
+                {
+                    $inc: {
+                        currentQty: parseInt(recievedQty),
+                        totalUnit: parseInt(totalUnit)
+                    }
+                },
+                { new: true }
+            ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+            var RecievedRecordsResult = await RecievedRecords.create({
+                createdAt: Date.now(),
+                createdBy: createdBy,
+                relatedBranch: relatedBranch,
+                requestedQty: parseInt(flag[0].requestedQty),
+                recievedQty: parseInt(recievedQty),
+                relatedAccessoryItems: accessoryItemID
+            })
+            const srresult = await StockRequest.findOneAndUpdate(
+                { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
+                { $set: { 'procedureAccessory.$.flag': true } }
+            );
+        }
         // if (accessoryItemID) {
         //     var result = await Stock.findOneAndUpdate(
         //         { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },
@@ -329,18 +388,19 @@ exports.stockRecieved = async (req, res) => {
         //     })
         // }
 
-        // const logResult = await Log.create({
-        //     "relatedStock": result._id,
-        //     "currentQty": requestedQty,
-        //     "actualQty": recievedQty,
-        //     "finalQty": recievedQty,
-        //     "type": "Request Recieved",
-        //     "relatedBranch": relatedBranch,
-        //     "createdBy": createdBy
-        // })
-        //return res.status(200).send({ success: true, data: result, log: logResult, RecievedRecordsResult: RecievedRecordsResult })
-        return res.status(200).send({ success: true, sqResult: sqResult })
+        const logResult = await Log.create({
+            "relatedStock": result._id,
+            "currentQty": requestedQty,
+            "actualQty": recievedQty,
+            "finalQty": recievedQty,
+            "type": "Request Recieved",
+            "relatedBranch": relatedBranch,
+            "createdBy": createdBy
+        })
+        return res.status(200).send({ success: true, data: result, log: logResult, RecievedRecordsResult: RecievedRecordsResult })
+        //return res.status(200).send({ success: true, sqResult: sqResult })
     } catch (error) {
+        console.log(error)
         return res.status(500).send({ error: true, message: error.message })
     }
 }
