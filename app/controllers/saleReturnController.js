@@ -71,6 +71,7 @@ exports.getSaleReturn = async (req, res) => {
 
 exports.createSaleReturn = async (req, res, next) => {
     let newBody = req.body;
+    let createdBy = req.credentials.id
     let { relatedTreatmentSelection, relatedSubTreatment, returnType, deferAmount, relatedBank, relatedCash, paidAmount, totalAmount, cashBack } = req.body;
     try {
         const TSResult = await TreatmentSelection.find({ _id: relatedTreatmentSelection }).populate('relatedTreatment')
