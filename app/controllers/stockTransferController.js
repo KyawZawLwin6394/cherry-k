@@ -164,7 +164,7 @@ exports.createStockTransfer = async (req, res, next) => {
       procedureMedicine.map(async (e, i) => {
         if (e.stockQty < e.transferQty) {
           procedureMedicineError.push(e)
-        } else if (e.stockQty > e.transferQty) {
+        } else if (e.stockQty >= e.transferQty) {
           let currentQty = e.stockQty - e.transferQty //both must be currentQty
           const result = await ProcedureMedicine.find({ _id: e.item_id })
           const from = result[0].fromUnit
@@ -199,7 +199,7 @@ exports.createStockTransfer = async (req, res, next) => {
       medicineLists.map(async (e, i) => {
         if (e.stockQty < e.transferQty) {
           medicineListsError.push(e)
-        } else if (e.stockQty > e.transferQty) {
+        } else if (e.stockQty >= e.transferQty) {
           let currentQty = e.stockQty - e.transferQty //both must be currentQty
           const result = await MedicineLists.find({ _id: e.item_id })
           const from = result[0].fromUnit
@@ -234,7 +234,7 @@ exports.createStockTransfer = async (req, res, next) => {
       procedureAccessory.map(async (e, i) => {
         if (e.stockQty < e.transferQty) {
           procedureAccessoryError.push(e)
-        } else if (e.stockQty > e.transferQty) {
+        } else if (e.stockQty >= e.transferQty) {
           let currentQty = e.stockQty - e.transferQty //both must be currentQty
           const result = await ProcedureAccessory.find({ _id: e.item_id })
           const from = result[0].fromUnit
