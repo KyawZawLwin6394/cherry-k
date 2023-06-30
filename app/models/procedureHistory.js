@@ -53,7 +53,7 @@ let ProcedureHistorySchema = new Schema({
     },
     date: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     },
     pHistory: {
         type: [mongoose.Schema.Types.ObjectId],

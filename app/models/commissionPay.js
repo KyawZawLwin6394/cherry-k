@@ -16,7 +16,7 @@ let ComissionPaySchema = new Schema({
     },
     collectDate: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     },
     remark: {
         type: String

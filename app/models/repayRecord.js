@@ -16,7 +16,7 @@ let RepayRecordSchema = new Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now()
+    default: Date.now
   },
   isDeleted: {
     type: Boolean,

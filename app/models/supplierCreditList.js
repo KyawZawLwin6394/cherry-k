@@ -16,7 +16,7 @@ let SupplierCreditListSchema = new Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now()
+    default: Date.now
   },
   creditAmount: {
     type: Number

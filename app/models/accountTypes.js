@@ -12,7 +12,7 @@ let AccountTypeSchema = new Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     },
     description: {
         type: String,

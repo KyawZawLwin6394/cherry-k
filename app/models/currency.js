@@ -19,7 +19,7 @@ let CurrencySchema = new Schema({
   },
   lastUpdate: {
     type:Date,
-    default:Date.now(),
+    default:Date.now,
     required:true,
   },
   // description: {
