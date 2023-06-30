@@ -9,7 +9,7 @@ exports.listAllTreatments = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 30; //limit
     skip = +skip || 0;
-    let query = { isDeleted: false },
+    let query = { isDeleted: false, sellEndFlag: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -40,7 +40,7 @@ exports.listAllTreatments = async (req, res) => {
 };
 
 exports.getTreatment = async (req, res) => {
-  const result = await Treatment.find({ _id: req.params.id, isDeleted: false }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('machine.item_id').populate('procedureAccessory.item_id').populate('medicineLists.item_id').populate('procedureMedicine.item_id').populate('treatmentName')
+  const result = await Treatment.find({ _id: req.params.id, isDeleted: false, sellEndFlag: false }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('machine.item_id').populate('procedureAccessory.item_id').populate('medicineLists.item_id').populate('procedureMedicine.item_id').populate('treatmentName')
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });

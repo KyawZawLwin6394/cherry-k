@@ -1,6 +1,7 @@
 'use strict';
 const SellEnd = require('../models/sellend');
 const Transaction = require('../models/transaction');
+const Treatment = require('../models/treatment');
 
 exports.listAllSellEnds = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -49,6 +50,10 @@ exports.createSellEnd = async (req, res, next) => {
     const newBody = req.body;
     const newSellEnd = new SellEnd(newBody);
     const result = await newSellEnd.save();
+    const updateManyResult = await Treatment.updateMany(
+      { "machine.item_id": relatedFixedAsset },
+      { $set: { sellEndFlag: true } }
+    )
     const firstTransaction =
     {
       "amount": newBody.profitAndLoss,
@@ -77,6 +82,7 @@ exports.createSellEnd = async (req, res, next) => {
       },
       { new: true }
     )
+
     res.status(200).send({
       message: 'SellEnd create success',
       success: true,

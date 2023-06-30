@@ -106,6 +106,10 @@ let TreatmentSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
   },
+  sellEndFlag: {
+    type: Boolean,
+    default: false
+  }
 });
 
 module.exports = mongoose.model('Treatments', TreatmentSchema);
