@@ -1,6 +1,7 @@
 'use strict';
 const StockTransfer = require('../models/stockTransfer');
 const Stock = require('../models/stock');
+const StockRequest = require('../models/stockRequest')
 const ProcedureMedicine = require('../models/procedureItem');
 const MedicineLists = require('../models/medicineItem');
 const ProcedureAccessory = require('../models/accessoryItem');
@@ -270,6 +271,11 @@ exports.createStockTransfer = async (req, res, next) => {
     }
     const newStockTransfer = new StockTransfer(newBody);
     const result = await newStockTransfer.save();
+    const stockRequestUpdate = await StockRequest.findOneAndUpdate(
+      { _id: req.body.stockRequestID },
+      { relatedTransfer: result._id },
+      {new:true}
+    )
 
     let response = { success: true, message: 'StockTransfer create success' }
     if (procedureMedicineError.length > 0) response.procedureMedicineError = procedureMedicineError

@@ -61,6 +61,10 @@ let StockRequestSchema = new Schema({
         type: Boolean,
         default: false
     },
+    relatedTransfer:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'StockTransfers'
+    },
     seq: {
         type: Number
     },

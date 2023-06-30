@@ -13,7 +13,7 @@ let StockTransferSchema = new Schema({
         stockQty: Number,
         requestedQty: Number,
         transferQty: Number,
-        purchasePrice: Number
+        purchasePrice: Number,
     }],
     medicineLists: [{
         item_id: {
