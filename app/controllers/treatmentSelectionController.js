@@ -605,7 +605,6 @@ exports.treatmentPayment = async (req, res, next) => {
         }
         if (result.paymentMethod === 'Credit') { //
             let dataTVC = {
-                "relatedBranch": req.body.relatedBranch,
                 "relatedTreatmentSelection": result._id,
                 "relatedTreatment": req.body.relatedTreatment,
                 "relatedAppointment": req.body.relatedAppointment,

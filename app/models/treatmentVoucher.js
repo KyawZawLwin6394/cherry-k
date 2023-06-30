@@ -13,7 +13,7 @@ let TreatmentVoucherSchema = new Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     },
     relatedTreatment: {
         type: mongoose.Schema.Types.ObjectId,

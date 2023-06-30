@@ -122,3 +122,17 @@ exports.trialBalance = async (req, res) => {
   }
 
 }
+
+exports.getRelatedTransactionExpense = async (req, res) => {
+  const result = await Transaction.find({ relatedExpense: req.params.id, isDeleted: false }).populate('relatedAccounting').populate('relatedTransaction').populate('relatedBank').populate('relatedCash').populate('relatedExpense');
+  if (!result)
+    return res.status(500).json({ error: true, message: 'No Record Found' });
+  return res.status(200).send({ success: true, data: result });
+};
+
+exports.getRelatedTransactionIncome = async (req, res) => {
+  const result = await Transaction.find({ relatedIncome: req.params.id, isDeleted: false }).populate('relatedAccounting').populate('relatedTransaction').populate('relatedBank').populate('relatedCash').populate('relatedIncome');
+  if (!result)
+    return res.status(500).json({ error: true, message: 'No Record Found' });
+  return res.status(200).send({ success: true, data: result });
+};
