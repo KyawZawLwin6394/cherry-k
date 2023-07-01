@@ -2,6 +2,7 @@
 const Expense = require('../models/expense');
 const Transaction = require('../models/transaction');
 const Accounting = require('../models/accountingList');
+const Currency = require('../models/currency');
 
 exports.listAllExpenses = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -212,6 +213,7 @@ exports.getwithExactDate = async (req, res) => {
 exports.expenseFilter = async (req, res) => {
     let query = { relatedBankAccount: { $exists: true }, isDeleted: false }
     try {
+        let currencyList = await Currency.find({});
         const { start, end, relatedBranch, createdBy } = req.query
         if (start && end) query.date = { $gte: start, $lt: end }
         if (relatedBranch) query.relatedBranch = relatedBranch
