@@ -89,6 +89,32 @@ exports.createPackageSelectionCode = async (req, res) => {
     }
 }
 
+exports.appointmentGenerate = async (req, res) => {
+    let relatedAppointments = []
+    const dataconfigs = [];
+    let { relatedPatient, relatedDoctor, originalDate, relatedBranch, treatmentTimes, inBetweenDuration } = req.body
+    if (originalDate === undefined) return res.status(500).send({ error: true, message: 'Original Date is required' })
+    const appointmentConfig = {
+        relatedPatient: relatedPatient,
+        relatedDoctor: relatedDoctor,
+        originalDate: new Date(originalDate), // Convert to Date object
+        phone: phone,
+        relatedBranch: relatedBranch
+    };
+    const numTreatments = treatmentTimes;
+    for (let i = 0; i < numTreatments; i++) {
+        const date = new Date(appointmentConfig.originalDate);
+        date.setDate(date.getDate() + (i * inBetweenDuration)); // Add 7 days for each iteration
+        const config = { ...appointmentConfig, originalDate: date };
+        dataconfigs.push(config);
+    }
+    const appointmentResult = await Appointment.insertMany(dataconfigs)
+    appointmentResult.map(function (element, index) {
+        relatedAppointments.push(element._id)
+    })
+    return res.status(200).send({ success: true, data: appointmentResult, relatedAppointments: relatedAppointments })
+}
+
 exports.createPackageSelection = async (req, res, next) => {
     let data = req.body;
     let relatedAppointments = []
@@ -116,7 +142,7 @@ exports.createPackageSelection = async (req, res, next) => {
             { new: true }
         )
 
-        data = { ...data, relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments, createdBy: createdBy, relatedBranch: { isDeleted: false }.relatedBranch }
+        data = { ...data, relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments, createdBy: createdBy, relatedBranch: req.body.relatedBranch }
 
 
         //first transaction 
