@@ -29,7 +29,7 @@ let TreatmentVoucherSchema = new Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['by Appointment', 'Lumpsum', 'Total', 'Advanced', 'FOC','pAdvance']
+        enum: ['by Appointment', 'Lumpsum', 'Total', 'Advanced', 'FOC', 'pAdvance']
     },
     amount: {
         type: Number
@@ -86,9 +86,13 @@ let TreatmentVoucherSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Attachments'
     },
-    relatedDiscount:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Discounts'
+    relatedDiscount: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Discounts'
+    },
+    relatedPackage: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Packages'
     }
 });
 
