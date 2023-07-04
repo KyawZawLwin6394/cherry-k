@@ -198,23 +198,39 @@ exports.copyStock = async (req, res) => {
 exports.checkReorder = async (req, res) => {
     try {
         let { relatedBranch } = req.query
-        const PIquery = { relatedProcedureItems: { $exists: true }, relatedBranch: relatedBranch };
-        const MIquery = { relatedMedicineItems: { $exists: true }, relatedBranch: relatedBranch };
-        const AIquery = { relatedAccessoryItems: { $exists: true }, relatedBranch: relatedBranch };
-        const relatedProcedureItems = await Stock.find(PIquery).populate('relatedProcedureItems')
-        const relatedAccessoryItems = await Stock.find(AIquery).populate('relatedAccessoryItems')
-        const relatedMedicineItems = await Stock.find(MIquery).populate('relatedMedicineItems')
-        const ProcedureItems = relatedProcedureItems.filter(item => item.currentQty <= item.reOrderQuantity);
-        const AccessoryItems = relatedAccessoryItems.filter(item => item.currentQty <= item.reOrderQuantity);
-        const MedicineItems = relatedMedicineItems.filter(item => item.currentQty <= item.reOrderQuantity);
+        if (relatedBranch) {
+            const PIquery = { relatedProcedureItems: { $exists: true }, relatedBranch: relatedBranch };
+            const MIquery = { relatedMedicineItems: { $exists: true }, relatedBranch: relatedBranch };
+            const AIquery = { relatedAccessoryItems: { $exists: true }, relatedBranch: relatedBranch };
+            const relatedProcedureItems = await Stock.find(PIquery).populate('relatedProcedureItems')
+            const relatedAccessoryItems = await Stock.find(AIquery).populate('relatedAccessoryItems')
+            const relatedMedicineItems = await Stock.find(MIquery).populate('relatedMedicineItems')
+            const ProcedureItems = relatedProcedureItems.filter(item => item.currentQty <= item.reOrderQuantity);
+            const AccessoryItems = relatedAccessoryItems.filter(item => item.currentQty <= item.reOrderQuantity);
+            const MedicineItems = relatedMedicineItems.filter(item => item.currentQty <= item.reOrderQuantity);
+            return res.status(200).send({
+                success: true, data: {
+                    ProcedureItems: ProcedureItems,
+                    AccessoryItems: AccessoryItems,
+                    MedicineItems: MedicineItems
+                },
+            })
+        } else {
+            const relatedMedicineItems = await MedicineItems.find({})
+            const relatedAccessoryItems = await AccessoryItems.find({})
+            const relatedProcedureItems = await ProcedureItems.find({})
+            const ProcedureItemsResult = relatedProcedureItems.filter(item => item.currentQty <= item.reOrderQuantity);
+            const AccessoryItemsResult = relatedAccessoryItems.filter(item => item.currentQty <= item.reOrderQuantity);
+            const MedicineItemsResult = relatedMedicineItems.filter(item => item.currentQty <= item.reOrderQuantity);
+            return res.status(200).send({
+                success: true, data: {
+                    ProcedureItems: ProcedureItemsResult,
+                    AccessoryItems: AccessoryItemsResult,
+                    MedicineItems: MedicineItemsResult
+                },
+            })
+        }
 
-        return res.status(200).send({
-            success: true, data: {
-                ProcedureItems: ProcedureItems,
-                AccessoryItems: AccessoryItems,
-                MedicineItems: MedicineItems
-            },
-        })
     } catch (error) {
         return res.status(500).send({ error: true, message: error.message })
     }
