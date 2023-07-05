@@ -277,7 +277,9 @@ exports.stockRecieved = async (req, res) => {
         const sqResult = await StockRequest.find({
             _id: stockRequestID, isDeleted: false
         }).populate('relatedTransfer')
+        if (sqResult[0].relatedTransfer === undefined) return res.status(500).send({ error: true, message: 'There is no transfer record for this Request!' })
         if (procedureItemID) {
+            console.log(flag[0].transferQty)
             const flag = sqResult[0].relatedTransfer.procedureMedicine.filter(item => item.item_id.toString() === procedureItemID)
             if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
             if (flag.length === 0) return res.status(500).send({ error: true, message: 'This procedure item does not exists in the stock reqeust!' })
@@ -339,6 +341,7 @@ exports.stockRecieved = async (req, res) => {
         }
         if (medicineItemID) {
             const flag = sqResult[0].relatedTransfer.medicineLists.filter(item => item.item_id.toString() === medicineItemID)
+
             if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
             if (flag.length === 0) return res.status(500).send({ error: true, message: 'This medicine item does not exists in the stock reqeust!' })
             if (flag[0].flag === true) {
@@ -390,7 +393,7 @@ exports.stockRecieved = async (req, res) => {
                 recievedQty: parseInt(recievedQty),
                 relatedMedicineItems: medicineItemID
             })
-            if (recievedQty ===0) {
+            if (recievedQty === 0) {
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
                     { $set: { 'medicineLists.$.flag': true } }
