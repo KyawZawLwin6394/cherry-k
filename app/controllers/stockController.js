@@ -293,7 +293,7 @@ exports.stockRecieved = async (req, res) => {
                         $inc: {
                             currentQty: parseInt(recievedQty),
                             totalUnit: parseInt(totalUnit),
-                            recievedQty: -recievedQty
+                            recievedQty: parseInt(flag[0].transferQty - recievedQty)
                         }
                     },
                     { new: true }
@@ -303,7 +303,7 @@ exports.stockRecieved = async (req, res) => {
                     createdBy: createdBy,
                     relatedBranch: relatedBranch,
                     requestedQty: parseInt(flag[0].requestedQty),
-                    recievedQty: parseInt(recievedQty),
+                    recievedQty: parseInt(flag[0].transferQty - recievedQty),
                     relatedProcedureItems: procedureItemID
                 })
                 if (recievedQty === 0) {
