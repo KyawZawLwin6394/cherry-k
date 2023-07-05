@@ -151,12 +151,12 @@ exports.createPackageSelection = async (req, res, next) => {
                 "amount": req.body.paidAmount,
                 "date": Date.now(),
                 "remark": null,
-                "relatedAccounting": "6467379159a9bc811d97f4d2", //Advance received from customer
+                "relatedAccounting": "64a3f2e39f17ad46313dc882", //Sales (Package)
                 "type": "Credit",
                 "createdBy": createdBy
             })
             var amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: "6467379159a9bc811d97f4d2" },
+                { _id: "64a3f2e39f17ad46313dc882" },
                 { $inc: { amount: req.body.paidAmount } }
             )
             //sec transaction
@@ -454,12 +454,12 @@ exports.createPackageSelection = async (req, res, next) => {
             "amount": req.body.paidAmount,
             "date": Date.now(),
             "remark": null,
-            "relatedAccounting": "6467379159a9bc811d97f4d2", //Advance received from customer
+            "relatedAccounting": "64a3f2e39f17ad46313dc882", //Sales Package
             "type": "Credit",
             "createdBy": createdBy
         })
         var freqamountUpdate = await Accounting.findOneAndUpdate(
-            { _id: "6467379159a9bc811d97f4d2" },
+            { _id: "64a3f2e39f17ad46313dc882" },
             { $inc: { amount: -req.body.paidAmount } }
         )
         //sec transaction

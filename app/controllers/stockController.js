@@ -7,6 +7,7 @@ const Branch = require('../models/branch');
 const Log = require('../models/log');
 const RecievedRecords = require('../models/recievedRecord');
 const StockRequest = require('../models/stockRequest');
+const { relative } = require('path');
 
 exports.listAllStocks = async (req, res) => {
     let query = req.mongoQuery
@@ -283,12 +284,40 @@ exports.stockRecieved = async (req, res) => {
             if (flag[0].flag === true) {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
             }
+            else if (flag[0].flag === false && flag[0].recievedQty > 0) {
+                var result = await Stock.findOneAndUpdate(
+                    { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
+                    {
+                        $inc: {
+                            currentQty: parseInt(recievedQty),
+                            totalUnit: parseInt(totalUnit),
+                            recievedQty: -recievedQty
+                        }
+                    },
+                    { new: true }
+                ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                var RecievedRecordsResult = await RecievedRecords.create({
+                    createdAt: Date.now(),
+                    createdBy: createdBy,
+                    relatedBranch: relatedBranch,
+                    requestedQty: parseInt(flag[0].requestedQty),
+                    recievedQty: parseInt(recievedQty),
+                    relatedProcedureItems: procedureItemID
+                })
+                if (recievedQty === flag[0].transferQty) {
+                    const srresult = await StockRequest.findOneAndUpdate(
+                        { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
+                        { $set: { 'procedureMedicine.$.flag': true } }
+                    );
+                }
+            }
             var result = await Stock.findOneAndUpdate(
                 { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
                 {
                     $inc: {
                         currentQty: parseInt(recievedQty),
-                        totalUnit: parseInt(totalUnit)
+                        totalUnit: parseInt(totalUnit),
+                        recievedQty: parseInt(flag[0].transferQty - recievedQty)
                     }
                 },
                 { new: true }
@@ -301,10 +330,12 @@ exports.stockRecieved = async (req, res) => {
                 recievedQty: parseInt(recievedQty),
                 relatedProcedureItems: procedureItemID
             })
-            const srresult = await StockRequest.findOneAndUpdate(
-                { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
-                { $set: { 'procedureMedicine.$.flag': true } }
-            );
+            if (recievedQty === flag[0].transferQty) {
+                const srresult = await StockRequest.findOneAndUpdate(
+                    { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
+                    { $set: { 'procedureMedicine.$.flag': true } }
+                );
+            }
         }
         if (medicineItemID) {
             const flag = sqResult[0].relatedTransfer.medicineLists.filter(item => item.item_id.toString() === medicineItemID)
@@ -313,12 +344,40 @@ exports.stockRecieved = async (req, res) => {
             if (flag[0].flag === true) {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
             }
+            if (flag[0].flag === false && flag[0].recievedQty > 0) {
+                var result = await Stock.findOneAndUpdate(
+                    { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
+                    {
+                        $inc: {
+                            currentQty: parseInt(recievedQty),
+                            totalUnit: parseInt(totalUnit),
+                            recievedQty: parseInt(flag[0].transferQty - recievedQty)
+                        }
+                    },
+                    { new: true }
+                ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                var RecievedRecordsResult = await RecievedRecords.create({
+                    createdAt: Date.now(),
+                    createdBy: createdBy,
+                    relatedBranch: relatedBranch,
+                    requestedQty: parseInt(flag[0].requestedQty),
+                    recievedQty: parseInt(recievedQty),
+                    relatedMedicineItems: medicineItemID
+                })
+                if (recievedQty === flag[0].transferQty) {
+                    const srresult = await StockRequest.findOneAndUpdate(
+                        { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
+                        { $set: { 'medicineLists.$.flag': true } }
+                    );
+                }
+            }
             var result = await Stock.findOneAndUpdate(
                 { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
                 {
                     $inc: {
                         currentQty: parseInt(recievedQty),
-                        totalUnit: parseInt(totalUnit)
+                        totalUnit: parseInt(totalUnit),
+                        recievedQty: parseInt(flag[0].transferQty - recievedQty)
                     }
                 },
                 { new: true }
@@ -331,31 +390,13 @@ exports.stockRecieved = async (req, res) => {
                 recievedQty: parseInt(recievedQty),
                 relatedMedicineItems: medicineItemID
             })
-            const srresult = await StockRequest.findOneAndUpdate(
-                { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
-                { $set: { 'medicineLists.$.flag': true } }
-            );
+            if (recievedQty === flag[0].transferQty) {
+                const srresult = await StockRequest.findOneAndUpdate(
+                    { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
+                    { $set: { 'medicineLists.$.flag': true } }
+                );
+            }
         }
-        // if (medicineItemID) {
-        //     var result = await Stock.findOneAndUpdate(
-        //         { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
-        //         {
-        //             $inc: {
-        //                 currentQty: recievedQty,
-        //                 totalUnit: totalUnit
-        //             }
-        //         },
-        //         { new: true }
-        //     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
-        //     var RecievedRecordsResult = await RecievedRecords.create({
-        //         createdAt: Date.now(),
-        //         createdBy: createdBy,
-        //         relatedBranch: relatedBranch,
-        //         requestedQty: requestedQty,
-        //         recievedQty: recievedQty,
-        //         relatedMedicineItems: medicineItemID
-        //     })
-        // }
         if (accessoryItemID) {
             const flag = sqResult[0].relatedTransfer.procedureAccessory.filter(item => item.item_id.toString() === accessoryItemID)
             if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
@@ -363,12 +404,41 @@ exports.stockRecieved = async (req, res) => {
             if (flag[0].flag === true) {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
             }
+            if (flag[0].flag === false && flag[0].recievedQty > 0) {
+                var result = await Stock.findOneAndUpdate(
+                    { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },
+                    {
+                        $inc: {
+                            currentQty: parseInt(recievedQty),
+                            totalUnit: parseInt(totalUnit),
+                            recievedQty: parseInt(flag[0].transferQty - recievedQty)
+                        }
+                    },
+                    { new: true }
+                ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                var RecievedRecordsResult = await RecievedRecords.create({
+                    createdAt: Date.now(),
+                    createdBy: createdBy,
+                    relatedBranch: relatedBranch,
+                    requestedQty: parseInt(flag[0].requestedQty),
+                    recievedQty: parseInt(recievedQty),
+                    relatedAccessoryItems: accessoryItemID
+                })
+                if (recievedQty === flag[0].transferQty) {
+                    const srresult = await StockRequest.findOneAndUpdate(
+                        { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
+                        { $set: { 'procedureAccessory.$.flag': true } }
+                    );
+                }
+
+            }
             var result = await Stock.findOneAndUpdate(
                 { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },
                 {
                     $inc: {
                         currentQty: parseInt(recievedQty),
-                        totalUnit: parseInt(totalUnit)
+                        totalUnit: parseInt(totalUnit),
+                        recievedQty: parseInt(flag[0].transferQty - recievedQty)
                     }
                 },
                 { new: true }
@@ -381,10 +451,12 @@ exports.stockRecieved = async (req, res) => {
                 recievedQty: parseInt(recievedQty),
                 relatedAccessoryItems: accessoryItemID
             })
-            const srresult = await StockRequest.findOneAndUpdate(
-                { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
-                { $set: { 'procedureAccessory.$.flag': true } }
-            );
+            if (recievedQty === flag[0].transferQty) {
+                const srresult = await StockRequest.findOneAndUpdate(
+                    { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
+                    { $set: { 'procedureAccessory.$.flag': true } }
+                );
+            }
         }
         // if (accessoryItemID) {
         //     var result = await Stock.findOneAndUpdate(

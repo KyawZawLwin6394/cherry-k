@@ -13,6 +13,10 @@ let StockRequestSchema = new Schema({
         stockQty: Number,
         requestedQty: Number,
         purchasePrice: Number,
+        recievedQty: {
+            type: Number,
+            default: 0
+        },
         flag: {
             type: Boolean,
             default: false
@@ -26,6 +30,10 @@ let StockRequestSchema = new Schema({
         stockQty: Number,
         requestedQty: Number,
         purchasePrice: Number,
+        recievedQty: {
+            type: Number,
+            default: 0
+        },
         flag: {
             type: Boolean,
             default: false
@@ -39,6 +47,10 @@ let StockRequestSchema = new Schema({
         stockQty: Number,
         requestedQty: Number,
         purchasePrice: Number,
+        recievedQty: {
+            type: Number,
+            default: 0
+        },
         flag: {
             type: Boolean,
             default: false
@@ -61,13 +73,18 @@ let StockRequestSchema = new Schema({
         type: Boolean,
         default: false
     },
-    relatedTransfer:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'StockTransfers'
+    relatedTransfer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'StockTransfers'
     },
     seq: {
         type: Number
     },
+    status: {
+        type: String,
+        enum: ['Ongoing', 'Done'],
+        default: 'Ongoing'
+    }
 
 });
 

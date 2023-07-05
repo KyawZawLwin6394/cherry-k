@@ -17,8 +17,7 @@ let TreatmentSchema = new Schema({
     ref: "TreatmentLists",
   },
   treatmentTimes: {
-    type: Number,
-    required: true
+    type: Number
   },
   relatedDoctor: {
     type: mongoose.Schema.Types.ObjectId,
@@ -69,15 +68,12 @@ let TreatmentSchema = new Schema({
   }],
   estimateTotalPrice: {
     type: Number,
-    required: true,
   },
   discount: {
     type: Number,
-    required: true
   },
   sellingPrice: {
     type: Number,
-    required: true,
   },
   description: {
     type: String
