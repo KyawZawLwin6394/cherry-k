@@ -304,7 +304,7 @@ exports.stockRecieved = async (req, res) => {
                     recievedQty: parseInt(recievedQty),
                     relatedProcedureItems: procedureItemID
                 })
-                if (recievedQty === flag[0].transferQty) {
+                if (recievedQty === 0) {
                     const srresult = await StockRequest.findOneAndUpdate(
                         { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
                         { $set: { 'procedureMedicine.$.flag': true } }
@@ -330,7 +330,7 @@ exports.stockRecieved = async (req, res) => {
                 recievedQty: parseInt(recievedQty),
                 relatedProcedureItems: procedureItemID
             })
-            if (recievedQty === flag[0].transferQty) {
+            if (recievedQty === 0) {
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
                     { $set: { 'procedureMedicine.$.flag': true } }
@@ -364,7 +364,7 @@ exports.stockRecieved = async (req, res) => {
                     recievedQty: parseInt(recievedQty),
                     relatedMedicineItems: medicineItemID
                 })
-                if (recievedQty === flag[0].transferQty) {
+                if (recievedQty === 0) {
                     const srresult = await StockRequest.findOneAndUpdate(
                         { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
                         { $set: { 'medicineLists.$.flag': true } }
@@ -390,7 +390,7 @@ exports.stockRecieved = async (req, res) => {
                 recievedQty: parseInt(recievedQty),
                 relatedMedicineItems: medicineItemID
             })
-            if (recievedQty === flag[0].transferQty) {
+            if (recievedQty ===0) {
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
                     { $set: { 'medicineLists.$.flag': true } }
@@ -424,7 +424,7 @@ exports.stockRecieved = async (req, res) => {
                     recievedQty: parseInt(recievedQty),
                     relatedAccessoryItems: accessoryItemID
                 })
-                if (recievedQty === flag[0].transferQty) {
+                if (recievedQty === 0) {
                     const srresult = await StockRequest.findOneAndUpdate(
                         { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
                         { $set: { 'procedureAccessory.$.flag': true } }
@@ -451,7 +451,7 @@ exports.stockRecieved = async (req, res) => {
                 recievedQty: parseInt(recievedQty),
                 relatedAccessoryItems: accessoryItemID
             })
-            if (recievedQty === flag[0].transferQty) {
+            if (recievedQty === 0) {
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
                     { $set: { 'procedureAccessory.$.flag': true } }
