@@ -122,7 +122,7 @@ exports.searchTreatments = async (req, res, next) => {
 
 exports.getRelatedTreatmentByTreatmentListID = async (req, res) => {
   try {
-    const result = await Treatment.find({ treatmentName: req.params.id }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('').populate('machine.item_id').populate('procedureAccessory.item_id').populate('medicineLists.item_id').populate('procedureMedicine.item_id').populate('treatmentName')
+    const result = await Treatment.find({ treatmentName: req.params.id, isDeleted: false }).populate('relatedDoctor').populate('relatedTherapist').populate('relatedPatient').populate('').populate('machine.item_id').populate('procedureAccessory.item_id').populate('medicineLists.item_id').populate('procedureMedicine.item_id').populate('treatmentName')
     if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (error) {
