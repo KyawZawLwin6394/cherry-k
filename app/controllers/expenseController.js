@@ -273,17 +273,57 @@ exports.filterExpense = async (req, res, next) => {
     } catch (err) {
         return res.status(500).send({ error: true, message: err.message })
     }
+
 }
 
-exports.searchExpense = async (req, res, next) => {
+exports.searchExpense = async (req, res, next) => { 
+    let query = { relatedBankAccount: { $exists: true }, isDeleted: false }
     try {
-        let query = req.mongoQuery
-        let { search } = req.body
+        let currencyList = await Currency.find({});
+        const { start, end, relatedBranch, createdBy, search } = req.query
+        // if (start && end) query.date = { $gte: start, $lt: end }
+        if (relatedBranch) query.relatedBranch = relatedBranch
+        if (createdBy) query.createdBy = createdBy
         if (search) query.$text = { $search: search }
-        const result = await Expense.find(query)
-        if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
-        return res.status(200).send({ success: true, data: result })
-    } catch (err) {
-        return res.status(500).send({ error: true, message: err.message })
+        const bankResult = await Expense.find(query).populate('relatedBankAccount relatedAccounting relatedCredit relatedCashAccount relatedBranch').populate('createdBy', 'givenName')
+        const { relatedBankAccount, ...query2 } = query;
+        query2.relatedCashAccount = { $exists: true };
+        console.log(query2)
+        const cashResult = await Expense.find(query2).populate('relatedBankAccount relatedAccounting relatedCredit relatedCashAccount relatedBranch').populate('createdBy', 'givenName')
+        const BankNames = bankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
+            const { name } = relatedBankAccount;
+            result[name] = (result[name] || 0) + finalAmount;
+            return result;
+        }, {});
+        const CashNames = cashResult.reduce((result, { relatedCashAccount, finalAmount }) => {
+            const { name } = relatedCashAccount;
+            result[name] = (result[name] || 0) + finalAmount;
+            return result;
+        }, {});
+        const BankTotal = bankResult.reduce((total, sale) => {
+            let current = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+            let ans = current * sale.finalAmount
+            return total + ans
+        }, 0);
+        const CashTotal = cashResult.reduce((total, sale) => {
+            let current = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+            let ans = current * sale.finalAmount
+            return total + ans
+        }, 0);
+        console.log(BankNames)
+
+        return res.status(200).send({
+            success: true,
+            data: {
+                BankList: bankResult,
+                CashList: cashResult,
+                BankNames: BankNames,
+                CashNames: CashNames,
+                BankTotal: BankTotal,
+                CashTotal: CashTotal
+            }
+        });
+    } catch (error) {
+        return res.status(500).send({ error: true, message: error.message })
     }
 }

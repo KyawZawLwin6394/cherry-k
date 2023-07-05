@@ -580,27 +580,64 @@ exports.incomeFilter = async (req, res) => {
 
 exports.filterIncome = async (req, res, next) => {
   try {
-      let query = req.mongoQuery
-      let { startDate, endDate } = req.query
-      if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate }
-      if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
-      const result = await Income.find(query)
-      if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
-      res.status(200).send({ success: true, data: result })
+    let query = req.mongoQuery
+    let { startDate, endDate } = req.query
+    if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate }
+    if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
+    const result = await Income.find(query)
+    if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
+    res.status(200).send({ success: true, data: result })
   } catch (err) {
-      return res.status(500).send({ error: true, message: err.message })
+    return res.status(500).send({ error: true, message: err.message })
   }
 }
 
 exports.searchIncome = async (req, res, next) => {
+  let query = { relatedBankAccount: { $exists: true }, isDeleted: false }
   try {
-      let query = req.mongoQuery
-      let { search } = req.body
-      if (search) query.$text = { $search: search }
-      const result = await Income.find(query)
-      if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
-      return res.status(200).send({ success: true, data: result })
-  } catch (err) {
-      return res.status(500).send({ error: true, message: err.message })
+    const currencyList = await Currency.find({})
+    const { start, end, relatedBranch, createdBy, search } = req.query
+    // if (start && end) query.date = { $gte: start, $lt: end }
+    if (relatedBranch) query.relatedBranch = relatedBranch
+    if (createdBy) query.createdBy = createdBy
+    if (search) query.$text = { $search: search }
+    const bankResult = await Income.find(query).populate('relatedAccounting relatedBankAccount relatedCashAccount relatedCredit relatedBranch')
+    const { relatedBankAccount, ...query2 } = query;
+    query2.relatedCashAccount = { $exists: true };
+    const cashResult = await Income.find(query2).populate('relatedAccounting relatedBankAccount relatedCashAccount relatedCredit relatedBranch')
+    const BankNames = bankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
+      const { name } = relatedBankAccount;
+      result[name] = (result[name] || 0) + finalAmount;
+      return result;
+    }, {});
+    const CashNames = cashResult.reduce((result, { relatedCashAccount, finalAmount }) => {
+      const { name } = relatedCashAccount;
+      result[name] = (result[name] || 0) + finalAmount;
+      return result;
+    }, {});
+    const BankTotal = bankResult.reduce((total, sale) => {
+      let cur = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+      let ans = cur * sale.finalAmount
+      return total + ans
+    }, 0);
+    const CashTotal = cashResult.reduce((total, sale) => {
+      let cur = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
+      let ans = cur * sale.finalAmount
+      return total + ans
+    }, 0);
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        BankList: bankResult,
+        CashList: cashResult,
+        BankNames: BankNames,
+        CashNames: CashNames,
+        BankTotal: BankTotal,
+        CashTotal: CashTotal
+      }
+    });
+  } catch (error) {
+    return res.status(500).send({ error: true, message: error.message })
   }
 }
