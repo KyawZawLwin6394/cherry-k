@@ -68,7 +68,9 @@ exports.createComission = async (req, res, next) => {
             appointmentAmount: req.body.totalAmount / req.body.treatmentTimes,
             commissionAmount: comission,
             relatedDoctor: req.body.doctorID,
-            percent: percent
+            percent: percent,
+            relatedBranch: req.body.relatedBranch,
+            relatedTreatmentSelection: req.body.relatedTreatmentSelection
         });
         res.status(200).send({
             message: 'Comission create success',
@@ -141,7 +143,14 @@ exports.searchCommission = async (req, res) => {
         let query = { status: 'Unclaimed' }
         if (month) query.date = { $gte: startDate, $lte: endDate }
         if (doctor) query.relatedDoctor = doctor
-        const result = await Comission.find(query).populate('relatedDoctor relatedAppointment')
+        const result = await Comission.find(query).populate('relatedDoctor relatedAppointment relatedBranch').populate({
+            path: 'relatedTreatmentSelection',
+            model: 'TreatmentSelections',
+            populate: {
+                path: 'relatedTreatment',
+                model: 'Treatments'
+            }
+        })
         for (let i = 0; i < result.length; i++) {
             total = result[i].commissionAmount + total
         }

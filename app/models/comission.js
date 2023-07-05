@@ -35,6 +35,14 @@ let ComissionSchema = new Schema({
         type: String,
         enum: ['Claimed', 'Unclaimed'],
         default: 'Unclaimed'
+    },
+    relatedBranch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branches'
+    },
+    relatedTreatmentSelection: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'TreatmentSelections'
     }
 });
 
