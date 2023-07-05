@@ -17,4 +17,6 @@ module.exports = (app) => {
 
     app.route('/api/stock-requests').get(verifyToken, catchError(stockRequest.listAllStockRequests))
     app.route('/api/stock-requests/code').get(verifyToken, catchError(stockRequest.generateCode))
+    app.route('/api/stock-requests/filter')
+        .get(verifyToken, catchError(stockRequest.filterStockRequest))
 };
