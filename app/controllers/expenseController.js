@@ -276,12 +276,12 @@ exports.filterExpense = async (req, res, next) => {
 
 }
 
-exports.searchExpense = async (req, res, next) => { 
+exports.searchExpense = async (req, res, next) => {
     let query = { relatedBankAccount: { $exists: true }, isDeleted: false }
     try {
         let currencyList = await Currency.find({});
         const { start, end, relatedBranch, createdBy, search } = req.query
-        // if (start && end) query.date = { $gte: start, $lt: end }
+        if (start && end) query.date = { $gte: start, $lt: end }
         if (relatedBranch) query.relatedBranch = relatedBranch
         if (createdBy) query.createdBy = createdBy
         if (search) query.$text = { $search: search }

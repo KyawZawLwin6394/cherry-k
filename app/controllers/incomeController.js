@@ -597,7 +597,7 @@ exports.searchIncome = async (req, res, next) => {
   try {
     const currencyList = await Currency.find({})
     const { start, end, relatedBranch, createdBy, search } = req.query
-    // if (start && end) query.date = { $gte: start, $lt: end }
+    if (start && end) query.date = { $gte: start, $lt: end }
     if (relatedBranch) query.relatedBranch = relatedBranch
     if (createdBy) query.createdBy = createdBy
     if (search) query.$text = { $search: search }
