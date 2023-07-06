@@ -303,11 +303,9 @@ exports.stockRecieved = async (req, res) => {
                     },
                     { new: true }
                 ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
-                let recQtyUpdae = recievedQuantity - recievedQty
-                console.log(recQtyUpdae, 'UPDATE')
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
-                    { $set: { 'procedureMedicine.$.recievedQty': parseInt(recQtyUpdae) } }
+                    { $set: { 'procedureMedicine.$.recievedQty': recievedQuantity - recievedQty } }
                 );
                 console.log(srresult, 'here')
                 var RecievedRecordsResult = await RecievedRecords.create({
@@ -356,13 +354,15 @@ exports.stockRecieved = async (req, res) => {
         }
         if (medicineItemID) {
             const flag = sqResult[0].relatedTransfer.medicineLists.filter(item => item.item_id.toString() === medicineItemID)
-            const recievedQuantity = sqResult[0].medicineLists.filter(item => item.item_id.toString() === medicineItemID)[0].recievedQty
+            const srFilter = sqResult[0].medicineLists.filter(item => item.item_id.toString() === medicineItemID)
+            const recievedQuantity = srFilter[0].recievedQty
+            const realFlag = srFilter[0].flag
             if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
             if (flag.length === 0) return res.status(500).send({ error: true, message: 'This medicine item does not exists in the stock reqeust!' })
-            if (flag[0].flag === true) {
+            if (realFlag === true) {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
             }
-            if (flag[0].flag === false && recievedQuantity > 0) {
+            if (realFlag === false && recievedQuantity > 0) {
                 if (recievedQty > recievedQuantity) return res.status(500).send({ error: true, message: 'Input cannot be greater than RecievedQty!' })
                 var result = await Stock.findOneAndUpdate(
                     { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
@@ -424,13 +424,15 @@ exports.stockRecieved = async (req, res) => {
         }
         if (accessoryItemID) {
             const flag = sqResult[0].relatedTransfer.procedureAccessory.filter(item => item.item_id.toString() === accessoryItemID)
-            const recievedQuantity = sqResult[0].relatedTransfer.procedureAccessory.filter(item => item.item_id.toString() === accessoryItemID)[0].recievedQty
+            const srFilter = sqResult[0].relatedTransfer.procedureAccessory.filter(item => item.item_id.toString() === accessoryItemID)
+            const recievedQuantity = srFilter[0].recievedQty
+            const realFlag = srFilter[0].flag
             if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
             if (flag.length === 0) return res.status(500).send({ error: true, message: 'This accessory item does not exists in the stock reqeust!' })
-            if (flag[0].flag === true) {
+            if (realFlag === true) {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
             }
-            if (flag[0].flag === false && recievedQuantity > 0) {
+            if (realFlag === false && recievedQuantity > 0) {
                 if (recievedQty > recievedQuantity) return res.status(500).send({ error: true, message: 'Input cannot be greater than RecievedQty!' })
                 var result = await Stock.findOneAndUpdate(
                     { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },

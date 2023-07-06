@@ -83,8 +83,10 @@ let StockRequestSchema = new Schema({
         default: 'Ongoing'
     }
 
-});
-
+},
+    { versionKey: '__v' }
+);
+    
 module.exports = mongoose.model('StockRequests', StockRequestSchema);
 
 //Author: Kyaw Zaw Lwin
