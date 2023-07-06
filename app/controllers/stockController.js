@@ -302,7 +302,7 @@ exports.stockRecieved = async (req, res) => {
                 ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
-                    { $set: { 'procedureMedicine.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
+                    { $set: { 'procedureMedicine.$.recievedQty': parseInt(recievedQuantity - recievedQty) } }
                 );
                 var RecievedRecordsResult = await RecievedRecords.create({
                     createdAt: Date.now(),
@@ -370,7 +370,7 @@ exports.stockRecieved = async (req, res) => {
                 ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
-                    { $set: { 'medicineLists.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
+                    { $set: { 'medicineLists.$.recievedQty': parseInt(recievedQuantity - recievedQty) } }
                 );
                 var RecievedRecordsResult = await RecievedRecords.create({
                     createdAt: Date.now(),
@@ -431,8 +431,7 @@ exports.stockRecieved = async (req, res) => {
                     {
                         $inc: {
                             currentQty: parseInt(recievedQty),
-                            totalUnit: parseInt(totalUnit),
-                            recievedQty: parseInt(flag[0].transferQty - recievedQty)
+                            totalUnit: parseInt(totalUnit)
                         }
                     },
                     { new: true }
@@ -447,7 +446,7 @@ exports.stockRecieved = async (req, res) => {
                 })
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
-                    { $set: { 'procedureAccessory.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
+                    { $set: { 'procedureAccessory.$.recievedQty': parseInt(recievedQuantity - recievedQty) } }
                 );
                 if (recievedQty === 0) {
                     const srresult = await StockRequest.findOneAndUpdate(
