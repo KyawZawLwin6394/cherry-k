@@ -18,7 +18,14 @@ exports.listAllMedicineItems = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await MedicineItem.find(query).populate('name')
+    let result = await MedicineItem.find(query).populate({
+      path: 'name',
+      model: 'MedicineLists',
+      populate: {
+        path: 'relatedBrand',
+        model: 'Brands'
+      }
+    })
     count = await MedicineItem.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);

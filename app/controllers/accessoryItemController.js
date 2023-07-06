@@ -17,7 +17,14 @@ exports.listAllAccessoryItems = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await AccessoryItem.find(query).populate('name')
+    let result = await AccessoryItem.find(query).populate({
+      path: 'name',
+      model: 'ProcedureAccessories',
+      populate: {
+        path: 'relatedBrand',
+        model: 'Brands'
+      }
+    })
     count = await AccessoryItem.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
