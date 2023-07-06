@@ -278,17 +278,20 @@ exports.stockRecieved = async (req, res) => {
             _id: stockRequestID, isDeleted: false
         }).populate('relatedTransfer')
         if (sqResult[0].relatedTransfer === undefined) return res.status(500).send({ error: true, message: 'There is no transfer record for this Request!' })
-
+        console.log('relatedTransfer', sqResult[0].relatedTransfer)
         if (procedureItemID) {
-            const recievedQuantity = sqResult[0].relatedTransfer.procedureMedicine.filter(item => item.item_id.toString() === procedureItemID)[0].recievedQty
+            const srFilter = sqResult[0].procedureMedicine.filter(item => item.item_id.toString() === procedureItemID)
+            const recievedQuantity = srFilter[0].recievedQty
+            const realFlag = srFilter[0].flag
             const flag = sqResult[0].relatedTransfer.procedureMedicine.filter(item => item.item_id.toString() === procedureItemID)
             if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
             if (flag.length === 0) return res.status(500).send({ error: true, message: 'This procedure item does not exists in the stock reqeust!' })
-            if (flag[0].flag === true) {
+            console.log('recivedQuantity', recievedQuantity, realFlag)
+            if (realFlag === true) {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
             }
-
-            else if (flag[0].flag === false && recievedQuantity > 0) {
+            else if (realFlag === false && recievedQuantity > 0) {
+                console.log('second cond')
                 if (recievedQty > recievedQuantity) return res.status(500).send({ error: true, message: 'Input cannot be greater than RecievedQty!' })
                 var result = await Stock.findOneAndUpdate(
                     { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
@@ -300,10 +303,13 @@ exports.stockRecieved = async (req, res) => {
                     },
                     { new: true }
                 ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                let recQtyUpdae = recievedQuantity - recievedQty
+                console.log(recQtyUpdae, 'UPDATE')
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
-                    { $inc: { 'procedureMedicine.$.recievedQty': -recievedQty } }
+                    { $set: { 'procedureMedicine.$.recievedQty': recQtyUpdae } }
                 );
+                console.log(srresult, 'here')
                 var RecievedRecordsResult = await RecievedRecords.create({
                     createdAt: Date.now(),
                     createdBy: createdBy,
@@ -485,6 +491,7 @@ exports.stockRecieved = async (req, res) => {
                 );
             }
         }
+        console.log('result', result)
         const logResult = await Log.create({
             "relatedStock": result._id,
             "currentQty": requestedQty,

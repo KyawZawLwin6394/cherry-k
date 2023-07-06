@@ -50,6 +50,17 @@ exports.listAllPatients = async (req, res) => {
         path: 'relatedDiscount',
         model: 'Discounts'
       }
+    }).populate({
+      path: 'relatedPackageSelection',
+      model: 'PackageSelections',
+      populate: {
+        path: 'relatedPackage',
+        model: 'Packages',
+        populate: {
+          path: 'relatedTreatments',
+          model: 'Treatments'
+        }
+      }
     });
     count = await Patient.find(query).count();
     const division = count / limit;
