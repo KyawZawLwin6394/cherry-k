@@ -23,5 +23,5 @@ module.exports = (app) => {
         .get(verifyToken, catchError(expense.filterExpense))
 
     app.route('/api/expenses-search')
-        .post(verifyToken, catchError(expense.searchExpense))
+        .get(verifyToken, catchError(expense.searchExpense))
 };

@@ -23,5 +23,5 @@ module.exports = (app) => {
         .get(verifyToken, catchError(income.filterIncome))
 
     app.route('/api/incomes-search')
-        .post(verifyToken, catchError(income.searchIncome))
+        .get(verifyToken, catchError(income.searchIncome))
 };
