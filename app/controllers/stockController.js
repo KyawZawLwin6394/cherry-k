@@ -289,17 +289,21 @@ exports.stockRecieved = async (req, res) => {
             }
 
             else if (flag[0].flag === false && recievedQuantity > 0) {
+                if (recievedQty > recievedQuantity) return res.status(500).send({ error: true, message: 'Input cannot be greater than RecievedQty!' })
                 var result = await Stock.findOneAndUpdate(
                     { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
                     {
                         $inc: {
                             currentQty: parseInt(recievedQty),
                             totalUnit: parseInt(totalUnit),
-                            recievedQty: parseInt(flag[0].transferQty - recievedQty)
                         }
                     },
                     { new: true }
                 ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                const srresult = await StockRequest.findOneAndUpdate(
+                    { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
+                    { $set: { 'procedureMedicine.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
+                );
                 var RecievedRecordsResult = await RecievedRecords.create({
                     createdAt: Date.now(),
                     createdBy: createdBy,
@@ -321,11 +325,14 @@ exports.stockRecieved = async (req, res) => {
                     $inc: {
                         currentQty: parseInt(recievedQty),
                         totalUnit: parseInt(totalUnit),
-                        recievedQty: parseInt(flag[0].transferQty - recievedQty)
                     }
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+            const srresult = await StockRequest.findOneAndUpdate(
+                { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
+                { $set: { 'procedureMedicine.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
+            );
             var RecievedRecordsResult = await RecievedRecords.create({
                 createdAt: Date.now(),
                 createdBy: createdBy,
@@ -350,17 +357,21 @@ exports.stockRecieved = async (req, res) => {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
             }
             if (flag[0].flag === false && recievedQuantity > 0) {
+                if (recievedQty > recievedQuantity) return res.status(500).send({ error: true, message: 'Input cannot be greater than RecievedQty!' })
                 var result = await Stock.findOneAndUpdate(
                     { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
                     {
                         $inc: {
                             currentQty: parseInt(recievedQty),
                             totalUnit: parseInt(totalUnit),
-                            recievedQty: parseInt(flag[0].transferQty - recievedQty)
                         }
                     },
                     { new: true }
                 ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                const srresult = await StockRequest.findOneAndUpdate(
+                    { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
+                    { $set: { 'medicineLists.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
+                );
                 var RecievedRecordsResult = await RecievedRecords.create({
                     createdAt: Date.now(),
                     createdBy: createdBy,
@@ -381,12 +392,15 @@ exports.stockRecieved = async (req, res) => {
                 {
                     $inc: {
                         currentQty: parseInt(recievedQty),
-                        totalUnit: parseInt(totalUnit),
-                        recievedQty: parseInt(flag[0].transferQty - recievedQty)
+                        totalUnit: parseInt(totalUnit)
                     }
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+            const srresult = await StockRequest.findOneAndUpdate(
+                { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
+                { $set: { 'medicineLists.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
+            );
             var RecievedRecordsResult = await RecievedRecords.create({
                 createdAt: Date.now(),
                 createdBy: createdBy,
@@ -411,6 +425,7 @@ exports.stockRecieved = async (req, res) => {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
             }
             if (flag[0].flag === false && recievedQuantity > 0) {
+                if (recievedQty > recievedQuantity) return res.status(500).send({ error: true, message: 'Input cannot be greater than RecievedQty!' })
                 var result = await Stock.findOneAndUpdate(
                     { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },
                     {
@@ -430,6 +445,10 @@ exports.stockRecieved = async (req, res) => {
                     recievedQty: parseInt(recievedQty),
                     relatedAccessoryItems: accessoryItemID
                 })
+                const srresult = await StockRequest.findOneAndUpdate(
+                    { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
+                    { $set: { 'procedureAccessory.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
+                );
                 if (recievedQty === 0) {
                     const srresult = await StockRequest.findOneAndUpdate(
                         { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
@@ -444,11 +463,14 @@ exports.stockRecieved = async (req, res) => {
                     $inc: {
                         currentQty: parseInt(recievedQty),
                         totalUnit: parseInt(totalUnit),
-                        recievedQty: parseInt(flag[0].transferQty - recievedQty)
                     }
                 },
                 { new: true }
             ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+            const srresult = await StockRequest.findOneAndUpdate(
+                { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
+                { $set: { 'procedureAccessory.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
+            );
             var RecievedRecordsResult = await RecievedRecords.create({
                 createdAt: Date.now(),
                 createdBy: createdBy,
@@ -464,27 +486,6 @@ exports.stockRecieved = async (req, res) => {
                 );
             }
         }
-        // if (accessoryItemID) {
-        //     var result = await Stock.findOneAndUpdate(
-        //         { relatedAccessoryItems: accessoryItemID, relatedBranch: relatedBranch },
-        //         {
-        //             $inc: {
-        //                 currentQty: recievedQty,
-        //                 totalUnit: totalUnit
-        //             }
-        //         },
-        //         { new: true }
-        //     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
-        //     var RecievedRecordsResult = await RecievedRecords.create({
-        //         createdAt: Date.now(),
-        //         createdBy: createdBy,
-        //         relatedBranch: relatedBranch,
-        //         requestedQty: requestedQty,
-        //         recievedQty: recievedQty,
-        //         relatedAccessoryItems: accessoryItemID
-        //     })
-        // }
-
         const logResult = await Log.create({
             "relatedStock": result._id,
             "currentQty": requestedQty,
