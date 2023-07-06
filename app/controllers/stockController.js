@@ -307,7 +307,7 @@ exports.stockRecieved = async (req, res) => {
                 console.log(recQtyUpdae, 'UPDATE')
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
-                    { $set: { 'procedureMedicine.$.recievedQty': recQtyUpdae } }
+                    { $set: { 'procedureMedicine.$.recievedQty': parseInt(recQtyUpdae) } }
                 );
                 console.log(srresult, 'here')
                 var RecievedRecordsResult = await RecievedRecords.create({
