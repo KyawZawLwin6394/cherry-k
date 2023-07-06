@@ -14,8 +14,7 @@ let StockRequestSchema = new Schema({
         requestedQty: Number,
         purchasePrice: Number,
         recievedQty: {
-            type: Number,
-            default: 0
+            type: Number
         },
         flag: {
             type: Boolean,
@@ -31,8 +30,7 @@ let StockRequestSchema = new Schema({
         requestedQty: Number,
         purchasePrice: Number,
         recievedQty: {
-            type: Number,
-            default: 0
+            type: Number
         },
         flag: {
             type: Boolean,
@@ -48,8 +46,7 @@ let StockRequestSchema = new Schema({
         requestedQty: Number,
         purchasePrice: Number,
         recievedQty: {
-            type: Number,
-            default: 0
+            type: Number
         },
         flag: {
             type: Boolean,

@@ -272,7 +272,7 @@ exports.checkReorder = async (req, res) => {
 exports.stockRecieved = async (req, res) => {
     try {
         let createdBy = req.credentials.id
-        const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, requestedQty, fromUnit, toUnit, stockRequestID } = req.body
+        const { procedureItemID, medicineItemID, accessoryItemID, relatedBranch, recievedQty, requestedQty, fromUnit, toUnit, stockRequestID, isDone } = req.body
         let totalUnit = (toUnit * recievedQty) / fromUnit
         const sqResult = await StockRequest.find({
             _id: stockRequestID, isDeleted: false
@@ -312,10 +312,10 @@ exports.stockRecieved = async (req, res) => {
                     recievedQty: parseInt(flag[0].transferQty - recievedQty),
                     relatedProcedureItems: procedureItemID
                 })
-                if (recievedQty === 0) {
+                if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
                         { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
-                        { $set: { 'procedureMedicine.$.flag': true } }
+                        { $set: { 'procedureMedicine.$.flag': true, 'procedureMedicine.$.recievedQty': 0 } }
                     );
                 }
             }
@@ -341,10 +341,10 @@ exports.stockRecieved = async (req, res) => {
                 recievedQty: parseInt(recievedQty),
                 relatedProcedureItems: procedureItemID
             })
-            if (recievedQty === 0) {
+            if (isDone === true) {
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
-                    { $set: { 'procedureMedicine.$.flag': true } }
+                    { $set: { 'procedureMedicine.$.flag': true, 'procedureMedicine.$.recievedQty': 0 } }
                 );
             }
         }
@@ -380,10 +380,10 @@ exports.stockRecieved = async (req, res) => {
                     recievedQty: parseInt(recievedQty),
                     relatedMedicineItems: medicineItemID
                 })
-                if (recievedQty === 0) {
+                if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
                         { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
-                        { $set: { 'medicineLists.$.flag': true } }
+                        { $set: { 'medicineLists.$.flag': true, 'medicineLists.$.recievedQty': 0 } }
                     );
                 }
             }
@@ -409,10 +409,10 @@ exports.stockRecieved = async (req, res) => {
                 recievedQty: parseInt(recievedQty),
                 relatedMedicineItems: medicineItemID
             })
-            if (recievedQty === 0) {
+            if (isDone === true) {
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'medicineLists.item_id': medicineItemID },
-                    { $set: { 'medicineLists.$.flag': true } }
+                    { $set: { 'medicineLists.$.flag': true, 'medicineLists.$.recievedQty': 0 } }
                 );
             }
         }
@@ -448,10 +448,10 @@ exports.stockRecieved = async (req, res) => {
                     { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
                     { $set: { 'procedureAccessory.$.recievedQty': parseInt(recievedQuantity - recievedQty) } }
                 );
-                if (recievedQty === 0) {
+                if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
                         { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
-                        { $set: { 'procedureAccessory.$.flag': true } }
+                        { $set: { 'procedureAccessory.$.flag': true, 'procedureAccessory.$.recievedQty': 0 } }
                     );
                 }
 
@@ -478,10 +478,10 @@ exports.stockRecieved = async (req, res) => {
                 recievedQty: parseInt(recievedQty),
                 relatedAccessoryItems: accessoryItemID
             })
-            if (recievedQty === 0) {
+            if (isDone === true) {
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
-                    { $set: { 'procedureAccessory.$.flag': true } }
+                    { $set: { 'procedureAccessory.$.flag': true, 'procedureAccessory.$.recievedQty': 0 } }
                 );
             }
         }
