@@ -278,14 +278,17 @@ exports.stockRecieved = async (req, res) => {
             _id: stockRequestID, isDeleted: false
         }).populate('relatedTransfer')
         if (sqResult[0].relatedTransfer === undefined) return res.status(500).send({ error: true, message: 'There is no transfer record for this Request!' })
+
         if (procedureItemID) {
-            console.log(flag[0].transferQty)
+            const recievedQuantity = sqResult[0].procedureMedicine.filter(item => item.item_id.toString() === procedureItemID)[0].recievedQty
+            console.log(recievedQuantity)
             const flag = sqResult[0].relatedTransfer.procedureMedicine.filter(item => item.item_id.toString() === procedureItemID)
-            if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
+            if (recievedQty > recievedQuantity) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
             if (flag.length === 0) return res.status(500).send({ error: true, message: 'This procedure item does not exists in the stock reqeust!' })
             if (flag[0].flag === true) {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
             }
+
             else if (flag[0].flag === false && flag[0].recievedQty > 0) {
                 var result = await Stock.findOneAndUpdate(
                     { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
@@ -293,7 +296,7 @@ exports.stockRecieved = async (req, res) => {
                         $inc: {
                             currentQty: parseInt(recievedQty),
                             totalUnit: parseInt(totalUnit),
-                            recievedQty: parseInt(flag[0].transferQty - recievedQty)
+                            recievedQty: parseInt(recievedQuantity - recievedQty)
                         }
                     },
                     { new: true }
@@ -303,7 +306,7 @@ exports.stockRecieved = async (req, res) => {
                     createdBy: createdBy,
                     relatedBranch: relatedBranch,
                     requestedQty: parseInt(flag[0].requestedQty),
-                    recievedQty: parseInt(flag[0].transferQty - recievedQty),
+                    recievedQty: parseInt(recievedQuantity - recievedQty),
                     relatedProcedureItems: procedureItemID
                 })
                 if (recievedQty === 0) {
@@ -319,7 +322,7 @@ exports.stockRecieved = async (req, res) => {
                     $inc: {
                         currentQty: parseInt(recievedQty),
                         totalUnit: parseInt(totalUnit),
-                        recievedQty: parseInt(flag[0].transferQty - recievedQty)
+                        recievedQty: parseInt(recievedQuantity - recievedQty)
                     }
                 },
                 { new: true }
@@ -341,8 +344,9 @@ exports.stockRecieved = async (req, res) => {
         }
         if (medicineItemID) {
             const flag = sqResult[0].relatedTransfer.medicineLists.filter(item => item.item_id.toString() === medicineItemID)
-
-            if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
+            const recievedQuantity = sqResult[0].medicineLists.filter(item => item.item_id.toString() === medicineItemID)[0].recievedQty
+            console.log(recievedQuantity)
+            if (recievedQty > recievedQuantity) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
             if (flag.length === 0) return res.status(500).send({ error: true, message: 'This medicine item does not exists in the stock reqeust!' })
             if (flag[0].flag === true) {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
@@ -354,7 +358,7 @@ exports.stockRecieved = async (req, res) => {
                         $inc: {
                             currentQty: parseInt(recievedQty),
                             totalUnit: parseInt(totalUnit),
-                            recievedQty: parseInt(flag[0].transferQty - recievedQty)
+                            recievedQty: parseInt(recievedQuantity - recievedQty)
                         }
                     },
                     { new: true }
@@ -380,7 +384,7 @@ exports.stockRecieved = async (req, res) => {
                     $inc: {
                         currentQty: parseInt(recievedQty),
                         totalUnit: parseInt(totalUnit),
-                        recievedQty: parseInt(flag[0].transferQty - recievedQty)
+                        recievedQty: parseInt(recievedQuantity - recievedQty)
                     }
                 },
                 { new: true }
@@ -401,8 +405,9 @@ exports.stockRecieved = async (req, res) => {
             }
         }
         if (accessoryItemID) {
+            const recievedQuantity = sqResult[0].relatedTransfer.procedureAccessory.filter(item => item.item_id.toString() === accessoryItemID)[0].recievedQty
             const flag = sqResult[0].relatedTransfer.procedureAccessory.filter(item => item.item_id.toString() === accessoryItemID)
-            if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
+            if (recievedQty > recievedQuantity) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
             if (flag.length === 0) return res.status(500).send({ error: true, message: 'This accessory item does not exists in the stock reqeust!' })
             if (flag[0].flag === true) {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
@@ -414,7 +419,7 @@ exports.stockRecieved = async (req, res) => {
                         $inc: {
                             currentQty: parseInt(recievedQty),
                             totalUnit: parseInt(totalUnit),
-                            recievedQty: parseInt(flag[0].transferQty - recievedQty)
+                            recievedQty: parseInt(recievedQuantity - recievedQty)
                         }
                     },
                     { new: true }
@@ -441,7 +446,7 @@ exports.stockRecieved = async (req, res) => {
                     $inc: {
                         currentQty: parseInt(recievedQty),
                         totalUnit: parseInt(totalUnit),
-                        recievedQty: parseInt(flag[0].transferQty - recievedQty)
+                        recievedQty: parseInt(recievedQuantity - recievedQty)
                     }
                 },
                 { new: true }
