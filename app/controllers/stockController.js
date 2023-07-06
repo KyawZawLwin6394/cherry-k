@@ -302,7 +302,7 @@ exports.stockRecieved = async (req, res) => {
                 ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureMedicine.item_id': procedureItemID },
-                    { $set: { 'procedureMedicine.$.recievedQty': parseInt(recievedQuantity - recievedQty) } }
+                    { $inc: { 'procedureMedicine.$.recievedQty': -recievedQty } }
                 );
                 var RecievedRecordsResult = await RecievedRecords.create({
                     createdAt: Date.now(),

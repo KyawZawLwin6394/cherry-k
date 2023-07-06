@@ -93,6 +93,10 @@ let TreatmentVoucherSchema = new Schema({
     relatedPackage: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Packages'
+    },
+    relatedDoctor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Doctors'
     }
 });
 
