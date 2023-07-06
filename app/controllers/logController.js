@@ -229,11 +229,8 @@ exports.createUsage = async (req, res) => {
           }
         }
       }
-
-
-
+      
       //procedureAccessory
-
       if (procedureAccessory !== undefined) {
         for (const e of procedureAccessory) {
           if (e.stock < e.actual) {
