@@ -125,8 +125,9 @@ exports.generateCode = async (req, res) => {
 exports.filterStockRequest = async (req, res, next) => {
     try {
         let query = req.mongoQuery
-        let { startDate, endDate } = req.query
+        let { startDate, endDate, relatedBranch } = req.query
         if (startDate && endDate) query.date = { $gte: startDate, $lte: endDate }
+        if (relatedBranch) query.relatedBranch = relatedBranch
         if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
         const result = await StockRequest.find(query).populate('procedureMedicine.item_id medicineLists.item_id procedureAccessory.item_id relatedBranch');
         if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })

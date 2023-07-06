@@ -354,3 +354,19 @@ exports.generateCode = async (req, res) => {
     return res.status(500).send({ error: true, message: error.message })
   }
 }
+
+exports.filterStockTransfer = async (req, res, next) => {
+  try {
+    let query = req.mongoQuery
+    let { startDate, endDate, relatedBranch } = req.query
+    if (startDate && endDate) query.date = { $gte: startDate, $lte: endDate }
+    if (relatedBranch) query.relatedBranch = relatedBranch
+    if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
+    const result = await StockTransfer.find(query).populate('procedureMedicine.item_id medicineLists.item_id procedureAccessory.item_id relatedBranch');
+    if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
+    res.status(200).send({ success: true, data: result })
+  } catch (err) {
+    return res.status(500).send({ error: true, message: err.message })
+  }
+
+}

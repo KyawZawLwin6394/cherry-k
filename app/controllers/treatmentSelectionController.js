@@ -416,7 +416,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedBranch": req.body.relatedBranch,
                 "remark": req.body.remark,
                 "payment": attachID,
-                "relatedDiscount": req.body.relatedDiscount
+                "relatedDiscount": req.body.relatedDiscount,
+                "relatedDoctor":req.body.relatedDoctor
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -444,7 +445,8 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedBranch": req.body.relatedBranch,
                 "remark": req.body.remark,
                 "payment": attachID,
-                "relatedDiscount": req.body.relatedDiscount
+                "relatedDiscount": req.body.relatedDiscount,
+                "relatedDoctor":req.body.relatedDoctor
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -620,7 +622,8 @@ exports.treatmentPayment = async (req, res, next) => {
                 "relatedBranch": req.body.relatedBranch,
                 "remark": req.body.remark,
                 "payment": attachID,
-                "relatedDiscount": req.body.relatedDiscount
+                "relatedDiscount": req.body.relatedDiscount,
+                "relatedDoctor":req.body.relatedDoctor
 
             }
             let today = new Date().toISOString()
