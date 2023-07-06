@@ -15,7 +15,7 @@ exports.listAllStockRequests = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await StockRequest.find(query).populate('procedureMedicine.item_id medicineLists.item_id procedureAccessory.item_id relatedBranch');
+        let result = await StockRequest.find(query).sort({ date: -1 }).populate('procedureMedicine.item_id medicineLists.item_id procedureAccessory.item_id relatedBranch');
         count = await StockRequest.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);

@@ -24,7 +24,7 @@ exports.listAllStockTransfers = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await StockTransfer.find(query)
+    let result = await StockTransfer.find(query).sort({ date: -1 })
     count = await StockTransfer.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -274,7 +274,7 @@ exports.createStockTransfer = async (req, res, next) => {
     const stockRequestUpdate = await StockRequest.findOneAndUpdate(
       { _id: req.body.stockRequestID },
       { relatedTransfer: result._id },
-      {new:true}
+      { new: true }
     )
 
     let response = { success: true, message: 'StockTransfer create success' }
