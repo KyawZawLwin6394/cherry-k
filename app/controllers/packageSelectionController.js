@@ -48,7 +48,7 @@ exports.listAllPackageSelections = async (req, res) => {
 exports.getAppointmentsForPackageSelection = async (req, res) => {
     try {
         let { relatedPackageSelection, relatedTreatment } = req.query;
-        const appointmentResult = await Appointment.find({ relatedPackageSelection: relatedPackageSelection, relatedTreatment: relatedTreatment })
+        const appointmentResult = await Appointment.find({ relatedPackageSelection: relatedPackageSelection, relatedTreatment: relatedTreatment }).populate('relatedDoctor')
         return res.status(200).send({ success: true, data: appointmentResult })
     } catch (error) {
         return res.status(500).send({
