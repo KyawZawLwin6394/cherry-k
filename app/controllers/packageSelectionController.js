@@ -92,7 +92,7 @@ exports.createPackageSelectionCode = async (req, res) => {
 exports.appointmentGenerate = async (req, res) => {
     let relatedAppointments = []
     const dataconfigs = [];
-    let { relatedPatient, relatedDoctor, originalDate, relatedBranch, treatmentTimes, inBetweenDuration, relatedPackageSelection } = req.body
+    let { relatedPatient, relatedDoctor, originalDate, relatedBranch, treatmentTimes, inBetweenDuration, relatedPackageSelection, relatedTreatment } = req.body
     if (originalDate === undefined) return res.status(500).send({ error: true, message: 'Original Date is required' })
     const appointmentConfig = {
         relatedPatient: relatedPatient,
@@ -100,7 +100,8 @@ exports.appointmentGenerate = async (req, res) => {
         originalDate: new Date(originalDate), // Convert to Date object
         phone: phone,
         relatedBranch: relatedBranch,
-        relatedPackageSelection: relatedPackageSelection
+        relatedPackageSelection: relatedPackageSelection,
+        relatedTreatment: relatedTreatment,
     };
     const numTreatments = treatmentTimes;
     for (let i = 0; i < numTreatments; i++) {
@@ -399,7 +400,7 @@ exports.createPackageSelection = async (req, res, next) => {
                 "remark": req.body.remark,
                 "payment": attachID,
                 "relatedDiscount": req.body.relatedDiscount,
-                "relatedDoctor":req.body.relatedDoctor
+                "relatedDoctor": req.body.relatedDoctor
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -428,7 +429,7 @@ exports.createPackageSelection = async (req, res, next) => {
                 "remark": req.body.remark,
                 "payment": attachID,
                 "relatedDiscount": req.body.relatedDiscount,
-                "relatedDoctor":req.body.relatedDoctor
+                "relatedDoctor": req.body.relatedDoctor
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
