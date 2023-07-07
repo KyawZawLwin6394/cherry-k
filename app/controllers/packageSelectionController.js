@@ -92,7 +92,7 @@ exports.createPackageSelectionCode = async (req, res) => {
 exports.appointmentGenerate = async (req, res) => {
     let relatedAppointments = []
     const dataconfigs = [];
-    let { relatedPatient, relatedDoctor, originalDate, relatedBranch, treatmentTimes, inBetweenDuration, relatedPackageSelection, relatedTreatment } = req.body
+    let { relatedPatient, relatedDoctor, originalDate, relatedBranch, treatmentTimes, inBetweenDuration, relatedPackageSelection, relatedTreatment,phone } = req.body
     if (originalDate === undefined) return res.status(500).send({ error: true, message: 'Original Date is required' })
     const appointmentConfig = {
         relatedPatient: relatedPatient,
