@@ -12,7 +12,28 @@ const { relative } = require('path');
 exports.listAllStocks = async (req, res) => {
     let query = req.mongoQuery
     try {
-        let result = await Stock.find(query).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
+        let result = await Stock.find(query).populate('relatedBranch relatedMachine').populate({
+            path: 'relatedProcedureItems',
+            model: 'ProcedureItems',
+            populate: {
+                path: 'name',
+                model: 'ProcedureMedicines'
+            }
+        }).populate({
+            path: 'relatedMedicineItems',
+            model: 'MedicineItems',
+            populate: {
+                path: 'name',
+                model: 'MedicineLists'
+            }
+        }).populate({
+            path: 'relatedAccessoryItems',
+            model: 'AccessoryItems',
+            populate: {
+                path: 'name',
+                model: 'ProcedureAccessories'
+            }
+        })
         let count = await Stock.find(query).count();
         res.status(200).send({
             success: true,
