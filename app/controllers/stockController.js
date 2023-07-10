@@ -68,9 +68,108 @@ exports.getStockByBranchID = async (req, res) => {
         medicinequery = { ...medicinequery, relatedBranch: req.query.relatedBranch }
         accessoryquery = { ...accessoryquery, relatedBranch: req.query.relatedBranch }
         console.log(procedurequery, medicinequery, accessoryquery)
-        const procedureResult = await Stock.find(procedurequery).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
-        const medicineResult = await Stock.find(medicinequery).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
-        const accessoryResult = await Stock.find(accessoryquery).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine')
+        const procedureResult = await Stock.find(procedurequery).populate('relatedBranch relatedMachine').populate({
+            path: 'relatedProcedureItems',
+            model: 'ProcedureItems',
+            populate: {
+                path: 'name',
+                model: 'ProcedureMedicines',
+                populate: {
+                    path: 'relatedBrand',
+                    model: 'Brands'
+                }
+            }
+        }).populate({
+            path: 'relatedMedicineItems',
+            model: 'MedicineItems',
+            populate: {
+                path: 'name',
+                model: 'MedicineLists',
+                populate: {
+                    path: 'relatedBrand',
+                    model: 'Brands'
+                }
+            }
+        }).populate({
+            path: 'relatedAccessoryItems',
+            model: 'AccessoryItems',
+            populate: {
+                path: 'name',
+                model: 'ProcedureAccessories',
+                populate: {
+                    path: 'relatedBrand',
+                    model: 'Brands'
+                }
+            }
+        })
+        const medicineResult = await Stock.find(medicinequery).populate('relatedBranch relatedMachine').populate({
+            path: 'relatedProcedureItems',
+            model: 'ProcedureItems',
+            populate: {
+                path: 'name',
+                model: 'ProcedureMedicines',
+                populate: {
+                    path: 'relatedBrand',
+                    model: 'Brands'
+                }
+            }
+        }).populate({
+            path: 'relatedMedicineItems',
+            model: 'MedicineItems',
+            populate: {
+                path: 'name',
+                model: 'MedicineLists',
+                populate: {
+                    path: 'relatedBrand',
+                    model: 'Brands'
+                }
+            }
+        }).populate({
+            path: 'relatedAccessoryItems',
+            model: 'AccessoryItems',
+            populate: {
+                path: 'name',
+                model: 'ProcedureAccessories',
+                populate: {
+                    path: 'relatedBrand',
+                    model: 'Brands'
+                }
+            }
+        })
+        const accessoryResult = await Stock.find(accessoryquery).populate('relatedBranch relatedMachine').populate({
+            path: 'relatedProcedureItems',
+            model: 'ProcedureItems',
+            populate: {
+                path: 'name',
+                model: 'ProcedureMedicines',
+                populate: {
+                    path: 'relatedBrand',
+                    model: 'Brands'
+                }
+            }
+        }).populate({
+            path: 'relatedMedicineItems',
+            model: 'MedicineItems',
+            populate: {
+                path: 'name',
+                model: 'MedicineLists',
+                populate: {
+                    path: 'relatedBrand',
+                    model: 'Brands'
+                }
+            }
+        }).populate({
+            path: 'relatedAccessoryItems',
+            model: 'AccessoryItems',
+            populate: {
+                path: 'name',
+                model: 'ProcedureAccessories',
+                populate: {
+                    path: 'relatedBrand',
+                    model: 'Brands'
+                }
+            }
+        })
         return res.status(200).send({
             success: true,
             data: {
