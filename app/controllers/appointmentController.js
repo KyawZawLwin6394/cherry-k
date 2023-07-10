@@ -154,6 +154,7 @@ exports.createAppointment = async (req, res, next) => {
 exports.updateAppointment = async (req, res, next) => {
   try {
     let { relatedPatient } = req.body;
+    console.log(req.body,'here')
     const result = await Appointment.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
