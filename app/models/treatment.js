@@ -105,6 +105,12 @@ let TreatmentSchema = new Schema({
   sellEndFlag: {
     type: Boolean,
     default: false
+  },
+  TCLSellingPrice: {
+    type: Number
+  },
+  TCLEstimateTotalPrice: {
+    type: Number
   }
 });
 
