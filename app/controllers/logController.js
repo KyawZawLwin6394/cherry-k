@@ -151,22 +151,26 @@ exports.filterLogs = async (req, res, next) => {
 
 exports.getStockTotalUnit = async (req, res) => {
   try {
+    let accessoryResults = [];
     let data = req.body;
-    if (data.procedureItems) var procedureItems = await Stock.find({ relatedProcedureItems: { $in: data.procedureItems }, relatedBranch: data.relatedBranch }).populate('relatedProcedureItems')
-    if (data.medicineItems) var medicineItems = await Stock.find({ relatedMedicineItems: { $in: data.medicineItems }, relatedBranch: data.relatedBranch }).populate('relatedAccessoryItems')
-    if (data.accessoryItems) var accessoryItems = await Stock.find({ relatedAccessoryItems: { $in: data.accessoryItems }, relatedBranch: data.relatedBranch }).populate('relatedAccessoryItems')
-    if (data.machine) var machine = await Stock.find({ relatedMachine: { $in: data.machine }, relatedBranch: data.relatedBranch }).populate('relatedMachine')
+    if (data.procedureItems) var procedureItems = await Stock.find({ relatedProcedureItems: { $in: data.procedureItems }, relatedBranch: data.relatedBranch }).populate('relatedProcedureItems');
+    if (data.medicineItems) var medicineItems = await Stock.find({ relatedMedicineItems: { $in: data.medicineItems }, relatedBranch: data.relatedBranch }).populate('relatedMedicineItems');
+    if (data.accessoryItems) accessoryResults = await Stock.find({ relatedAccessoryItems: { $in: data.accessoryItems }, relatedBranch: data.relatedBranch }).populate('relatedAccessoryItems');
+    if (data.machine) var machine = await Stock.find({ relatedMachine: { $in: data.machine }, relatedBranch: data.relatedBranch }).populate('relatedMachine');
     return res.status(200).send({
       success: true,
       procedureItems: procedureItems,
       medicineItems: medicineItems,
-      accessoryItems: accessoryItems,
+      accessoryItems: accessoryResults,
+      aicount: data.accessoryItems.length,
+      aireturn: accessoryResults.length,
       machine: machine
-    })
+    });
   } catch (error) {
-    return res.status(500).send({})
+    return res.status(500).send({ error: true, message: error.message });
   }
-}
+};
+
 
 exports.getUsage = async (req, res) => {
   try {

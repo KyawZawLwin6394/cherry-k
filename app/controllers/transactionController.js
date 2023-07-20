@@ -161,17 +161,17 @@ exports.bankCashTransactionReport = async (req, res) => {
     if (type === 'Bank') {
       name = transactionResult.reduce((result, { relatedBank, amount }) => {
         const { name } = relatedBank;
-        result[name] = (result[name] || 0) + amount;
+        result[name] = (result[name] || 0) + parseInt(amount);
         return result;
       }, {});
-      total = transactionResult.reduce((total, sale) => total + sale.amount, 0);
+      total = transactionResult.reduce((total, sale) => total + parseInt(sale.amount), 0);
     } else {
       name = transactionResult.reduce((result, { relatedCash, amount }) => {
         const { name } = relatedCash;
-        result[name] = (result[name] || 0) + amount;
+        result[name] = (result[name] || 0) + parseInt(amount);
         return result;
       }, {});
-      total = transactionResult.reduce((total, sale) => total + sale.amount, 0);
+      total = transactionResult.reduce((total, sale) => total + parseInt(sale.amount), 0);
     }
     return res.status(200).send({ success: true, data: transactionResult, names: name, total: total })
   } catch (error) {
