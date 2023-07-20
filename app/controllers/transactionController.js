@@ -149,7 +149,7 @@ exports.bankCashTransactionReport = async (req, res) => {
   let query = { isDeleted: false }
   let [name, total] = ['', 0]
   try {
-    if (start & end) query.createdAt = { $gte: start, $lte: end }
+    if (start & end) query.date = { $gte: start, $lte: end }
     if (type === 'Bank') query.relatedBank = account
     if (type === 'Cash') query.relatedCash = account
 
