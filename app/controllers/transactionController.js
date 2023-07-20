@@ -143,3 +143,38 @@ exports.getRelatedTransactionIncome = async (req, res) => {
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
 };
+
+exports.bankCashTransactionReport = async (req, res) => {
+  let { start, end, type, account } = req.query
+  let query = { isDeleted: false }
+  let [name, total] = ['', 0]
+  try {
+    if (start & end) query.createdAt = { $gte: start, $lte: end }
+    if (type === 'Bank') query.relatedBank = account
+    if (type === 'Cash') query.relatedCash = account
+
+    const transactionResult = await Transaction.find(query).populate('relatedAccounting relatedTreatment relatedBank relatedCash relatedMedicineSale relatedBranch').populate('createdBy', 'givenName').populate({
+      path: 'relatedTransaction',
+      model: 'Transactions',
+      populate: ('relatedAccounting relatedTreatment relatedBank relatedCash relatedMedicineSale relatedBranch')
+    })
+    if (type === 'Bank') {
+      name = transactionResult.reduce((result, { relatedBank, amount }) => {
+        const { name } = relatedBank;
+        result[name] = (result[name] || 0) + amount;
+        return result;
+      }, {});
+      total = transactionResult.reduce((total, sale) => total + sale.amount, 0);
+    } else {
+      name = transactionResult.reduce((result, { relatedCash, amount }) => {
+        const { name } = relatedCash;
+        result[name] = (result[name] || 0) + amount;
+        return result;
+      }, {});
+      total = transactionResult.reduce((total, sale) => total + sale.amount, 0);
+    }
+    return res.status(200).send({ success: true, data: transactionResult, names: name, total: total })
+  } catch (error) {
+    return res.status(500).send({ error: true, message: error.message })
+  }
+} 

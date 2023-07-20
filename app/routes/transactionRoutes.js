@@ -25,4 +25,6 @@ module.exports = (app) => {
 
     app.route('/api/transactions/relatedIncome/:id')
         .get(catchError(transaction.getRelatedTransactionIncome))
+
+    app.route('/api/transactions/report').get(verifyToken, catchError(transaction.bankCashTransactionReport))
 };
