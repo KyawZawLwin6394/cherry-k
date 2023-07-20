@@ -149,10 +149,10 @@ exports.bankCashTransactionReport = async (req, res) => {
   let query = { isDeleted: false }
   let [name, total] = ['', 0]
   try {
-    if (start & end) query.date = { $gte: start, $lte: end }
+    if (start && end) query.date = { $gte: start, $lte: end }
     if (type === 'Bank') query.relatedBank = account
     if (type === 'Cash') query.relatedCash = account
-
+    console.log(query)
     const transactionResult = await Transaction.find(query).populate('relatedAccounting relatedTreatment relatedBank relatedCash relatedMedicineSale relatedBranch').populate('createdBy', 'givenName').populate({
       path: 'relatedTransaction',
       model: 'Transactions',
