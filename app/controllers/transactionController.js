@@ -42,7 +42,7 @@ exports.getTransaction = async (req, res) => {
     model: 'AccountingLists',
     populate: {
       path: 'relatedHeader',
-      model: 'Headers'
+      model: 'AccountHeaders'
     }
   }).populate('relatedTreatment').populate({
     path: 'relatedTransaction',
