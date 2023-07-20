@@ -16,7 +16,7 @@ exports.getAllJournals = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await Transaction.find(query).populate('relatedAccounting')
+        let result = await Transaction.find(query).populate('relatedAccounting relatedBranch')
         count = await Transaction.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
