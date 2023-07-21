@@ -137,7 +137,7 @@ exports.createMedicineSale = async (req, res, next) => {
       "remark": req.body.remark,
       "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines),
       "relatedMedicineSale": medicineSaleResult._id,
-        "type": "Credit",
+      "type": "Credit",
       "createdBy": createdBy
     })
     const fTransResult = await fTransaction.save()
@@ -403,6 +403,8 @@ exports.getwithExactDate = async (req, res) => {
     return res.status(500).send({ error: true, message: error.message })
   }
 }
+
+
 
 exports.searchMedicineSale = async (req, res, next) => {
   try {
