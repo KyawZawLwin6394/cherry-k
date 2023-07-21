@@ -97,6 +97,10 @@ let TreatmentVoucherSchema = new Schema({
     relatedDoctor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Doctors'
+    },
+    tsType:{
+        type:String,
+        enum:['TS','TSMulti','MS','Combined']
     }
 });
 
