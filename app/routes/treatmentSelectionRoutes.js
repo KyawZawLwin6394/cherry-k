@@ -17,7 +17,12 @@ module.exports = (app) => {
         .delete(verifyToken, catchError(treatmentSelection.deleteTreatmentSelection))
         .post(verifyToken, catchError(treatmentSelection.activateTreatmentSelection))
 
-    app.route('/api/treatment-selections').get(verifyToken, catchError(treatmentSelection.listAllTreatmentSelections))
+    app.route('/api/treatment-selections')
+        .get(verifyToken, catchError(treatmentSelection.listAllTreatmentSelections));
+
+    app.route('/api/treatment-selections/multi')
+        .post(verifyToken, catchError(treatmentSelection.createMultiTreatmentSelection))
+        .get(verifyToken, catchError(treatmentSelection.listMultiTreatmentSelections))
 
     app.route('/api/treatment-selections/transaction').post(verifyToken, catchError(treatmentSelection.createTreatmentTransaction))
     app.route('/api/treatment-selections/treatment/:id').get(verifyToken, catchError(treatmentSelection.getTreatementSelectionByTreatmentID))

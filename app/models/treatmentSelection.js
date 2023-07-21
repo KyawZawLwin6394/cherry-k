@@ -34,6 +34,16 @@ let TreatmentSelectionSchema = new Schema({
     required: true,
     default: false
   },
+  multiTreatment: [{
+    item_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Treatments'
+    },
+    discountAmount: Number,
+    discountPercent: Number,
+    price: Number,
+    qty: Number
+  }],
   relatedTreatment: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Treatments'
@@ -105,7 +115,10 @@ let TreatmentSelectionSchema = new Schema({
   remark: {
     type: String
   },
-
+  tsType:{
+    type:String,
+    enum:['TS','TSMulti']
+  }
 
 });
 const patient = mongoose.model('TreatmentSelections', TreatmentSelectionSchema)
