@@ -40,7 +40,6 @@ let TreatmentSelectionSchema = new Schema({
       ref: 'Treatments'
     },
     discountAmount: Number,
-    discountPercent: Number,
     price: Number,
     qty: Number
   }],
@@ -115,9 +114,9 @@ let TreatmentSelectionSchema = new Schema({
   remark: {
     type: String
   },
-  tsType:{
-    type:String,
-    enum:['TS','TSMulti']
+  tsType: {
+    type: String,
+    enum: ['TS', 'TSMulti']
   }
 
 });

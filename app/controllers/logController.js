@@ -10,7 +10,7 @@ const Appointment = require('../models/appointment')
 
 exports.listAllLog = async (req, res) => {
   try {
-    let result = await Log.find({ isDeleted: false }).populate('createdBy relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedAccessoryItems relatedMachine').populate({
+    let result = await Log.find({ isDeleted: false }).populate('createdBy relatedTreatmentSelection relatedAppointment relatedProcedureItems relatedBranch relatedAccessoryItems relatedMachine').populate({
       path: 'relatedTreatmentSelection',
       populate: [{
         path: 'relatedTreatment',
