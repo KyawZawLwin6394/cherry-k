@@ -153,10 +153,10 @@ exports.bankCashTransactionReport = async (req, res) => {
     if (type === 'Bank') query.relatedBank = account
     if (type === 'Cash') query.relatedCash = account
     console.log(query)
-    const transactionResult = await Transaction.find(query).populate('relatedAccounting relatedTreatment relatedBank relatedCash relatedMedicineSale relatedBranch').populate('createdBy', 'givenName').populate({
+    const transactionResult = await Transaction.find(query).populate('relatedAccounting relatedTreatment relatedBank relatedCash relatedMedicineSale relatedBranch relatedIncome relatedExpense').populate('createdBy', 'givenName').populate({
       path: 'relatedTransaction',
       model: 'Transactions',
-      populate: ('relatedAccounting relatedTreatment relatedBank relatedCash relatedMedicineSale relatedBranch')
+      populate: ('relatedAccounting relatedTreatment relatedBank relatedCash relatedMedicineSale relatedBranch relatedIncome relatedExpense')
     })
     if (type === 'Bank') {
       name = transactionResult.reduce((result, { relatedBank, amount }) => {
