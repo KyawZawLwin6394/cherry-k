@@ -6,6 +6,12 @@ const Schema = mongoose.Schema;
 
 
 let PurchaseSchema = new Schema({
+    code: {
+        type: String
+    },
+    seq: {
+        type: Number
+    },
     purchaseDate: {
         type: Date,
     },

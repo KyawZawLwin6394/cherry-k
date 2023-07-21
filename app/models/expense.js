@@ -6,6 +6,12 @@ const Schema = mongoose.Schema;
 
 
 let ExpenseSchema = new Schema({
+    code: {
+        type: String
+    },
+    seq: {
+        type: Number
+    },
     relatedAccounting: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'AccountingLists',

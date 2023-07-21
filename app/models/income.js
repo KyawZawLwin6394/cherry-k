@@ -6,6 +6,12 @@ const Schema = mongoose.Schema;
 
 
 let IncomeSchema = new Schema({
+    code: {
+        type: String,
+    },
+    seq: {
+        type: Number
+    },
     relatedAccounting: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'AccountingLists',
@@ -49,7 +55,7 @@ let IncomeSchema = new Schema({
     relatedBranch: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Branches'
-      },
+    },
 });
 
 module.exports = mongoose.model('Incomes', IncomeSchema);

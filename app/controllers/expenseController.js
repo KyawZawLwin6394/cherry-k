@@ -48,6 +48,22 @@ exports.getExpense = async (req, res) => {
     return res.status(200).send({ success: true, data: result });
 };
 
+exports.getCode = async (req, res) => {
+    let data = {}
+    try {
+        let today = new Date().toISOString()
+        const latestDocument = await Expense.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
+        if (latestDocument.length === 0) data = { ...data, seq: 1, code: "EPC-" + "-1" } // if seq is undefined set initial patientID and seq
+        if (latestDocument.length > 0) {
+            const increment = latestDocument[0].seq + 1
+            data = { ...data, code: "EPC" + "-" + increment, seq: increment }
+        }
+        return res.status(200).send({ success: true, data: data })
+    } catch (error) {
+        return res.status(500).send({ "error": true, message: error.message })
+    }
+}
+
 exports.createExpense = async (req, res, next) => {
     try {
 

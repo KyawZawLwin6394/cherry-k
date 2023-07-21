@@ -10,6 +10,9 @@ module.exports = (app) => {
         .post(verifyToken, catchError(purchase.createPurchase))
         .put(verifyToken, catchError(purchase.updatePurchase))
 
+    app.route('/api/purchases/code').get(verifyToken, catchError(purchase.getCode))
+
+
     app.route('/api/purchase/:id')
         .get(verifyToken, catchError(purchase.getPurchase))
         .delete(verifyToken, catchError(purchase.deletePurchase))
