@@ -115,11 +115,8 @@ exports.getOpeningAndClosingWithExactDate = async (req, res) => {
         const endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1); // Set end date to the beginning of the next day
 
         const latestDocument = await AccountBalance.findOne(query, null, { sort });
-        console.log(latestDocument)
-        if (latestDocument === null) return res.status(404).send({ error: true, message: 'Not Found!' })
+        let openingTotal = latestDocument ? latestDocument[0].amount : 0
 
-        let openingTotal = latestDocument.length > 0 ? latestDocument[0].amount : 0
-        
         const medicineTotal = await MedicineSale.find({ createdAt: { $gte: startDate, $lt: endDate }, relatedBranch: relatedBranch, relatedCash: relatedCash, relatedBank: relatedBank }).then(msResult => {
             const msTotal = msResult.reduce((accumulator, currentValue) => { return accumulator + currentValue.totalAmount }, 0)
             return msTotal
