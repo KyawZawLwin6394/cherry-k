@@ -163,7 +163,7 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
     let { relatedPatient, totalAmount, paymentMethod, paidAmount, relatedBank, relatedCash, relatedTreatment, relatedAppointment, bankType, paymentType, relatedBranch, remark, relatedDiscount, relatedDoctor } = req.body
     let tvcCreate = false;
     try {
-        if (files.payment) {
+        if (files) {
             for (const element of files.payment) {
                 let imgPath = element.path.split('cherry-k')[1];
                 const attachData = {
