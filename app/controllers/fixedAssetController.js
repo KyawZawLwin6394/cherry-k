@@ -1,7 +1,7 @@
 'use strict';
 const FixedAsset = require('../models/fixedAsset');
-const Branch = require('../models/branch');
-const Stock = require('../models/stock');
+const Transaction = require('../models/transaction');
+const Accounting = require('../models/accountingList');
 
 exports.listAllFixedAssets = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -18,6 +18,7 @@ exports.listAllFixedAssets = async (req, res) => {
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
     let result = await FixedAsset.find(query).populate('relatedAccount');
+    console.log(result)
     count = await FixedAsset.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -47,27 +48,76 @@ exports.getFixedAsset = async (req, res) => {
 
 exports.createFixedAsset = async (req, res, next) => {
   try {
+    const data = req.body;
+    const { initialPrice, depriciationTotal, depriciationAcc, fixedAssetAcc, relatedBank, relatedCash } = req.body;
     const newBody = req.body;
     const newFixedAsset = new FixedAsset(newBody);
-    const result = await newFixedAsset.save();
-    const getAllBranches = await Branch.find();
-    for (let i = 0; i < getAllBranches.length; i++) {
-      const stockResult = await Stock.create({
-        "relatedProcedureItems": result._id,
-        "currentQty": 0,
-        "fromUnit": 0,
-        "toUnit": 0,
-        "reorderQty": 0,
-        "relatedBranch": getAllBranches[i]._id //branch_id
+    const result = await newFixedAsset.save().then(async response => {
+      if (fixedAssetAcc) {
+        var transResult = await Transaction.create({
+          "amount": initialPrice,
+          "date": Date.now(),
+          "remark": data.remark,
+          "type": "Debit",
+          "relatedTransaction": null,
+          "relatedAccounting": fixedAssetAcc,
+        })
+        const transResultAmtUpdate = await Accounting.findOneAndUpdate(
+          { _id: fixedAssetAcc },
+          { $inc: { amount: initialPrice } }
+        )
+      }
+      if (depriciationAcc) {
+        var transResult = await Transaction.create({
+          "amount": depriciationTotal,
+          "date": Date.now(),
+          "remark": data.remark,
+          "type": "Debit",
+          "relatedTransaction": null,
+          "relatedAccounting": depriciationAcc,
+        })
+        const transResultUpdate = await Accounting.findOneAndUpdate(
+          { _id: depriciationAcc },
+          { $inc: { amount: depriciationTotal } }
+        )
+      }
+
+      const SectransResult = await Transaction.create({
+        "amount": data.totalPrice,
+        "date": Date.now(),
+        "remark": data.remark,
+        "type": "Credit",
+        "relatedTransaction": null,
+        "relatedBank": relatedBank, //Bank or cashk
+        "relatedCash": relatedCash,
+        "relatedTransaction": transResult._id
       })
-    }
+      var fTransUpdate = await Transaction.findOneAndUpdate(
+        { _id: transResult._id },
+        {
+          relatedTransaction: SectransResult._id
+        },
+        { new: true }
+      )
+      if (relatedBank) {
+        var amountUpdate = await Accounting.findOneAndUpdate(
+          { _id: relatedBank },
+          { $inc: { amount: totalPrice } }
+        )
+      } else if (relatedCash) {
+        var amountUpdate = await Accounting.findOneAndUpdate(
+          { _id: relatedCash },
+          { $inc: { amount: totalPrice } }
+        )
+      }
+    })
     res.status(200).send({
       message: 'FixedAsset create success',
       success: true,
       data: result
     });
   } catch (error) {
-    // console.log(error)
+    console.log(error)
     return res.status(500).send({ "error": true, message: error.message })
   }
 };
