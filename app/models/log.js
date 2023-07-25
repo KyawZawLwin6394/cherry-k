@@ -6,6 +6,10 @@ const Schema = mongoose.Schema;
 
 
 let LogSchema = new Schema({
+    relatedGeneralItems: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'GeneralItems'
+    },
     relatedTreatmentSelection: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'TreatmentSelections'

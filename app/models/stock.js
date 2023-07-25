@@ -10,6 +10,10 @@ let StockSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
   },
+  relatedGeneralItems: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'GeneralItems'
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Users'
