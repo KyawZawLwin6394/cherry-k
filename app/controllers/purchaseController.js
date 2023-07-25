@@ -130,16 +130,6 @@ exports.createPurchase = async (req, res, next) => {
             { _id: '646733d659a9bc811d97efa9' },
             { $inc: { amount: data.totalPrice } }
         )
-        const secTrans = await Transaction.create({
-            "amount": data.totalPrice,
-            "date": Date.now(),
-            "remark": data.remark,
-            "type": "Debit",
-            "relatedTransaction": null,
-            "relatedBank": req.body.relatedBank, //Opening Stock
-            "relatedCash": req.body.relatedCash,
-            "relatedTransaction": transResult._id
-        })
         //64ae1fea12b3d31436d4805f Purchase
         const purchaseResult = await Transaction.create({
             "amount": data.totalPrice,
@@ -153,16 +143,6 @@ exports.createPurchase = async (req, res, next) => {
             { _id: relatedPurchaseAccount },
             { $inc: { amount: data.totalPrice } }
         )
-        const secTranResult = await Transaction.create({
-            "amount": data.totalPrice,
-            "date": Date.now(),
-            "remark": data.remark,
-            "type": "Credit",
-            "relatedTransaction": null,
-            "relatedBank": req.body.relatedBank, //Bank or cashk
-            "relatedCash": req.body.relatedCash,
-            "relatedTransaction": transResult._id
-        })
         var fTransUpdate = await Transaction.findOneAndUpdate(
             { _id: transResult._id },
             {
@@ -170,17 +150,6 @@ exports.createPurchase = async (req, res, next) => {
             },
             { new: true }
         )
-        if (req.body.relatedBank) {
-            var amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: req.body.relatedBank },
-                { $inc: { amount: -req.body.totalPrice } }
-            )
-        } else if (req.body.relatedCash) {
-            var amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: req.body.relatedCash },
-                { $inc: { amount: -req.body.totalPrice } }
-            )
-        }
         const transUpdate = await Transaction.findOneAndUpdate({ _id: transResult._id }, { "relatedTransaction": secTranResult._id })
         res.status(200).send({
             message: 'Purchase create success',
