@@ -68,11 +68,11 @@ exports.createAccessoryItem = async (req, res, next) => {
     for (let i = 0; i < getAllBranches.length; i++) {
       const stockResult = await Stock.create({
         "relatedAccessoryItems": result._id,
-        "currentQty": 1,
+        "currentQty": 10,
         "fromUnit": result.fromUnit,
         "toUnit": result.toUnit,
         "reorderQty": 1,
-        "totalUnit": 1,
+        "totalUnit": 10,
         "relatedBranch": getAllBranches[i]._id //branch_id
       })
     }
