@@ -111,7 +111,38 @@ let TreatmentSchema = new Schema({
   },
   TCLEstimateTotalPrice: {
     type: Number
-  }
+  },
+  EightMileSellingPrice: {
+    type: Number
+  },
+  EightMileEstimateTotalPrice: {
+    type: Number
+  },
+  NPTSellingPrice: {
+    type: Number
+  },
+  NPTEstimateTotalPrice: {
+    type: Number
+  },
+  LSHSellingPrice: {
+    type: Number
+  },
+  LSHEstimateTotalPrice: {
+    type: Number
+  },
+  MDYSellingPrice: {
+    type: Number
+  },
+  MDYEstimateTotalPrice: {
+    type: Number
+  },
+  KShoppingSellingPrice: {
+    type: Number
+  },
+  KShoppingEstimateTotalPrice: {
+    type: Number
+  },
+
 });
 
 module.exports = mongoose.model('Treatments', TreatmentSchema);
