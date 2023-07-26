@@ -5,6 +5,7 @@ const ProcedureItems = require('../models/procedureItem');
 const AccessoryItems = require('../models/accessoryItem');
 const Stock = require('../models/stock');
 const Transaction = require('../models/transaction');
+const Accounting = require('../models/accountingList');
 
 exports.listAllPurchases = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -146,7 +147,7 @@ exports.createPurchase = async (req, res, next) => {
         var fTransUpdate = await Transaction.findOneAndUpdate(
             { _id: transResult._id },
             {
-                relatedTransaction: secTranResult._id
+                relatedTransaction: purchaseResult._id
             },
             { new: true }
         )
