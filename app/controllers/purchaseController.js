@@ -151,7 +151,7 @@ exports.createPurchase = async (req, res, next) => {
             },
             { new: true }
         )
-        const transUpdate = await Transaction.findOneAndUpdate({ _id: transResult._id }, { "relatedTransaction": secTranResult._id })
+        const transUpdate = await Transaction.findOneAndUpdate({ _id: transResult._id }, { "relatedTransaction": purchaseResult._id })
         res.status(200).send({
             message: 'Purchase create success',
             success: true,
