@@ -77,7 +77,8 @@ let PurchaseRequestSchema = new Schema({
     },
     type:{
         type:String,
-        enum:['Requested','Approved','Received']
+        enum:['Requested','Approved','Received'],
+        default:'Requested'
     }
 });
 

@@ -75,8 +75,7 @@ exports.createPurchaseRequest = async (req, res, next) => {
         res.status(200).send({
             message: 'PurchaseRequest create success',
             success: true,
-            data: result,
-            transResult: transResult
+            data: result
         });
     } catch (error) {
         return res.status(500).send({ "error": true, message: error.message })
