@@ -15,9 +15,11 @@ let PurchaseRequestSchema = new Schema({
     purchaseDate: {
         type: Date,
     },
-    supplierName: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Suppliers',
+    reason:{
+        type:String
+    },
+    requiredDate:{
+        type:Date
     },
     remark: {
         type: String,
@@ -27,27 +29,48 @@ let PurchaseRequestSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'MedicineItems'
         },
-        qty: Number,
-        price: Number,
-        subTotal: Number
+        stockQty: Number,
+        requestedQty: Number,
+        purchasePrice: Number,
+        recievedQty: {
+            type: Number
+        },
+        flag: {
+            type: Boolean,
+            default: false
+        }
     }],
     procedureItems: [{
         item_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ProcedureItems'
         },
-        qty: Number,
-        price: Number,
-        subTotal: Number
+        stockQty: Number,
+        requestedQty: Number,
+        purchasePrice: Number,
+        recievedQty: {
+            type: Number
+        },
+        flag: {
+            type: Boolean,
+            default: false
+        }
     }],
     accessoryItems: [{
         item_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'AccessoryItems'
         },
-        qty: Number,
-        price: Number,
-        subTotal: Number
+        stockQty: Number,
+        requestedQty: Number,
+        purchasePrice: Number,
+        recievedQty: {
+            type: Number
+        },
+        flag: {
+            type: Boolean,
+            default: false
+        }
     }],
     totalQTY: {
         type: Number,
@@ -59,6 +82,10 @@ let PurchaseRequestSchema = new Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    relatedApprove: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Purchases'
     },
     date: {
         type: Date,
@@ -75,10 +102,10 @@ let PurchaseRequestSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Branches'
     },
-    type:{
-        type:String,
-        enum:['Requested','Approved','Received'],
-        default:'Requested'
+    type: {
+        type: String,
+        enum: ['Requested', 'Approved', 'Received'],
+        default: 'Requested'
     }
 });
 

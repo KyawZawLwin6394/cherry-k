@@ -27,27 +27,30 @@ let PurchaseSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'MedicineItems'
         },
-        qty: Number,
-        price: Number,
-        subTotal: Number
+        stockQty: Number,
+        requestedQty: Number,
+        transferQty: Number,
+        purchasePrice: Number
     }],
     procedureItems: [{
         item_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ProcedureItems'
         },
-        qty: Number,
-        price: Number,
-        subTotal: Number
+        stockQty: Number,
+        requestedQty: Number,
+        transferQty: Number,
+        purchasePrice: Number,
     }],
     accessoryItems: [{
         item_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'AccessoryItems'
         },
-        qty: Number,
-        price: Number,
-        subTotal: Number
+        stockQty: Number,
+        requestedQty: Number,
+        transferQty: Number,
+        purchasePrice: Number
     }],
     totalQTY: {
         type: Number,
