@@ -153,10 +153,12 @@ exports.purchaseRecieved = async (req, res) => {
                         { new: true }
                     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
                 } else if (relatedBranch === undefined) {
-                    var result = await ProcedureItems.findOneAndUpdate({ _id: procedureItemID }, {$inc:{
-                        currentQuantity:parseInt(recievedQty),
-                        totalUnit:parseInt(totalUnit)
-                    }})
+                    var result = await ProcedureItems.findOneAndUpdate({ _id: procedureItemID }, {
+                        $inc: {
+                            currentQuantity: parseInt(recievedQty),
+                            totalUnit: parseInt(totalUnit)
+                        }
+                    }, { new: true })
                 }
                 const srresult = await purchaseRequest.findOneAndUpdate(
                     { _id: relatedPurchase, 'procedureItems.item_id': procedureItemID },
