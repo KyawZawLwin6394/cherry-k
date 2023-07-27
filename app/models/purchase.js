@@ -27,6 +27,7 @@ let PurchaseSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'MedicineItems'
         },
+        subTotal:Number,
         stockQty: Number,
         requestedQty: Number,
         transferQty: Number,
@@ -37,6 +38,7 @@ let PurchaseSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ProcedureItems'
         },
+        subTotal:Number,
         stockQty: Number,
         requestedQty: Number,
         transferQty: Number,
@@ -47,6 +49,7 @@ let PurchaseSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'AccessoryItems'
         },
+        subTotal:Number,
         stockQty: Number,
         requestedQty: Number,
         transferQty: Number,
