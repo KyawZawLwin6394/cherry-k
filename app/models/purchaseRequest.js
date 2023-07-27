@@ -20,7 +20,7 @@ let PurchaseRequestSchema = new Schema({
     },
     requiredDate:{
         type:Date
-    },
+    },    
     remark: {
         type: String,
     },

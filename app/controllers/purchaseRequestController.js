@@ -21,7 +21,7 @@ exports.listAllPurchaseRequests = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
-        let result = await PurchaseRequest.find(query).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id').populate('relatedBranch').populate('accessoryItems.item_id')
+        let result = await PurchaseRequest.find(query).populate('medicineItems.item_id').populate('procedureItems.item_id').populate('relatedBranch').populate('accessoryItems.item_id')
         count = await PurchaseRequest.find(query).count();
         const division = count / limit;
         page = Math.ceil(division);
@@ -43,7 +43,7 @@ exports.listAllPurchaseRequests = async (req, res) => {
 };
 
 exports.getPurchaseRequest = async (req, res) => {
-    const result = await PurchaseRequest.find({ _id: req.params.id, isDeleted: false }).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id').populate('accessoryItems.item_id')
+    const result = await PurchaseRequest.find({ _id: req.params.id, isDeleted: false }).populate('medicineItems.item_id').populate('procedureItems.item_id').populate('accessoryItems.item_id')
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
@@ -88,7 +88,7 @@ exports.updatePurchaseRequest = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id').populate('accessoryItems.item_id')
+        ).populate('medicineItems.item_id').populate('procedureItems.item_id').populate('accessoryItems.item_id')
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
