@@ -141,16 +141,23 @@ exports.purchaseRecieved = async (req, res) => {
             } else if (realFlag === false && recievedQuantity > 0) {
                 console.log('second cond')
                 if (recievedQty > recievedQuantity) return res.status(500).send({ error: true, message: 'Input cannot be greater than RecievedQty!' })
-                var result = await Stock.findOneAndUpdate(
-                    { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
-                    {
-                        $inc: {
-                            currentQty: parseInt(recievedQty),
-                            totalUnit: parseInt(totalUnit),
-                        }
-                    },
-                    { new: true }
-                ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                if (relatedBranch) {
+                    var result = await Stock.findOneAndUpdate(
+                        { relatedProcedureItems: procedureItemID, relatedBranch: relatedBranch },
+                        {
+                            $inc: {
+                                currentQty: parseInt(recievedQty),
+                                totalUnit: parseInt(totalUnit),
+                            }
+                        },
+                        { new: true }
+                    ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                } else if (relatedBranch === undefined) {
+                    var result = await ProcedureItems.findOneAndUpdate({ _id: procedureItemID }, {$inc:{
+                        currentQuantity:parseInt(recievedQty),
+                        totalUnit:parseInt(totalUnit)
+                    }})
+                }
                 const srresult = await purchaseRequest.findOneAndUpdate(
                     { _id: relatedPurchase, 'procedureItems.item_id': procedureItemID },
                     { $set: { 'procedureItems.$.recievedQty': recievedQuantity - recievedQty } }
