@@ -32,6 +32,7 @@ let PurchaseRequestSchema = new Schema({
         stockQty: Number,
         requestedQty: Number,
         purchasePrice: Number,
+        subTotal:Number,
         recievedQty: {
             type: Number
         },
@@ -45,6 +46,7 @@ let PurchaseRequestSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ProcedureItems'
         },
+        subTotal:Number,
         stockQty: Number,
         requestedQty: Number,
         purchasePrice: Number,
@@ -61,6 +63,7 @@ let PurchaseRequestSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'AccessoryItems'
         },
+        subTotal:Number,
         stockQty: Number,
         requestedQty: Number,
         purchasePrice: Number,
