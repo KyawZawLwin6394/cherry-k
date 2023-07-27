@@ -68,12 +68,13 @@ exports.getCode = async (req, res) => {
 
 exports.createPurchase = async (req, res, next) => {
     let data = req.body
-    let { relatedBranch, relatedPurchaseAccount } = data
+    let { relatedBranch, relatedPurchaseRequest } = data
     try {
+        if (relatedPurchaseRequest === undefined) return res.status(500).send({error:true, message:'relatedPurchaseRequest is required!'})
         data = { ...data, relatedBranch: relatedBranch }
         const newPurchase = new Purchase(data);
         const result = await newPurchase.save();
-        const prUpdate = await purchaseRequest.findOneAndUpdate({ _id: relatedPurchaseAccount }, { relatedApprove: result._id }, { new: true })
+        const prUpdate = await purchaseRequest.findOneAndUpdate({ _id: relatedPurchaseRequest }, { relatedApprove: result._id }, { new: true })
         const transResult = await Transaction.create({
             "amount": data.totalPrice,
             "date": Date.now(),
@@ -120,10 +121,18 @@ exports.createPurchase = async (req, res, next) => {
 };
 
 exports.purchaseRecieved = async (req, res) => {
-    let createdBy = req.credentials.id
-    const { toUnit, recievedQty, fromUnit, relatedPurchase } = req.body
-    const totalUnit = (toUnit * recievedQty) / fromUnit
-    const prResult = await Purchase.find({ _id: relatedPurchase, isDeleted: false }).populate()
+    try {
+        let createdBy = req.credentials.id
+        const { toUnit, recievedQty, fromUnit, relatedPurchase } = req.body
+        const totalUnit = (toUnit * recievedQty) / fromUnit
+        const prResult = await purchaseRequest.find({ _id: relatedPurchase, isDeleted: false }).populate('relatedApprove')
+        if (prResult[0].relatedApprove === undefined) return res.status(500).send({ error: true, message: 'There is no purchase request for this request!' });
+        console.log("relatedApprove", prResult[0].relatedApprove)
+        return res.status(200).send({ success: true, data: prResult })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send({ error: true, message: error.message })
+    }
 }
 
 exports.updatePurchase = async (req, res, next) => {

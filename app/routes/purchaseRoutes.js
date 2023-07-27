@@ -12,6 +12,7 @@ module.exports = (app) => {
 
     app.route('/api/purchases/code').get(verifyToken, catchError(purchase.getCode))
 
+    app.route('/api/purchases/recieve').put(verifyToken, purchase.purchaseRecieved);
 
     app.route('/api/purchase/:id')
         .get(verifyToken, catchError(purchase.getPurchase))
