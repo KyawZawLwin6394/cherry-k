@@ -29,7 +29,7 @@ exports.createHistory = async (req, res, next) => {
     let files = req.files;
     let data = req.body;
     console.log(req.body)
-    if (files.consent) {
+    if (files.consent.length > 0) {
       for (const element of files.consent) {
         let imgPath = element.path.split('cherry-k')[1];
         const attachData = {
@@ -41,7 +41,7 @@ exports.createHistory = async (req, res, next) => {
         data = { ...data, consent: attachResult._id.toString() }
       }
     }
-    data = { ...data, skinCareAndCosmetic: JSON.parse(req.body.skinCareAndCosmetic) }
+    if (req.body.skinCareAndCosmetic) data = { ...data, skinCareAndCosmetic: JSON.parse(req.body.skinCareAndCosmetic) }
     console.log(data)
     const result = await History.create(data);
     res.status(200).send({
