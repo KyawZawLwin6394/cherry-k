@@ -126,7 +126,6 @@ exports.activateComission = async (req, res, next) => {
 
 exports.searchCommission = async (req, res) => {
     let total = 0
-    console.log('here')
     try {
         const { month, doctor } = req.query;
         if (month) {
@@ -140,10 +139,10 @@ exports.searchCommission = async (req, res) => {
             // Get the start and end dates for the specified month
             var startDate = new Date(Date.UTC(new Date().getFullYear(), months.indexOf(month), 1));
             var endDate = new Date(Date.UTC(new Date().getFullYear(), months.indexOf(month) + 1, 1));
-            console.log(startDate, endDate)
         } else {
             var { startDate, endDate } = req.query;
         }
+        console.log(startDate, endDate)
         let query = { status: 'Unclaimed' }
         if (month) query.date = { $gte: startDate, $lte: endDate }
         if (doctor) query.relatedDoctor = doctor
