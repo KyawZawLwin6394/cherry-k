@@ -43,7 +43,7 @@ exports.listAllPurchaseRequests = async (req, res) => {
 };
 
 exports.getPurchaseRequest = async (req, res) => {
-    const result = await PurchaseRequest.find({ _id: req.params.id, isDeleted: false }).populate('medicineItems.item_id relatedApprove').populate('procedureItems.item_id').populate('accessoryItems.item_id relatedBranch')
+    const result = await PurchaseRequest.find({ _id: req.params.id, isDeleted: false }).populate('medicineItems.item_id').populate('procedureItems.item_id').populate('accessoryItems.item_id').populate('relatedApprove').populate('relatedBranch')
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
