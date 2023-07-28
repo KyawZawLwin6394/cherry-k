@@ -43,10 +43,32 @@ exports.listAllPurchaseRequests = async (req, res) => {
 };
 
 exports.getPurchaseRequest = async (req, res) => {
-    const result = await PurchaseRequest.find({ _id: req.params.id, isDeleted: false }).populate('medicineItems.item_id').populate('procedureItems.item_id').populate('accessoryItems.item_id').populate('relatedApprove').populate('relatedBranch')
-    if (!result)
-        return res.status(500).json({ error: true, message: 'No Record Found' });
-    return res.status(200).send({ success: true, data: result });
+    try {
+        const result = await PurchaseRequest.findById(req.params.id)
+            .populate('medicineItems.item_id')
+            .populate('procedureItems.item_id')
+            .populate('accessoryItems.item_id')
+            .populate('relatedApprove')
+            .populate('relatedBranch')
+            .populate({
+                path: 'relatedApprove',
+                model: 'Purchases',
+                populate: [
+                    { path: 'medicineItems.item_id' },
+                    { path: 'procedureItems.item_id' },
+                    { path: 'accessoryItems.item_id' },
+                    { path: 'relatedBranch' },
+                ],
+            });
+
+        if (!result)
+            return res.status(404).json({ error: true, message: 'No Record Found' });
+
+        return res.status(200).send({ success: true, data: result });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ error: true, message: 'Server Error' });
+    }
 };
 
 exports.getCode = async (req, res) => {
