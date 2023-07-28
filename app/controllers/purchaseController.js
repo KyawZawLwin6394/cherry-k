@@ -76,39 +76,39 @@ exports.createPurchase = async (req, res, next) => {
         const newPurchase = new Purchase(data);
         const result = await newPurchase.save();
         const prUpdate = await purchaseRequest.findOneAndUpdate({ _id: relatedPurchaseRequest }, { relatedApprove: result._id }, { new: true })
-        const transResult = await Transaction.create({
-            "amount": data.totalPrice,
-            "date": Date.now(),
-            "remark": data.remark,
-            "type": "Credit",
-            "relatedTransaction": null,
-            "relatedAccounting": "646733d659a9bc811d97efa9", //Opening Stock
-            "relatedBranch": relatedBranch
-        })
-        const transResultAmtUpdate = await Accounting.findOneAndUpdate(
-            { _id: '646733d659a9bc811d97efa9' },
-            { $inc: { amount: data.totalPrice } }
-        )
-        //64ae1fea12b3d31436d4805f Purchase
-        const purchaseResult = await Transaction.create({
-            "amount": data.totalPrice,
-            "date": Date.now(),
-            "remark": data.remark,
-            "type": "Debit",
-            "relatedTransaction": null,
-            "relatedAccounting": relatedPurchaseAccount, //Purchase
-        })
-        const purchaseAMTUpdate = await Accounting.findOneAndUpdate(
-            { _id: relatedPurchaseAccount },
-            { $inc: { amount: data.totalPrice } }
-        )
-        var fTransUpdate = await Transaction.findOneAndUpdate(
-            { _id: transResult._id },
-            {
-                relatedTransaction: purchaseResult._id
-            },
-            { new: true }
-        )
+        // const transResult = await Transaction.create({
+        //     "amount": data.totalPrice,
+        //     "date": Date.now(),
+        //     "remark": data.remark,
+        //     "type": "Credit",
+        //     "relatedTransaction": null,
+        //     "relatedAccounting": "646733d659a9bc811d97efa9", //Opening Stock
+        //     "relatedBranch": relatedBranch
+        // })
+        // const transResultAmtUpdate = await Accounting.findOneAndUpdate(
+        //     { _id: '646733d659a9bc811d97efa9' },
+        //     { $inc: { amount: data.totalPrice } }
+        // )
+        // //64ae1fea12b3d31436d4805f Purchase
+        // const purchaseResult = await Transaction.create({
+        //     "amount": data.totalPrice,
+        //     "date": Date.now(),
+        //     "remark": data.remark,
+        //     "type": "Debit",
+        //     "relatedTransaction": null,
+        //     "relatedAccounting": relatedPurchaseAccount, //Purchase
+        // })
+        // const purchaseAMTUpdate = await Accounting.findOneAndUpdate(
+        //     { _id: relatedPurchaseAccount },
+        //     { $inc: { amount: data.totalPrice } }
+        // )
+        // var fTransUpdate = await Transaction.findOneAndUpdate(
+        //     { _id: transResult._id },
+        //     {
+        //         relatedTransaction: purchaseResult._id
+        //     },
+        //     { new: true }
+        // )
         const transUpdate = await Transaction.findOneAndUpdate({ _id: transResult._id }, { "relatedTransaction": purchaseResult._id })
         res.status(200).send({
             message: 'Purchase create success',
