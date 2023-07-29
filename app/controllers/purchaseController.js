@@ -9,6 +9,7 @@ const Accounting = require('../models/accountingList');
 const purchaseRequest = require('../models/purchaseRequest');
 const RecievedRecords = require('../models/recievedRecord');
 const Log = require('../models/log');
+const medicineItem = require('../models/medicineItem');
 
 exports.listAllPurchases = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -210,6 +211,93 @@ exports.purchaseRecieved = async (req, res) => {
                     const srresult = await purchaseRequest.findOneAndUpdate(
                         { _id: relatedPurchase, 'procedureItems.item_id': procedureItemID },
                         { $set: { 'procedureItems.$.flag': true, 'procedureItems.$.recievedQty': 0 } }
+                    );
+                }
+            }
+
+        }
+
+        if (medicineItemID) {
+
+            const prFilter = prResult[0].medicineItems.filter(item => item.item_id.toString() === medicineItemID)
+            console.log(prFilter[0])
+            const recievedQuantity = prFilter[0].recievedQty
+            const realFlag = prFilter[0].flag
+            console.log(prResult[0].relatedApprove)
+            const flag = prResult[0].relatedApprove.medicineItems.filter(item => item.item_id.toString() === medicineItemID)
+            if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
+            console.log('recivedQuantity', recievedQuantity, realFlag)
+            if (realFlag === true) {
+                return res.status(500).send({ error: true, message: 'Already Recieved' })
+            } else if (realFlag === false && recievedQuantity > 0) {
+                console.log('second cond')
+                if (recievedQty > recievedQuantity) return res.status(500).send({ error: true, message: 'Input cannot be greater than RecievedQty!' })
+                if (relatedBranch) {
+                    var result = await Stock.findOneAndUpdate(
+                        { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
+                        {
+                            $inc: {
+                                currentQty: parseInt(recievedQty),
+                                totalUnit: parseInt(totalUnit),
+                            }
+                        },
+                        { new: true }
+                    ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                } else if (relatedBranch === undefined) {
+                    var result = await MedicineItems.findOneAndUpdate({ _id: medicineItemID }, {
+                        $inc: {
+                            currentQuantity: parseInt(recievedQty),
+                            totalUnit: parseInt(totalUnit)
+                        }
+                    }, { new: true })
+                }
+                const srresult = await purchaseRequest.findOneAndUpdate(
+                    { _id: relatedPurchase, 'medicineItems.item_id': procedureItemID },
+                    { $set: { 'medicineItems.$.recievedQty': recievedQuantity - recievedQty } }
+                );
+                console.log(srresult, 'here')
+                var RecievedRecordsResult = await RecievedRecords.create({
+                    createdAt: Date.now(),
+                    createdBy: createdBy,
+                    relatedBranch: relatedBranch,
+                    requestedQty: parseInt(flag[0].requestedQty),
+                    recievedQty: parseInt(flag[0].transferQty - recievedQty),
+                    relatedMedicineItems: medicineItemID
+                })
+                if (isDone === true) {
+                    const srresult = await purchaseRequest.findOneAndUpdate(
+                        { _id: relatedPurchase, 'medicineItems.item_id': procedureItemID },
+                        { $set: { 'medicineItems.$.flag': true, 'medicineItems.$.recievedQty': 0 } }
+                    );
+                }
+            }
+            else {
+                var result = await Stock.findOneAndUpdate(
+                    { relatedMedicineItems: medicineItemID, relatedBranch: relatedBranch },
+                    {
+                        $inc: {
+                            currentQty: parseInt(recievedQty),
+                            totalUnit: parseInt(totalUnit),
+                        }
+                    },
+                    { new: true }
+                ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                const srresult = await purchaseRequest.findOneAndUpdate(
+                    { _id: relatedPurchase, 'medicineItems.item_id': medicineItemID },
+                    { $set: { 'medicineItems.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
+                );
+                var RecievedRecordsResult = await RecievedRecords.create({
+                    createdAt: Date.now(),
+                    createdBy: createdBy,
+                    relatedBranch: relatedBranch,
+                    requestedQty: parseInt(flag[0].requestedQty),
+                    recievedQty: parseInt(recievedQty),
+                    relatedMedicineItems: medicineItemID
+                })
+                if (isDone === true) {
+                    const srresult = await purchaseRequest.findOneAndUpdate(
+                        { _id: relatedPurchase, 'medicineItems.item_id': medicineItemID },
+                        { $set: { 'medicineItems.$.flag': true, 'medicineItems.$.recievedQty': 0 } }
                     );
                 }
             }
