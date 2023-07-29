@@ -8,6 +8,7 @@ const Transaction = require('../models/transaction');
 const Accounting = require('../models/accountingList');
 const purchaseRequest = require('../models/purchaseRequest');
 const RecievedRecords = require('../models/recievedRecord');
+const Log = require('../models/log');
 
 exports.listAllPurchases = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -125,14 +126,17 @@ exports.purchaseRecieved = async (req, res) => {
         let createdBy = req.credentials.id
         const { toUnit, recievedQty, fromUnit, relatedPurchase, medicineItemID, procedureItemID, accessoryItemID, relatedBranch, requestedQty, isDone } = req.body
         const totalUnit = (toUnit * recievedQty) / fromUnit
+        console.log(toUnit, recievedQty, fromUnit)
         const prResult = await purchaseRequest.find({ _id: relatedPurchase, isDeleted: false }).populate('relatedApprove')
         if (prResult[0].relatedApprove === undefined) return res.status(500).send({ error: true, message: 'There is no purchase request for this request!' });
-        console.log("relatedApprove", prResult[0].relatedApprove)
         if (procedureItemID) {
+
             const prFilter = prResult[0].procedureItems.filter(item => item.item_id.toString() === procedureItemID)
+            console.log(prFilter[0])
             const recievedQuantity = prFilter[0].recievedQty
             const realFlag = prFilter[0].flag
-            const flag = prResult[0].relatedApprove.procedureItem.filter(item => item.item_id.toString() === procedureItemID)
+            console.log(prResult[0].relatedApprove)
+            const flag = prResult[0].relatedApprove.procedureItems.filter(item => item.item_id.toString() === procedureItemID)
             if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
             console.log('recivedQuantity', recievedQuantity, realFlag)
             if (realFlag === true) {
