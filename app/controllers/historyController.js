@@ -44,7 +44,7 @@ exports.createHistory = async (req, res, next) => {
     if (req.body.skinCareAndCosmetic) data = { ...data, skinCareAndCosmetic: JSON.parse(req.body.skinCareAndCosmetic) }
     console.log(data)
     const result = await History.create(data);
-    const populate = await History.find({ _id: result._id })
+    const populate = await History.find({ _id: result._id }).populate('consent')
     res.status(200).send({
       message: 'History create success',
       success: true,
