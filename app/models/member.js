@@ -31,6 +31,9 @@ let Member = new Schema({
         required: true,
         default: false
     },
+    cardNo:{
+        type:String
+    }
 });
 
 module.exports = mongoose.model('Members', Member);
