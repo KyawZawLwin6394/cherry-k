@@ -323,11 +323,8 @@ exports.purchaseRecieved = async (req, res) => {
 
 exports.updatePurchase = async (req, res, next) => {
     try {
-        const result = await Purchase.findOneAndUpdate(
-            { _id: req.body.id },
-            req.body,
-            { new: true },
-        ).populate('supplierName').populate('medicineItems.item_id').populate('procedureItems.item_id')
+        let data = req.body
+        const result = await procedureHistory.findOneAndUpdate({ _id: req.body._id }, data, { new: true }).populate('medicineItems.item_id customTreatmentPackages.item_id pHistory relatedAppointment relatedTreatmentSelection before after')
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
