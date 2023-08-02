@@ -34,6 +34,14 @@ let RecievedRecordSchema = new Schema({
     relatedAccessoryItems: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'AccessoryItems'
+    },
+    relatedPurchaseRequest:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'PurchaseRequests'
+    },
+    type:{
+        type:String,
+        enum:['Purchase','Transfer']
     }
 });
 

@@ -436,7 +436,8 @@ exports.stockRecieved = async (req, res) => {
                     relatedBranch: relatedBranch,
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(flag[0].transferQty - recievedQty),
-                    relatedProcedureItems: procedureItemID
+                    relatedProcedureItems: procedureItemID,
+                    type:'Transfer'
                 })
                 if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
@@ -466,7 +467,8 @@ exports.stockRecieved = async (req, res) => {
                     relatedBranch: relatedBranch,
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(recievedQty),
-                    relatedProcedureItems: procedureItemID
+                    relatedProcedureItems: procedureItemID,
+                    type:'Transfer'
                 })
                 if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
@@ -509,7 +511,8 @@ exports.stockRecieved = async (req, res) => {
                     relatedBranch: relatedBranch,
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(recievedQty),
-                    relatedMedicineItems: medicineItemID
+                    relatedMedicineItems: medicineItemID,
+                    type:'Transfer'
                 })
                 if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
@@ -538,7 +541,8 @@ exports.stockRecieved = async (req, res) => {
                     relatedBranch: relatedBranch,
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(recievedQty),
-                    relatedMedicineItems: medicineItemID
+                    relatedMedicineItems: medicineItemID,
+                    type:'Transfer'
                 })
                 if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
@@ -577,7 +581,8 @@ exports.stockRecieved = async (req, res) => {
                     relatedBranch: relatedBranch,
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(recievedQty),
-                    relatedAccessoryItems: accessoryItemID
+                    relatedAccessoryItems: accessoryItemID,
+                    type:'Transfer'
                 })
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
@@ -611,7 +616,8 @@ exports.stockRecieved = async (req, res) => {
                     relatedBranch: relatedBranch,
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(recievedQty),
-                    relatedAccessoryItems: accessoryItemID
+                    relatedAccessoryItems: accessoryItemID,
+                    type:'Transfer' 
                 })
                 if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
