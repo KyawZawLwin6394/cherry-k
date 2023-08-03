@@ -256,7 +256,7 @@ exports.purchaseRecieved = async (req, res) => {
                     }, { new: true })
                 }
                 const srresult = await purchaseRequest.findOneAndUpdate(
-                    { _id: relatedPurchase, 'medicineItems.item_id': procedureItemID },
+                    { _id: relatedPurchase, 'medicineItems.item_id': medicineItemID },
                     { $set: { 'medicineItems.$.recievedQty': recievedQuantity - recievedQty } }
                 );
                 console.log(srresult, 'here')
@@ -271,10 +271,13 @@ exports.purchaseRecieved = async (req, res) => {
                     type: 'Purchase'
                 })
                 if (isDone === true) {
+                    
                     const srresult = await purchaseRequest.findOneAndUpdate(
-                        { _id: relatedPurchase, 'medicineItems.item_id': procedureItemID },
+                        { _id: relatedPurchase, 'medicineItems.item_id': medicineItemID },
                         { $set: { 'medicineItems.$.flag': true, 'medicineItems.$.recievedQty': 0 } }
                     );
+
+                    console.log('true')
                 }
             }
             else {
