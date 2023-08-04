@@ -74,7 +74,14 @@ exports.updateMember = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        ).populate('relatedDiscount')
+        ).populate({
+            path:'relatedDiscount',
+            model:'Discounts',
+            populate:{
+                path:'relatedFOCID',
+                model:'Treatments'
+            }
+        })
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })

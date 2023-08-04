@@ -198,7 +198,6 @@ exports.createUsage = async (req, res) => {
     const appResult = await Appointment.find({ _id: req.body.relatedAppointment })
     let status;
     if (appResult[0].relatedUsage === undefined) {
-
       if (procedureMedicine !== undefined) {
         for (const e of procedureMedicine) {
           if (e.stock < e.actual) {
@@ -233,7 +232,6 @@ exports.createUsage = async (req, res) => {
           }
         }
       }
-      
       //procedureAccessory
       if (procedureAccessory !== undefined) {
         for (const e of procedureAccessory) {
@@ -270,9 +268,7 @@ exports.createUsage = async (req, res) => {
           }
         }
       }
-
       //machine
-
       if (machine !== undefined) {
         for (const e of machine) {
           if (e.stock < e.actual) {
