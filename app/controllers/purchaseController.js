@@ -156,6 +156,8 @@ exports.purchaseRecieved = async (req, res) => {
                         },
                         { new: true }
                     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                        .then(response => console.log(response))
+                        .catch(error => console.log(error))
                 } else if (relatedBranch === undefined) {
                     var result = await ProcedureItems.findOneAndUpdate({ _id: procedureItemID }, {
                         $inc: {
@@ -163,6 +165,8 @@ exports.purchaseRecieved = async (req, res) => {
                             totalUnit: parseInt(totalUnit)
                         }
                     }, { new: true })
+                        .then(response => console.log(response))
+                        .catch(error => console.log(error))
                 }
                 const srresult = await purchaseRequest.findOneAndUpdate(
                     { _id: relatedPurchase, 'procedureItems.item_id': procedureItemID },
@@ -218,6 +222,15 @@ exports.purchaseRecieved = async (req, res) => {
                     );
                 }
             }
+            const logResult = await Log.create({
+                "relatedProcedureItems": procedureItemID,
+                "currentQty": requestedQty,
+                "actualQty": recievedQty,
+                "finalQty": recievedQty,
+                "type": "Request Recieved",
+                "relatedBranch": relatedBranch,
+                "createdBy": createdBy
+            })
 
         }
 
@@ -247,6 +260,8 @@ exports.purchaseRecieved = async (req, res) => {
                         },
                         { new: true }
                     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                        .then(response => console.log(response, 'fire'))
+                        .catch(error => console.log(error, 'fire'))
                 } else if (relatedBranch === undefined) {
                     var result = await MedicineItems.findOneAndUpdate({ _id: medicineItemID }, {
                         $inc: {
@@ -254,6 +269,8 @@ exports.purchaseRecieved = async (req, res) => {
                             totalUnit: parseInt(totalUnit)
                         }
                     }, { new: true })
+                        .then(response => console.log(response, 'fire'))
+                        .catch(error => console.log(error, 'fire'))
                 }
                 const srresult = await purchaseRequest.findOneAndUpdate(
                     { _id: relatedPurchase, 'medicineItems.item_id': medicineItemID },
@@ -271,7 +288,7 @@ exports.purchaseRecieved = async (req, res) => {
                     type: 'Purchase'
                 })
                 if (isDone === true) {
-                    
+
                     const srresult = await purchaseRequest.findOneAndUpdate(
                         { _id: relatedPurchase, 'medicineItems.item_id': medicineItemID },
                         { $set: { 'medicineItems.$.flag': true, 'medicineItems.$.recievedQty': 0 } }
@@ -311,8 +328,17 @@ exports.purchaseRecieved = async (req, res) => {
                         { $set: { 'medicineItems.$.flag': true, 'medicineItems.$.recievedQty': 0 } }
                     );
                 }
-            }
 
+            }
+            const logResult = await Log.create({
+                "relatedMedicineItems": medicineItem,
+                "currentQty": requestedQty,
+                "actualQty": recievedQty,
+                "finalQty": recievedQty,
+                "type": "Request Recieved",
+                "relatedBranch": relatedBranch,
+                "createdBy": createdBy
+            })
         }
 
         if (accessoryItemID) {
@@ -403,19 +429,18 @@ exports.purchaseRecieved = async (req, res) => {
                     );
                 }
             }
+            const logResult = await Log.create({
+                "relatedAccessoryItems": accessoryItemID,
+                "currentQty": requestedQty,
+                "actualQty": recievedQty,
+                "finalQty": recievedQty,
+                "type": "Request Recieved",
+                "relatedBranch": relatedBranch,
+                "createdBy": createdBy
+            })
 
         }
-
-        const logResult = await Log.create({
-            "relatedStock": result._id,
-            "currentQty": requestedQty,
-            "actualQty": recievedQty,
-            "finalQty": recievedQty,
-            "type": "Request Recieved",
-            "relatedBranch": relatedBranch,
-            "createdBy": createdBy
-        })
-        return res.status(200).send({ success: true, data: result, logResult: logResult })
+        return res.status(200).send({ success: true, data: result })
     } catch (error) {
         console.log(error)
         return res.status(500).send({ error: true, message: error.message })
