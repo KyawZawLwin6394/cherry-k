@@ -331,7 +331,7 @@ exports.purchaseRecieved = async (req, res) => {
 
             }
             const logResult = await Log.create({
-                "relatedMedicineItems": medicineItem,
+                "relatedMedicineItems": medicineItemID,
                 "currentQty": requestedQty,
                 "actualQty": recievedQty,
                 "finalQty": recievedQty,
