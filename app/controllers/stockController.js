@@ -249,49 +249,52 @@ exports.activateStock = async (req, res, next) => {
 
 exports.copyStock = async (req, res) => {
     try {
-        //let accessoryArray = ['64a0017422c5eb76edec6f03', '64ae2cf43eaccede11ec2524', '64a001c922c5eb76edec6fc5', '64ae326b3eaccede11ec5786', '649ffdec22c5eb76edec66c8', '649ffda722c5eb76edec668b', '64ae24e73eaccede11ebeea2', '64a0014f22c5eb76edec6cfc', '64a001a022c5eb76edec6f56', '649fff0122c5eb76edec6713', '64a0035522c5eb76edec716b']
-        let accessoryArray = ['64a001f222c5eb76edec6ff7']
-        // const procedureItems = await ProcedureItems.find({ isDeleted: false })
-        const accessoryItems = await AccessoryItems.find({ _id: { $in: accessoryArray } })
-        // const medicineItems = await MedicineItems.find({ isDeleted: false })
+        const procedureItems = await ProcedureItems.find({ isDeleted: false })
+        const accessoryItems = await AccessoryItems.find({ isDeleted: false })
+        const medicineItems = await MedicineItems.find({ isDeleted: false })
         const branches = await Branch.find({})
-        // for (let i = 0; i < procedureItems.length; i++) {
-        //     console.log('here')
-        //     for (let b = 0; b < branches.length; b++) {
-        //         console.log('here2')
-        //         var stockResult = await Stock.create(
-        //             {
-        //                 "relatedBranch": branches[b]._id,
-        //                 "relatedProcedureItems": procedureItems[i]._id,
-        //                 "currentQty": procedureItems[i].currentQuantity,
-        //                 "fromUnit": procedureItems[i].fromUnit,
-        //                 "toUnit": procedureItems[i].toUnit,
-        //                 "reOrderQuantity": procedureItems[i].reOrderQuantity,
-        //                 "totalUnit": (procedureItems[i].currentQuantity * procedureItems[i].toUnit) / procedureItems[i].fromUnit
-        //             }
-        //         )
-        //         console.log(stockResult)
-        //     }
-        // }
+        for (let i = 0; i < procedureItems.length; i++) {
+            console.log('here')
+            for (let b = 0; b < branches.length; b++) {
+                console.log('here2')
+                var stockResult = await Stock.create(
+                    {
+                        "relatedBranch": branches[b]._id,
+                        "relatedProcedureItems": procedureItems[i]._id,
+                        // "currentQty": procedureItems[i].currentQuantity,
+                        "currentQty": 0,
 
-        // for (let i = 0; i < medicineItems.length; i++) {
-        //     console.log('here')
-        //     for (let b = 0; b < branches.length; b++) {
-        //         console.log('here2')
-        //         var stockResult = await Stock.create(
-        //             {
-        //                 "relatedBranch": branches[b]._id,
-        //                 "relatedMedicineItems": medicineItems[i]._id,
-        //                 "currentQty": medicineItems[i].currentQuantity,
-        //                 "fromUnit": medicineItems[i].fromUnit,
-        //                 "toUnit": medicineItems[i].toUnit,
-        //                 "reOrderQuantity": medicineItems[i].reOrderQuantity,
-        //                 "totalUnit": (medicineItems[i].currentQuantity * medicineItems[i].toUnit) / medicineItems[i].fromUnit
-        //             }
-        //         )
-        //         console.log(stockResult)
-        //     }
-        // }
+                        "fromUnit": procedureItems[i].fromUnit,
+                        "toUnit": procedureItems[i].toUnit,
+                        "reOrderQuantity": procedureItems[i].reOrderQuantity,
+                        "totalUnit": 0
+                        // "totalUnit": (procedureItems[i].currentQuantity * procedureItems[i].toUnit) / procedureItems[i].fromUnit
+                    }
+                )
+                console.log(stockResult)
+            }
+        }
+
+        for (let i = 0; i < medicineItems.length; i++) {
+            console.log('here')
+            for (let b = 0; b < branches.length; b++) {
+                console.log('here2')
+                var stockResult = await Stock.create(
+                    {
+                        "relatedBranch": branches[b]._id,
+                        "relatedMedicineItems": medicineItems[i]._id,
+                        // "currentQty": medicineItems[i].currentQuantity,
+                        "currentQty": 0,
+                        "fromUnit": medicineItems[i].fromUnit,
+                        "toUnit": medicineItems[i].toUnit,
+                        "reOrderQuantity": medicineItems[i].reOrderQuantity,
+                        "totalUnit": 0
+                        // "totalUnit": (medicineItems[i].currentQuantity * medicineItems[i].toUnit) / medicineItems[i].fromUnit
+                    }
+                )
+                console.log(stockResult)
+            }
+        }
 
         for (let i = 0; i < accessoryItems.length; i++) {
             console.log('here')
@@ -301,10 +304,12 @@ exports.copyStock = async (req, res) => {
                     {
                         "relatedBranch": branches[b]._id,
                         "relatedAccessoryItems": accessoryItems[i]._id,
-                        "currentQty": accessoryItems[i].currentQuantity,
+                        "currentQty": 0,
+                        // "currentQty": accessoryItems[i].currentQuantity,
                         "fromUnit": accessoryItems[i].fromUnit,
                         "toUnit": accessoryItems[i].toUnit,
-                        "totalUnit": (accessoryItems[i].currentQuantity * accessoryItems[i].toUnit) / accessoryItems[i].fromUnit,
+                        // "totalUnit": (accessoryItems[i].currentQuantity * accessoryItems[i].toUnit) / accessoryItems[i].fromUnit,
+                        "totalUnit": 0,
                         "reOrderQuantity": accessoryItems[i].reOrderQuantity
                     }
                 )
@@ -437,7 +442,7 @@ exports.stockRecieved = async (req, res) => {
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(flag[0].transferQty - recievedQty),
                     relatedProcedureItems: procedureItemID,
-                    type:'Transfer'
+                    type: 'Transfer'
                 })
                 if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
@@ -468,7 +473,7 @@ exports.stockRecieved = async (req, res) => {
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(recievedQty),
                     relatedProcedureItems: procedureItemID,
-                    type:'Transfer'
+                    type: 'Transfer'
                 })
                 if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
@@ -512,7 +517,7 @@ exports.stockRecieved = async (req, res) => {
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(recievedQty),
                     relatedMedicineItems: medicineItemID,
-                    type:'Transfer'
+                    type: 'Transfer'
                 })
                 if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
@@ -542,7 +547,7 @@ exports.stockRecieved = async (req, res) => {
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(recievedQty),
                     relatedMedicineItems: medicineItemID,
-                    type:'Transfer'
+                    type: 'Transfer'
                 })
                 if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
@@ -582,7 +587,7 @@ exports.stockRecieved = async (req, res) => {
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(recievedQty),
                     relatedAccessoryItems: accessoryItemID,
-                    type:'Transfer'
+                    type: 'Transfer'
                 })
                 const srresult = await StockRequest.findOneAndUpdate(
                     { _id: stockRequestID, 'procedureAccessory.item_id': accessoryItemID },
@@ -617,7 +622,7 @@ exports.stockRecieved = async (req, res) => {
                     requestedQty: parseInt(flag[0].requestedQty),
                     recievedQty: parseInt(recievedQty),
                     relatedAccessoryItems: accessoryItemID,
-                    type:'Transfer' 
+                    type: 'Transfer'
                 })
                 if (isDone === true) {
                     const srresult = await StockRequest.findOneAndUpdate(
