@@ -69,18 +69,20 @@ exports.getRelatedMedicineItem = async (req, res) => {
 exports.createMedicineItem = async (req, res, next) => {
   try {
     const newMedicineItem = new MedicineItem(req.body);
-    const result = await newMedicineItem.save();
+    const result = await newMedicineItem.save()
     const getAllBranches = await Branch.find();
     for (let i = 0; i < getAllBranches.length; i++) {
-      const stockResult = await Stock.create({
-        "relatedProcedureItems": result._id,
+      let data = {
+        "relatedMedicineItems": result._id,
         "currentQty": 0,
         "fromUnit": result.fromUnit,
         "toUnit": result.toUnit,
         "reorderQty": 1,
         "totalUnit": 0,
         "relatedBranch": getAllBranches[i]._id //branch_id
-      })
+      }
+      console.log(data)
+      const stockResult = await Stock.create(data)
     }
     res.status(200).send({
       message: 'MedicineItem create success',
