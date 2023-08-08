@@ -157,7 +157,7 @@ exports.purchaseRecieved = async (req, res) => {
                         { new: true }
                     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
                         .then(response => console.log(response))
-                        .catch(error => console.log(error))
+                        .catch(error => { return res.status(200).send({ error: true, message: error.message }) })
                 } else if (relatedBranch === undefined) {
                     var result = await ProcedureItems.findOneAndUpdate({ _id: procedureItemID }, {
                         $inc: {
@@ -166,7 +166,7 @@ exports.purchaseRecieved = async (req, res) => {
                         }
                     }, { new: true })
                         .then(response => console.log(response))
-                        .catch(error => console.log(error))
+                        .catch(error => { return res.status(200).send({ error: true, message: error.message }) })
                 }
                 const srresult = await purchaseRequest.findOneAndUpdate(
                     { _id: relatedPurchase, 'procedureItems.item_id': procedureItemID },
@@ -201,6 +201,7 @@ exports.purchaseRecieved = async (req, res) => {
                     },
                     { new: true }
                 ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                    .catch(error => { return res.status(200).send({ error: true, message: error.message }) })
                 const srresult = await purchaseRequest.findOneAndUpdate(
                     { _id: relatedPurchase, 'procedureItems.item_id': procedureItemID },
                     { $set: { 'procedureItems.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
@@ -261,7 +262,7 @@ exports.purchaseRecieved = async (req, res) => {
                         { new: true }
                     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
                         .then(response => console.log(response, 'fire'))
-                        .catch(error => console.log(error, 'fire'))
+                        .catch(error => { return res.status(200).send({ error: true, message: error.message }) })
                 } else if (relatedBranch === undefined) {
                     var result = await MedicineItems.findOneAndUpdate({ _id: medicineItemID }, {
                         $inc: {
@@ -270,7 +271,7 @@ exports.purchaseRecieved = async (req, res) => {
                         }
                     }, { new: true })
                         .then(response => console.log(response, 'fire'))
-                        .catch(error => console.log(error, 'fire'))
+                        .catch(error => { return res.status(200).send({ error: true, message: error.message }) })
                 }
                 const srresult = await purchaseRequest.findOneAndUpdate(
                     { _id: relatedPurchase, 'medicineItems.item_id': medicineItemID },
@@ -308,6 +309,7 @@ exports.purchaseRecieved = async (req, res) => {
                     },
                     { new: true }
                 ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                    .catch(error => { return res.status(200).send({ error: true, message: error.message }) })
                 const srresult = await purchaseRequest.findOneAndUpdate(
                     { _id: relatedPurchase, 'medicineItems.item_id': medicineItemID },
                     { $set: { 'medicineItems.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
@@ -367,13 +369,14 @@ exports.purchaseRecieved = async (req, res) => {
                         },
                         { new: true }
                     ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                        .catch(error => { return res.status(200).send({ error: true, message: error.message }) })
                 } else if (relatedBranch === undefined) {
                     var result = await AccessoryItems.findOneAndUpdate({ _id: accessoryItemID }, {
                         $inc: {
                             currentQuantity: parseInt(recievedQty),
                             totalUnit: parseInt(totalUnit)
                         }
-                    }, { new: true })
+                    }, { new: true }).catch(error => { return res.status(200).send({ error: true, message: error.message }) })
                 }
                 const srresult = await purchaseRequest.findOneAndUpdate(
                     { _id: relatedPurchase, 'accessoryItems.item_id': accessoryItemID },
@@ -408,6 +411,7 @@ exports.purchaseRecieved = async (req, res) => {
                     },
                     { new: true }
                 ).populate('relatedBranch relatedProcedureItems relatedMedicineItems relatedAccessoryItems relatedMachine').populate('createdBy', 'givenName')
+                    .catch(error => { return res.status(200).send({ error: true, message: error.message }) })
                 const srresult = await purchaseRequest.findOneAndUpdate(
                     { _id: relatedPurchase, 'accessoryItems.item_id': accessoryItemID },
                     { $set: { 'accessoryItems.$.recievedQty': parseInt(flag[0].transferQty - recievedQty) } }
