@@ -54,7 +54,7 @@ exports.listMultiTreatmentSelections = async (req, res) => {
 };
 
 exports.listAllTreatmentSelections = async (req, res) => {
-    let { keyword, role, limit, skip } = req.query;
+    let { keyword, role, limit, skip, tsType } = req.query;
     let count = 0;
     let page = 0;
 
@@ -68,6 +68,7 @@ exports.listAllTreatmentSelections = async (req, res) => {
             ? (regexKeyword = new RegExp(keyword, 'i'))
             : '';
         regexKeyword ? (query['name'] = regexKeyword) : '';
+        if (tsType) query.tsType = tsType
         let result = await TreatmentSelection.find(query).populate('createdBy relatedBranch relatedTreatmentList relatedAppointments relatedPatient finishedAppointments remainingAppointments relatedTransaction').populate({
             path: 'relatedTreatment',
             model: 'Treatments',
@@ -160,10 +161,15 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
     let files = req.files
     let data = req.body
     let createdBy = req.credentials.id
-    let { relatedPatient, totalAmount, paymentMethod, paidAmount, relatedBank, relatedCash, relatedTreatment, relatedAppointment, bankType, paymentType, relatedBranch, remark, relatedDiscount, relatedDoctor } = req.body
+    let { relatedPatient, totalAmount, totalDiscount, totalPaidAmount, multiTreatment, paidAmount, relatedBank, relatedCash, relatedAppointment, bankType, paymentType, remark, relatedDiscount, relatedDoctor } = req.body
     let tvcCreate = false;
+    let TSArray = []
+    let response = {
+        message: 'Treatment Selection create success',
+        success: true
+    }
     try {
-        if (files) {
+        if (files.length > 0) {
             for (const element of files.payment) {
                 let imgPath = element.path.split('cherry-k')[1];
                 const attachData = {
@@ -180,78 +186,46 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             { $inc: { conditionAmount: totalAmount, conditionPurchaseFreq: 1, conditionPackageQty: 1 } },
             { new: true }
         )
-        data = { ...data, createdBy: createdBy, relatedBranch: req.mongoQuery.relatedBranch, tsType: 'TSMulti' }
-        console.log(data, 'checking data...') //Adding TSMulti type
-
-        if (paymentMethod === 'Cash Down') {
-            var fTransResult = await Transaction.create({
-                "amount": paidAmount,
-                "date": Date.now(),
-                "remark": null,
-                "relatedAccounting": "6467379159a9bc811d97f4d2", //Advance received from customer
-                "type": "Credit",
-                "createdBy": createdBy
-            })
-            var amountUpdate = await Accounting.findOneAndUpdate(
-                { _id: "6467379159a9bc811d97f4d2" },
-                { $inc: { amount: paidAmount } }
-            )
-            //sec transaction
-            var secTransResult = await Transaction.create({
-                "amount": paidAmount,
-                "date": Date.now(),
-                "remark": null,
-                "relatedBank": relatedBank,
-                "relatedCash": relatedCash,
-                "type": "Debit",
-                "relatedTransaction": fTransResult._id,
-                "createdBy": createdBy
-            });
-            var fTransUpdate = await Transaction.findOneAndUpdate(
-                { _id: fTransResult._id },
-                {
-                    relatedTransaction: secTransResult._id
-                },
-                { new: true }
-            )
-            if (relatedBank) {
-                var amountUpdate = await Accounting.findOneAndUpdate(
-                    { _id: relatedBank },
-                    { $inc: { amount: paidAmount } }
-                )
-            } else if (relatedCash) {
-                var amountUpdate = await Accounting.findOneAndUpdate(
-                    { _id: relatedCash },
-                    { $inc: { amount: paidAmount } }
-                )
-            }
-            tvcCreate = true;
-        }
-        if (fTransResult && secTransResult) { data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id] } } //adding relatedTransactions to treatmentSelection model
+        data = { ...data, createdBy: createdBy, tsType: 'TSMulti', relatedBranch: data.relatedBranch }
+        //Adding TSMulti type
+        tvcCreate = true;
+        let parsedMulti = JSON.parse(multiTreatment)
         if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
-        console.log(data, 'data2')
-        const result = await TreatmentSelection.create(data)
-
+        for (const i of parsedMulti) {
+            data.multiTreatment = parsedMulti
+            data.relatedTreatment = i.item_id
+            data.totalAmount = i.price
+            data.discount = i.discountAmount
+            let result = await TreatmentSelection.create(data)
+            TSArray.push(result._id)
+        }
         if (tvcCreate === true) {
             //--> treatment voucher create
             let dataTVC = {
-                "relatedTreatmentSelection": result._id,
-                "relatedTreatment": relatedTreatment,
+                "relatedTreatmentSelection": TSArray,
+                "deposit": req.body.deposit,
+                "purchaseType": req.body.purchaseType,
+                "relatedDoctor": req.body.relatedDoctor,
                 "relatedAppointment": relatedAppointment,
                 "relatedPatient": relatedPatient,
                 "paymentMethod": "Advanced", //enum: ['by Appointment','Lapsum','Total','Advanced']
-                "amount": paidAmount,
+                "totalPaidAmount": paidAmount,
                 "relatedBank": relatedBank,
                 "bankType": bankType,//must be bank acc from accounting accs
                 "paymentType": paymentType, //enum: ['Bank','Cash']
                 "relatedCash": relatedCash, //must be cash acc from accounting accs
                 "createdBy": createdBy,
-                "relatedBranch": relatedBranch,
                 "remark": remark,
                 "payment": attachID,
                 "relatedDiscount": relatedDiscount,
-                "relatedDoctor": relatedDoctor
+                "relatedDoctor": relatedDoctor,
+                "totalDiscount": totalDiscount,
+                "totalAmount": totalAmount,
+                "totalPaidAmount": totalPaidAmount,
+                "tsType": "TSMulti"
             }
+            console.log(parsedMulti)
+            dataTVC.multiTreatment = parsedMulti
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
             if (latestDocument.length === 0) dataTVC = { ...dataTVC, seq: 1, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-1" } // if seq is undefined set initial patientID and seq
@@ -262,32 +236,16 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
         if (treatmentVoucherResult) {
-            var populatedTV = await TreatmentVoucher.find({ _id: treatmentVoucherResult._id }).populate('relatedDiscount')
+            var populatedTV = await TreatmentVoucher.find({ _id: treatmentVoucherResult._id }).populate('relatedDiscount multiTreatment.item_id')
         }
-        const populatedResult = await TreatmentSelection.find({ _id: result._id }).populate('createdBy relatedAppointments remainingAppointments relatedTransaction relatedPatient relatedTreatmentList').populate({
-            path: 'relatedTreatment',
-            model: 'Treatments',
-            populate: {
-                path: 'relatedDoctor',
-                model: 'Doctors'
-            }
-        })
+        var updatePatient = await Patient.findOneAndUpdate({ _id: relatedPatient }, { $addToSet: { relatedTreatmentSelection: TSArray } })
 
-        let response = {
-            message: 'Treatment Selection create success',
-            success: true,
-            data: populatedResult,
-            patientFreqUpdate: freqUpdate
-            // fTransResult: fTransResult,
-            // secTransResult: secTransResult,
-            // treatmentVoucherResult:treatmentVoucherResult
-        }
+
         if (populatedTV) response.treatmentVoucherResult = populatedTV
-        // if (fTransUpdate) response.fTransResult = fTransUpdate
-        // if (fTransResult) response.secTransResult = secTransResult
         res.status(200).send(response);
 
     } catch (error) {
+        console.log(error)
         return res.status(500).send({ error: true, message: error.message })
     }
 }

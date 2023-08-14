@@ -117,7 +117,16 @@ let TreatmentSelectionSchema = new Schema({
   tsType: {
     type: String,
     enum: ['TS', 'TSMulti']
-  }
+  },
+  multiTreatment: [{
+    item_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Treatments'
+    },
+    discountAmount: Number,
+    price: Number,
+    qty: Number
+  }],
 
 });
 const patient = mongoose.model('TreatmentSelections', TreatmentSelectionSchema)

@@ -31,9 +31,6 @@ let TreatmentVoucherSchema = new Schema({
         type: String,
         enum: ['by Appointment', 'Lumpsum', 'Total', 'Advanced', 'FOC', 'pAdvance']
     },
-    amount: {
-        type: Number
-    },
     code: {
         type: String
     },
@@ -52,10 +49,10 @@ let TreatmentVoucherSchema = new Schema({
     seq: {
         type: Number
     },
-    relatedTreatmentSelection: {
+    relatedTreatmentSelection: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'TreatmentSelections'
-    },
+    }],
     remark: {
         type: String
     },
@@ -82,6 +79,20 @@ let TreatmentVoucherSchema = new Schema({
     remark: {
         type: String
     },
+    totalDiscount: {
+        type: Number
+    },
+    totalAmount: {
+        type: Number
+    },
+    paidAmount: {
+        type: Number,
+        default: 0
+    },
+    totalPaidAmount: {
+        type: Number,
+        default: 0
+    },
     payment: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Attachments'
@@ -90,17 +101,70 @@ let TreatmentVoucherSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Discounts'
     },
-    relatedPackage: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Packages'
+    discountAmount: {
+        type: Number
+    },
+    discountType: {
+        type: Number
+    },
+    tsType: {
+        type: String,
+        enum: ['TS', 'TSMulti', 'MS', 'Combined', 'PS']
+    },
+    msTotalAmount: {
+        type: Number,
+        default: 0
+    },
+    msTotalDiscountAmount: {
+        type: Number
+    },
+    msPaidAmount: {
+        type: Number
+    },
+    msChange: {
+        type: Number
+    },
+    msGrandTotal: {
+        type: Number
+    },
+    multiTreatment: [{
+        item_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Treatments'
+        },
+        discountAmount: Number,
+        price: Number,
+        qty: Number
+    }],
+    tvDiscount: {
+        type: Number
+    },
+    amount: {
+        type: Number
+    },
+    medicineItems: [{
+        item_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'MedicineItems'
+        },
+        qty: Number,
+        price: Number,
+        discountAmount: Number
+    }],
+    relatedTransaction: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'Transactions'
     },
     relatedDoctor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Doctors'
     },
-    tsType:{
-        type:String,
-        enum:['TS','TSMulti','MS','Combined']
+    purchaseType: {
+        type: String,
+        enum: ['Clinic', 'Surgery']
+    },
+    deposit: {
+        type: Number
     }
 });
 
