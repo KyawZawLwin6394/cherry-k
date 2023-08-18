@@ -161,7 +161,7 @@ let TreatmentVoucherSchema = new Schema({
     },
     purchaseType: {
         type: String,
-        enum: ['Clinic', 'Surgery']
+        enum: ['Solid Beauty', 'Normal']
     },
     deposit: {
         type: Number
