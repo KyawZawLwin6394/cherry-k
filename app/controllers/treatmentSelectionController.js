@@ -164,12 +164,13 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
     let { relatedPatient, totalAmount, totalDiscount, totalPaidAmount, multiTreatment, paidAmount, relatedBank, relatedCash, relatedAppointment, bankType, paymentType, remark, relatedDiscount, relatedDoctor } = req.body
     let tvcCreate = false;
     let TSArray = []
+    let attachID;
     let response = {
         message: 'Treatment Selection create success',
         success: true
     }
     try {
-        if (files.length > 0) {
+        if (files.payment) {
             for (const element of files.payment) {
                 let imgPath = element.path.split('cherry-k')[1];
                 const attachData = {
@@ -178,9 +179,11 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
                     image: imgPath.split('\\')[2]
                 };
                 const attachResult = await Attachment.create(attachData);
-                var attachID = attachResult._id.toString()
+                console.log(attachResult,'here')
+                attachID = attachResult._id.toString()
             }
         }
+        console.log(attachID)
         const patientUpdate = await Patient.findOneAndUpdate(
             { _id: relatedPatient },
             { $inc: { conditionAmount: totalAmount, conditionPurchaseFreq: 1, conditionPackageQty: 1 } },
