@@ -9,6 +9,7 @@ const Accounting = require('../models/accountingList');
 const Attachment = require('../models/attachment');
 const AdvanceRecords = require('../models/advanceRecord');
 const Package = require('../models/treatment');
+const TreatmentSelection = require('../models/treatmentSelection');
 
 exports.listAllPackageSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -127,8 +128,9 @@ exports.appointmentGenerate = async (req, res) => {
     appointmentResult.map(function (element, index) {
         relatedAppointments.push(element._id)
     })
+    const patientupdate = await TreatmentSelection.findOneAndUpdate({ _id: req.body.relatedTreatmentSelection }, { $push: { relatedAppointments: relatedAppointments } }, { new: true })
     const populatedAppointments = await Appointment.find({ _id: { $in: appointmentResult.map(item => item._id) } }).populate('relatedDoctor');
-    return res.status(200).send({ success: true, data: populatedAppointments, relatedAppointments: relatedAppointments })
+    return res.status(200).send({ success: true, data: populatedAppointments, relatedAppointments: relatedAppointments, patientUpdate: patientupdate })
 }
 
 exports.createPackageSelection = async (req, res, next) => {
