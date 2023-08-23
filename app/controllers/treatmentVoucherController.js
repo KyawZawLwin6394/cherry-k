@@ -515,7 +515,7 @@ exports.activateTreatmentVoucher = async (req, res, next) => {
 
 exports.filterTreatmentVoucher = async (req, res, next) => {
     try {
-        let query = req.mongoQuery
+        let query = { isDeleted: false }
         let { startDate, endDate, relatedDoctor, relatedPatient } = req.query
         if (startDate && endDate) query.date = { $gte: startDate, $lte: endDate }
         if (relatedDoctor) query.relatedDoctor = relatedDoctor
