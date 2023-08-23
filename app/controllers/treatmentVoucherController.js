@@ -3,6 +3,9 @@ const TreatmentVoucher = require('../models/treatmentVoucher');
 const MedicineItems = require('../models/medicineItem');
 const Transaction = require('../models/transaction');
 const Accounting = require('../models/accountingList');
+const Patient = require('../models/patient');
+const Stock = require('../models/stock');
+const Log = require('../models/log');
 
 exports.combineMedicineSale = async (req, res) => {
     let data = req.body;
@@ -10,81 +13,82 @@ exports.combineMedicineSale = async (req, res) => {
     let createdBy = req.credentials.id;
     let objID = ''
     //first transaction 
-    const fTransaction = new Transaction({
-        "amount": data.payAmount,
-        "date": Date.now(),
-        "remark": req.body.remark,
-        "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines),
-        "relatedMedicineSale": medicineSaleResult._id,
-        "type": "Credit",
-        "createdBy": createdBy
-    })
-    const fTransResult = await fTransaction.save()
-    var amountUpdate = await Accounting.findOneAndUpdate(
-        { _id: "646739c059a9bc811d97fa8b" },
-        { $inc: { amount: -data.payAmount } }
-    )
-    //sec transaction
-    const secTransaction = new Transaction(
-        {
-            "amount": data.payAmount,
-            "date": Date.now(),
-            "remark": req.body.remark,
-            "relatedBank": req.body.relatedBank,
-            "relatedCash": req.body.relatedCash,
-            "type": "Debit",
-            "relatedTransaction": fTransResult._id,
-            "createdBy": createdBy
-        }
-    )
-    const secTransResult = await secTransaction.save();
-    var fTransUpdate = await Transaction.findOneAndUpdate(
-        { _id: fTransResult._id },
-        {
-            relatedTransaction: secTransResult._id
-        },
-        { new: true }
-    )
-    if (req.body.relatedBankAccount) {
-        var amountUpdate = await Accounting.findOneAndUpdate(
-            { _id: req.body.relatedBankAccount },
-            { $inc: { amount: data.payAmount } }
-        )
-    } else if (req.body.relatedCash) {
-        var amountUpdate = await Accounting.findOneAndUpdate(
-            { _id: req.body.relatedCash },
-            { $inc: { amount: data.payAmount } }
-        )
-    }
+    // const fTransaction = new Transaction({
+    //     "amount": data.payAmount,
+    //     "date": Date.now(),
+    //     "remark": req.body.remark,
+    //     "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines),
+    //     "relatedMedicineSale": medicineSaleResult._id,
+    //     "type": "Credit",
+    //     "createdBy": createdBy
+    // })
+    // const fTransResult = await fTransaction.save()
+    // var amountUpdate = await Accounting.findOneAndUpdate(
+    //     { _id: "646739c059a9bc811d97fa8b" },
+    //     { $inc: { amount: -data.payAmount } }
+    // )
+    // //sec transaction
+    // const secTransaction = new Transaction(
+    //     {
+    //         "amount": data.payAmount,
+    //         "date": Date.now(),
+    //         "remark": req.body.remark,
+    //         "relatedBank": req.body.relatedBank,
+    //         "relatedCash": req.body.relatedCash,
+    //         "type": "Debit",
+    //         "relatedTransaction": fTransResult._id,
+    //         "createdBy": createdBy
+    //     }
+    // )
+    // const secTransResult = await secTransaction.save();
+    // var fTransUpdate = await Transaction.findOneAndUpdate(
+    //     { _id: fTransResult._id },
+    //     {
+    //         relatedTransaction: secTransResult._id
+    //     },
+    //     { new: true }
+    // )
+    // if (req.body.relatedBankAccount) {
+    //     var amountUpdate = await Accounting.findOneAndUpdate(
+    //         { _id: req.body.relatedBankAccount },
+    //         { $inc: { amount: data.payAmount } }
+    //     )
+    // } else if (req.body.relatedCash) {
+    //     var amountUpdate = await Accounting.findOneAndUpdate(
+    //         { _id: req.body.relatedCash },
+    //         { $inc: { amount: data.payAmount } }
+    //     )
+    // }
 
-    if (req.body.relatedBank) objID = relatedBank
-    if (req.body.relatedCash) objID = relatedCash
-    //transaction
-    const acc = await Accounting.find({ _id: objID })
-    const accResult = await Accounting.findOneAndUpdate(
-        { _id: objID },
-        { amount: parseInt(req.body.payAmount) + parseInt(acc[0].amount) },
-        { new: true },
-    )
-    data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.body.relatedBranch }
-    console.log(data)
+    // if (req.body.relatedBank) objID = relatedBank
+    // if (req.body.relatedCash) objID = relatedCash
+    // //transaction
+    // const acc = await Accounting.find({ _id: objID })
+    // const accResult = await Accounting.findOneAndUpdate(
+    //     { _id: objID },
+    //     { amount: parseInt(req.body.payAmount) + parseInt(acc[0].amount) },
+    //     { new: true },
+    // )
+    // data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.body.relatedBranch }
+    // console.log(data)
 
     const patientUpdate = await Patient.findOneAndUpdate(
         { _id: relatedPatient },
-        { $inc: { conditionAmount: req.body.grandTotal, conditionPurchaseFreq: 1, conditionPackageQty: 1 } },
+        { $inc: { conditionAmount: req.body.msPaidAmount, conditionPurchaseFreq: 1, conditionPackageQty: 1 } },
         { new: true }
     )
     if (medicineItems !== undefined) {
         for (const e of medicineItems) {
 
             let totalUnit = e.stock - e.quantity
-            const result = await Stock.find({ relatedMedicineItems: e.item_id, relatedBranch: relatedBranch })
+            const result = await Stock.find({ relatedMedicineItems: e.item_id, relatedBranch: req.body.relatedBranch })
+            if (result.length <= 0) return res.status(500).send({ error: true, message: 'Medicine Item Not Found!' })
             const from = result[0].fromUnit
             const to = result[0].toUnit
             const currentQty = (from * totalUnit) / to
             try {
                 const result = await Stock.findOneAndUpdate(
-                    { relatedMedicineItems: e.item_id, relatedBranch: relatedBranch },
+                    { relatedMedicineItems: e.item_id, relatedBranch: req.body.relatedBranch },
                     { totalUnit: totalUnit, currentQty: currentQty },
                     { new: true },
                 )
@@ -99,7 +103,7 @@ exports.combineMedicineSale = async (req, res) => {
                 "actualQty": e.actual,
                 "finalQty": totalUnit,
                 "type": "Medicine Sale",
-                "relatedBranch": relatedBranch,
+                "relatedBranch": req.body.relatedBranch,
                 "createdBy": createdBy
             })
         }
