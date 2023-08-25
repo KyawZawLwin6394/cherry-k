@@ -42,6 +42,7 @@ exports.createHistory = async (req, res, next) => {
       }
     }
     if (req.body.skinCareAndCosmetic) data = { ...data, skinCareAndCosmetic: JSON.parse(req.body.skinCareAndCosmetic) }
+    if (req.body.selectedDiseases) data = { ...data, selectedDiseases: JSON.parse(req.body.selectedDiseases) }
     console.log(data)
     const result = await History.create(data);
     const populate = await History.find({ _id: result._id }).populate('consent')
@@ -73,6 +74,7 @@ exports.updateHistory = async (req, res, next) => {
       }
     }
     if (req.body.skinCareAndCosmetic) data = { ...data, skinCareAndCosmetic: JSON.parse(req.body.skinCareAndCosmetic) }
+    if (req.body.selectedDiseases) data = { ...data, selectedDiseases: JSON.parse(req.body.selectedDiseases) }
     console.log(data)
     const result = await History.findOneAndUpdate(
       { _id: data.id },
