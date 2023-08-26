@@ -9,7 +9,7 @@ const Log = require('../models/log');
 
 exports.combineMedicineSale = async (req, res) => {
     let data = req.body;
-    let { remark, relatedBank, relatedCash, msPaidAmount, medicineItems, id, relatedPatient } = req.body;
+    let { remark, relatedBank, relatedCash, msPaidAmount, bankType, medicineItems, id, relatedPatient } = req.body;
     let createdBy = req.credentials.id;
     let objID = ''
     //first transaction 

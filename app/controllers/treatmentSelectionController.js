@@ -179,7 +179,7 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
                     image: imgPath.split('\\')[2]
                 };
                 const attachResult = await Attachment.create(attachData);
-                console.log(attachResult,'here')
+                console.log(attachResult, 'here')
                 attachID = attachResult._id.toString()
             }
         }
@@ -241,7 +241,7 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
         if (treatmentVoucherResult) {
             var populatedTV = await TreatmentVoucher.find({ _id: treatmentVoucherResult._id }).populate('relatedDiscount multiTreatment.item_id')
         }
-        var updatePatient = await Patient.findOneAndUpdate({ _id: relatedPatient }, { $addToSet: { relatedTreatmentSelection: TSArray } })
+        var updatePatient = await Patient.findOneAndUpdate({ _id: relatedPatient }, { $addToSet: { relatedTreatmentSelection: TSArray }, $inc: { conditionAmount: req.body.totalAmount, conditionPurchaseFreq: 1, conditionPackageQty: 1 } })
 
 
         if (populatedTV) response.treatmentVoucherResult = populatedTV

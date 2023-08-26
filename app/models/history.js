@@ -54,42 +54,6 @@ let HistorySchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Attachments"
     },
-    underCareStatus: {
-        type: String,
-        enum: ['Yes', 'No']
-    },
-    underCareExplain: {
-        type: String
-    },
-    plasticSurgeryStatus: {
-        type: String,
-        enum: ['Yes', 'No']
-    },
-    plasticSurgeryExplain: {
-        type: String
-    },
-    skinCancerStatus: {
-        type: String,
-        enum: ['Yes', 'No']
-    },
-    skinCancerExplain: {
-        type: String
-    },
-    bodySpaTreatmentStatus: {
-        type: String,
-        enum: ['Yes', 'No']
-    },
-    bodySpaTreatmentExplain: {
-        type: String
-    },
-    selectedDiseases: [{
-        name: {
-            type: String
-        },
-        remark: {
-            type: String
-        }
-    }]
 });
 
 module.exports = mongoose.model('Histories', HistorySchema);
