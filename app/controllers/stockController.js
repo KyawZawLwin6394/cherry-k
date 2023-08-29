@@ -411,7 +411,7 @@ exports.stockRecieved = async (req, res) => {
             const recievedQuantity = srFilter[0].recievedQty
             const realFlag = srFilter[0].flag
             const flag = sqResult[0].relatedTransfer.procedureMedicine.filter(item => item.item_id.toString() === procedureItemID)
-            if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
+            if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than TransferedQty!' })
             if (flag.length === 0) return res.status(500).send({ error: true, message: 'This procedure item does not exists in the stock reqeust!' })
             console.log('recivedQuantity', recievedQuantity, realFlag)
             if (realFlag === true) {
