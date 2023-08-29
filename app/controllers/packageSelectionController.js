@@ -131,7 +131,7 @@ exports.appointmentGenerate = async (req, res) => {
     const treatmentSelectionUpdate = await TreatmentSelection.findOneAndUpdate({ _id: req.body.relatedTreatmentSelection }, { $push: { relatedAppointments: relatedAppointments } }, { new: true })
     const patientUpdate = await Patient.findOneAndUpdate({ _id: relatedPatient }, { relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments, createdBy: req.credentials.id, relatedBranch: req.mongoQuery.relatedBranch });
     const populatedAppointments = await Appointment.find({ _id: { $in: appointmentResult.map(item => item._id) } }).populate('relatedDoctor');
-    return res.status(200).send({ success: true, data: populatedAppointments, relatedAppointments: relatedAppointments, patientUpdate: patientupdate })
+    return res.status(200).send({ success: true, data: populatedAppointments, relatedAppointments: relatedAppointments, patientUpdate: patientUpdate })
 }
 
 exports.createPackageSelection = async (req, res, next) => {
