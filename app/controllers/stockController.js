@@ -488,7 +488,7 @@ exports.stockRecieved = async (req, res) => {
             const srFilter = sqResult[0].medicineLists.filter(item => item.item_id.toString() === medicineItemID)
             const recievedQuantity = srFilter[0].recievedQty
             const realFlag = srFilter[0].flag
-            if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
+            if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than TransferedQty!' })
             if (flag.length === 0) return res.status(500).send({ error: true, message: 'This medicine item does not exists in the stock reqeust!' })
             if (realFlag === true) {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
@@ -563,7 +563,7 @@ exports.stockRecieved = async (req, res) => {
             const srFilter = sqResult[0].procedureAccessory.filter(item => item.item_id.toString() === accessoryItemID)
             const recievedQuantity = srFilter[0].recievedQty
             const realFlag = srFilter[0].flag
-            if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than RequestedQty!' })
+            if (recievedQty > flag[0].transferQty) return res.status(500).send({ error: true, message: 'RecievedQty cannot be greater than TransferedQty!' })
             if (flag.length === 0) return res.status(500).send({ error: true, message: 'This accessory item does not exists in the stock reqeust!' })
             if (realFlag === true) {
                 return res.status(500).send({ error: true, message: 'Already Recieved' })
