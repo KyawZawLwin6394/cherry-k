@@ -204,7 +204,7 @@ exports.createUsage = async (req, res) => {
             procedureItemsError.push(e);
           } else if (e.stock > e.actual) {
             let totalUnit = e.stock - e.actual;
-            const result = await Stock.find({ relatedProcedureItems: e.item_id, relatedBranch: relatedBranch });
+            const result = await ProcedureItem.find({ _id: e.item_id });
             const from = result[0].fromUnit;
             const to = result[0].toUnit;
             const currentQty = (from * totalUnit) / to;
@@ -239,7 +239,7 @@ exports.createUsage = async (req, res) => {
             accessoryItemsError.push(e)
           } else if (e.stock > e.actual) {
             let totalUnit = e.stock - e.actual
-            const result = await Stock.find({ relatedAccessoryItems: e.item_id, relatedBranch: relatedBranch })
+            const result = await AccessoryItem.find({ _id: e.item_id });
             const from = result[0].fromUnit
             const to = result[0].toUnit
             const currentQty = (from * totalUnit) / to
@@ -274,7 +274,7 @@ exports.createUsage = async (req, res) => {
           if (e.stock < e.actual) {
             machineError.push(e)
           } else if (e.stock > e.actual) {
-            const result = await Stock.find({ relatedMachine: e.item_id, relatedBranch: relatedBranch })
+            const result = await Machine.find({ _id: e.item_id });
             let totalUnit = e.stock - e.actual
             const from = result[0].fromUnit
             const to = result[0].toUnit
@@ -352,7 +352,7 @@ exports.createUsage = async (req, res) => {
             procedureItemsError.push(e)
           } else if (e.stock > e.actual) {
             let totalUnit = e.stock - e.actual
-            const result = await Stock.find({ relatedProcedureItems: e.item_id, relatedBranch: relatedBranch })
+            const result = await ProcedureItem.find({ _id: e.item_id });
             const from = result[0].fromUnit
             const to = result[0].toUnit
             const currentQty = (from * totalUnit) / to
@@ -390,7 +390,7 @@ exports.createUsage = async (req, res) => {
             accessoryItemsError.push(e)
           } else if (e.stock > e.actual) {
             let totalUnit = e.stock - e.actual
-            const result = await Stock.find({ relatedAccessoryItems: e.item_id, relatedBranch: relatedBranch })
+            const result = await AccessoryItem.find({ _id: e.item_id });
             const from = result[0].fromUnit
             const to = result[0].toUnit
             const currentQty = (from * totalUnit) / to
@@ -428,7 +428,7 @@ exports.createUsage = async (req, res) => {
             machineError.push(e)
           } else if (e.stock > e.actual) {
             let totalUnit = e.stock - e.actual
-            const result = await Stock.find({ relatedMachine: e.item_id, relatedBranch: relatedBranch })
+            const result = await Machine.find({ _id: e.item_id });
             const from = result[0].fromUnit
             const to = result[0].toUnit
             const currentQty = (from * totalUnit) / to
