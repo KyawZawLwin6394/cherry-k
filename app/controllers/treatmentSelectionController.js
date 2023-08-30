@@ -9,6 +9,7 @@ const Accounting = require('../models/accountingList');
 const Attachment = require('../models/attachment');
 const AdvanceRecords = require('../models/advanceRecord');
 const Treatment = require('../models/treatment');
+const Debt = require('../models/debt');
 
 exports.listMultiTreatmentSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -242,6 +243,13 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             var populatedTV = await TreatmentVoucher.find({ _id: treatmentVoucherResult._id }).populate('relatedDiscount multiTreatment.item_id')
         }
         var updatePatient = await Patient.findOneAndUpdate({ _id: relatedPatient }, { $addToSet: { relatedTreatmentSelection: TSArray }, $inc: { conditionAmount: req.body.totalAmount, conditionPurchaseFreq: 1, conditionPackageQty: 1 } })
+        if (req.body.balance) {
+            const debtCreate = await Debt.create({
+                "balance": req.body.balance,
+                "relatedPatient": data.relatedPatient,
+                "relatedTreatmentVoucher": treatmentVoucherResult._id
+            })
+        }
 
 
         if (populatedTV) response.treatmentVoucherResult = populatedTV
@@ -261,6 +269,9 @@ exports.createTreatmentSelection = async (req, res, next) => {
     let files = req.files
     // if (flag === true) patient advance update(-totalAmount)
     try {
+
+
+
         if (req.body.originalDate === undefined) return res.status(500).send({ error: true, message: 'Original Date is required' })
         const appointmentConfig = {
             relatedPatient: req.body.relatedPatient,
@@ -682,6 +693,14 @@ exports.createTreatmentSelection = async (req, res, next) => {
         }
         if (treatmentVoucherResult) {
             var populatedTV = await TreatmentVoucher.find({ _id: treatmentVoucherResult._id }).populate('relatedDiscount')
+        }
+
+        if (req.body.balance) {
+            const debtCreate = await Debt.create({
+                "balance": req.body.balance,
+                "relatedPatient": data.relatedPatient,
+                "relatedTreatmentVoucher": treatmentVoucherResult._id
+            })
         }
 
         let response = {

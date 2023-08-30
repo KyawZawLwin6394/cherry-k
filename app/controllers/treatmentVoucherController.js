@@ -214,6 +214,13 @@ exports.combineMedicineSale = async (req, res) => {
         data,
         { new: true }
     )
+    if (req.body.balance) {
+        const debtCreate = await Debt.create({
+            "balance": req.body.balance,
+            "relatedPatient": data.relatedPatient,
+            "relatedTreatmentVoucher": medicineSaleResult._id
+        })
+    }
     res.status(200).send({
         message: 'MedicineSale Combination success',
         success: true,
@@ -331,6 +338,14 @@ exports.createSingleMedicineSale = async (req, res) => {
 
     const newMedicineSale = new TreatmentVoucher(data)
     const medicineSaleResult = await newMedicineSale.save()
+    if (req.body.balance) {
+        const debtCreate = await Debt.create({
+            "balance": req.body.balance,
+            "relatedPatient": data.relatedPatient,
+            "relatedTreatmentVoucher": medicineSaleResult._id
+        })
+    }
+
     res.status(200).send({
         message: 'MedicineSale Transaction success',
         success: true,
