@@ -6,6 +6,7 @@ const Accounting = require('../models/accountingList');
 const Patient = require('../models/patient');
 const Stock = require('../models/stock');
 const Log = require('../models/log');
+const Debt = require('../models/debt');
 
 exports.combineMedicineSale = async (req, res) => {
     let data = req.body;
