@@ -596,7 +596,7 @@ exports.TreatmentVoucherFilter = async (req, res) => {
         data: {}
     }
     try {
-        const { startDate, endDate, createdBy, purchaseType, relatedDoctor, bankType, tsType, relatedPatient, bankID } = req.query
+        const { startDate, endDate, createdBy, purchaseType, relatedDoctor, bankType, tsType, relatedPatient, bankID, relatedBranch } = req.query
         if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate }
         if (relatedPatient) query.relatedPatient = relatedPatient
         if (bankType) query.bankType = bankType
@@ -605,6 +605,7 @@ exports.TreatmentVoucherFilter = async (req, res) => {
         if (bankID) query.relatedBank = bankID
         if (purchaseType) query.purchaseType = purchaseType
         if (relatedDoctor) query.relatedDoctor = relatedDoctor
+        if (relatedBranch) query.relatedBranch = relatedBranch
         let bankResult = await TreatmentVoucher.find(query).populate('relatedTreatment relatedDoctor relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedAccounting payment createdBy').populate({
             path: 'relatedTreatmentSelection',
             model: 'TreatmentSelections',

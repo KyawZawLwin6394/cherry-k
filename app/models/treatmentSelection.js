@@ -125,7 +125,11 @@ let TreatmentSelectionSchema = new Schema({
     },
     discountAmount: Number,
     price: Number,
-    qty: Number
+    qty: Number,
+    treatmentVoucher:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'TreatmentVouchers'
+    }
   }],
 
 });
