@@ -3,6 +3,8 @@ const ProcedureHistory = require('../models/procedureHistory');
 const Attachment = require('../models/attachment');
 const procedureHistory = require('../models/procedureHistory');
 const MedicineItems = require('../models/medicineItem');
+const medicineItem = require('../models/medicineItem');
+const Stock = require('../models/stock');
 
 exports.listAllProcedureHistorys = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -47,11 +49,16 @@ exports.getProcedureHistory = async (req, res) => {
 };
 
 exports.getRelatedProcedureHistory = async (req, res) => {
-  let { relatedAppointment, relatedTreatmentSelection } = req.query
+  let { relatedAppointment, relatedTreatmentSelection, relatedBranch } = req.query
   const result = await ProcedureHistory.find({ relatedTreatmentSelection: relatedTreatmentSelection, relatedAppointment: relatedAppointment, isDeleted: false }).populate('medicineItems.item_id customTreatmentPackages.item_id pHistory relatedAppointment relatedTreatmentSelection')
-  if (result.length===0)
+  let medItems = []
+  for (const i of result[0].medicineItems) {
+    const result = await Stock.findOne({ relatedMedicineItems: i.item_id, relatedBranch: relatedBranch })
+    if (result) medItems.push(result)
+  }
+  if (result.length === 0)
     return res.status(404).json({ error: true, message: 'No Record Found' });
-  return res.status(200).send({ success: true, data: result });
+  return res.status(200).send({ success: true, data: result, stockMedItems: medItems });
 };
 
 exports.uploadImage = async (req, res) => {
@@ -112,7 +119,7 @@ exports.createProcedureHistory = async (req, res, next) => {
 
 exports.updateProcedureHistory = async (req, res, next) => {
   let data = req.body;
-  
+
   let files = req.files;
   try {
     if (files.before) {
@@ -144,7 +151,7 @@ exports.updateProcedureHistory = async (req, res, next) => {
         data.after.push(attachResult._id.toString());
       }
     }
-    console.log(data,'heree')
+    console.log(data, 'heree')
     const result = await procedureHistory.findOneAndUpdate({ _id: req.body._id }, data, { new: true }).populate('medicineItems.item_id customTreatmentPackages.item_id pHistory relatedAppointment relatedTreatmentSelection before after')
     res.status(200).send({
       message: 'ProcedureHistory update success',
