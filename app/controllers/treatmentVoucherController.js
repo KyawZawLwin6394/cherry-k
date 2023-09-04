@@ -7,6 +7,7 @@ const Patient = require('../models/patient');
 const Stock = require('../models/stock');
 const Log = require('../models/log');
 const Debt = require('../models/debt');
+const treatmentVoucher = require('../models/treatmentVoucher');
 
 exports.combineMedicineSale = async (req, res) => {
     let data = req.body;
@@ -232,6 +233,7 @@ exports.combineMedicineSale = async (req, res) => {
 
 exports.createSingleMedicineSale = async (req, res) => {
     let data = req.body;
+    let objID = ''
     let { medicineItems, relatedBranch } = req.body;
     let createdBy = req.credentials.id;
     if (medicineItems !== undefined) {
@@ -265,6 +267,9 @@ exports.createSingleMedicineSale = async (req, res) => {
             })
         }
     }
+
+    const newMedicineSale = new TreatmentVoucher(data)
+    const medicineSaleResult = await newMedicineSale.save()
     //Transaction
     const fTransaction = new Transaction({
         "amount": data.payAmount,
@@ -278,12 +283,12 @@ exports.createSingleMedicineSale = async (req, res) => {
     const fTransResult = await fTransaction.save()
     var amountUpdate = await Accounting.findOneAndUpdate(
         { _id: "646739c059a9bc811d97fa8b" },
-        { $inc: { amount: -data.payAmount } }
+        { $inc: { amount: data.msPaidAmount } }
     )
     //sec transaction
     const secTransaction = new Transaction(
         {
-            "amount": data.payAmount,
+            "amount": data.msPaidAmount,
             "date": Date.now(),
             "remark": req.body.remark,
             "relatedBank": req.body.relatedBank,
@@ -304,29 +309,25 @@ exports.createSingleMedicineSale = async (req, res) => {
     if (req.body.relatedBankAccount) {
         var amountUpdate = await Accounting.findOneAndUpdate(
             { _id: req.body.relatedBankAccount },
-            { $inc: { amount: data.payAmount } }
+            { $inc: { amount: data.msPaidAmount } }
         )
     } else if (req.body.relatedCash) {
         var amountUpdate = await Accounting.findOneAndUpdate(
             { _id: req.body.relatedCash },
-            { $inc: { amount: data.payAmount } }
+            { $inc: { amount: data.msPaidAmount } }
         )
     }
 
-    if (req.body.relatedBank) objID = relatedBank
-    if (req.body.relatedCash) objID = relatedCash
+    if (req.body.relatedBank) objID = req.body.relatedBank
+    if (req.body.relatedCash) objID = req.body.relatedCash
     //transaction
     const acc = await Accounting.find({ _id: objID })
     const accResult = await Accounting.findOneAndUpdate(
         { _id: objID },
-        { amount: parseInt(req.body.payAmount) + parseInt(acc[0].amount) },
+        { amount: parseInt(req.body.msPaidAmount) + parseInt(acc[0].amount) },
         { new: true },
     )
-    data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.body.relatedBranch }
-    console.log(data)
-
-    const newMedicineSale = new TreatmentVoucher(data)
-    const medicineSaleResult = await newMedicineSale.save()
+    const updateMedSale = TreatmentVoucher.findOneAndUpdate({ _id: medicineSaleResult._id }, { relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.body.relatedBranch }, { new: true })
     if (req.body.balance) {
         const debtCreate = await Debt.create({
             "balance": req.body.balance,
@@ -338,7 +339,7 @@ exports.createSingleMedicineSale = async (req, res) => {
     res.status(200).send({
         message: 'MedicineSale Transaction success',
         success: true,
-        data: medicineSaleResult
+        data: updateMedSale
     });
 
 }
