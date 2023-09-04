@@ -265,6 +265,66 @@ exports.createSingleMedicineSale = async (req, res) => {
             })
         }
     }
+    //Transaction
+    const fTransaction = new Transaction({
+        "amount": data.payAmount,
+        "date": Date.now(),
+        "remark": req.body.remark,
+        "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines),
+        "relatedMedicineSale": medicineSaleResult._id,
+        "type": "Credit",
+        "createdBy": createdBy
+    })
+    const fTransResult = await fTransaction.save()
+    var amountUpdate = await Accounting.findOneAndUpdate(
+        { _id: "646739c059a9bc811d97fa8b" },
+        { $inc: { amount: -data.payAmount } }
+    )
+    //sec transaction
+    const secTransaction = new Transaction(
+        {
+            "amount": data.payAmount,
+            "date": Date.now(),
+            "remark": req.body.remark,
+            "relatedBank": req.body.relatedBank,
+            "relatedCash": req.body.relatedCash,
+            "type": "Debit",
+            "relatedTransaction": fTransResult._id,
+            "createdBy": createdBy
+        }
+    )
+    const secTransResult = await secTransaction.save();
+    var fTransUpdate = await Transaction.findOneAndUpdate(
+        { _id: fTransResult._id },
+        {
+            relatedTransaction: secTransResult._id
+        },
+        { new: true }
+    )
+    if (req.body.relatedBankAccount) {
+        var amountUpdate = await Accounting.findOneAndUpdate(
+            { _id: req.body.relatedBankAccount },
+            { $inc: { amount: data.payAmount } }
+        )
+    } else if (req.body.relatedCash) {
+        var amountUpdate = await Accounting.findOneAndUpdate(
+            { _id: req.body.relatedCash },
+            { $inc: { amount: data.payAmount } }
+        )
+    }
+
+    if (req.body.relatedBank) objID = relatedBank
+    if (req.body.relatedCash) objID = relatedCash
+    //transaction
+    const acc = await Accounting.find({ _id: objID })
+    const accResult = await Accounting.findOneAndUpdate(
+        { _id: objID },
+        { amount: parseInt(req.body.payAmount) + parseInt(acc[0].amount) },
+        { new: true },
+    )
+    data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.body.relatedBranch }
+    console.log(data)
+
     const newMedicineSale = new TreatmentVoucher(data)
     const medicineSaleResult = await newMedicineSale.save()
     if (req.body.balance) {
@@ -565,23 +625,23 @@ exports.TreatmentVoucherFilter = async (req, res) => {
             const CashNames = cashResult.reduce((result, { relatedCash, paidAmount, msPaidAmount, totalPaidAmount }) => {
                 if (relatedCash) {
                     const { name } = relatedCash;
-                    result[name] = (result[name] || 0) + paidAmount + msPaidAmount + totalPaidAmount;
+                    result[name] = (result[name] || 0) + (paidAmount || 0 + msPaidAmount || 0 + totalPaidAmount || 0);
                 }
                 return result;
             }, {});
 
-            const CashTotal = cashResult.reduce((total, sale) => total + sale.paidAmount + sale.msPaidAmount + sale.totalPaidAmount, 0);
+            const CashTotal = cashResult.reduce((total, sale) => total + sale.paidAmount || 0 + sale.msPaidAmount || 0 + sale.totalPaidAmount || 0, 0);
             response.data = { ...response.data, CashList: cashResult, CashNames: CashNames, CashTotal: CashTotal }
         }
         //filter solid beauty
         const BankNames = bankResult.reduce((result, { relatedBank, paidAmount, msPaidAmount, totalPaidAmount }) => {
             if (relatedBank) {
                 const { name } = relatedBank;
-                result[name] = (result[name] || 0) + paidAmount + msPaidAmount + totalPaidAmount;
+                result[name] = (result[name] || 0) + (paidAmount || 0 + msPaidAmount || 0 + totalPaidAmount || 0);
             } return result;
 
         }, {});
-        const BankTotal = bankResult.reduce((total, sale) => total + sale.paidAmount + sale.msPaidAmount + sale.totalPaidAmount, 0);
+        const BankTotal = bankResult.reduce((total, sale) => total + sale.paidAmount || 0 + sale.msPaidAmount || 0 + sale.totalPaidAmount || 0, 0);
         response.data = { ...response.data, BankList: bankResult, BankNames: BankNames, BankTotal: BankTotal }
 
         return res.status(200).send(response);
