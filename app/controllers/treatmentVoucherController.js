@@ -232,116 +232,130 @@ exports.combineMedicineSale = async (req, res) => {
 }
 
 exports.createSingleMedicineSale = async (req, res) => {
-    let data = req.body;
-    let objID = ''
-    let { medicineItems, relatedBranch } = req.body;
-    let createdBy = req.credentials.id;
-    if (medicineItems !== undefined) {
-        for (const e of medicineItems) {
-            if (e.stock < e.quantity) return res.status(500).send({ error: true, message: 'RequestedQty Cannot Be Greater Than StockQty!' })
-            let totalUnit = e.stock - e.quantity
-            const result = await Stock.find({ relatedMedicineItems: e.item_id, relatedBranch: req.body.relatedBranch })
-            if (result.length <= 0) return res.status(500).send({ error: true, message: 'Medicine Item Not Found!' })
-            const from = result[0].fromUnit
-            const to = result[0].toUnit
-            const currentQty = (from * totalUnit) / to
-            try {
-                const result = await Stock.findOneAndUpdate(
-                    { relatedMedicineItems: e.item_id, relatedBranch: relatedBranch },
-                    { totalUnit: totalUnit, currentQty: currentQty },
-                    { new: true },
-                )
-            } catch (error) {
-                return res.status(500).send({ error: true, message: error.message })
+    try {
+        let data = req.body;
+        let objID = ''
+        let { medicineItems, relatedBranch } = req.body;
+        let createdBy = req.credentials.id;
+        if (medicineItems !== undefined) {
+            for (const e of medicineItems) {
+                if (e.stock < e.quantity) return res.status(500).send({ error: true, message: 'RequestedQty Cannot Be Greater Than StockQty!' })
+                let totalUnit = e.stock - e.quantity
+                const result = await Stock.find({ relatedMedicineItems: e.item_id, relatedBranch: req.body.relatedBranch })
+                if (result.length <= 0) return res.status(500).send({ error: true, message: 'Medicine Item Not Found!' })
+                const from = result[0].fromUnit
+                const to = result[0].toUnit
+                const currentQty = (from * totalUnit) / to
+                try {
+                    const result = await Stock.findOneAndUpdate(
+                        { relatedMedicineItems: e.item_id, relatedBranch: relatedBranch },
+                        { totalUnit: totalUnit, currentQty: currentQty },
+                        { new: true },
+                    )
+                } catch (error) {
+                    return res.status(500).send({ error: true, message: error.message })
+                }
+                const logResult = await Log.create({
+                    "relatedTreatmentSelection": null,
+                    "relatedAppointment": null,
+                    "relatedMedicineItems": e.item_id,
+                    "currentQty": e.stock,
+                    "actualQty": e.actual,
+                    "finalQty": totalUnit,
+                    "type": "Medicine Sale",
+                    "relatedBranch": req.body.relatedBranch,
+                    "createdBy": createdBy
+                })
             }
-            const logResult = await Log.create({
-                "relatedTreatmentSelection": null,
-                "relatedAppointment": null,
-                "relatedMedicineItems": e.item_id,
-                "currentQty": e.stock,
-                "actualQty": e.actual,
-                "finalQty": totalUnit,
-                "type": "Medicine Sale",
-                "relatedBranch": req.body.relatedBranch,
-                "createdBy": createdBy
-            })
         }
-    }
 
-    const newMedicineSale = new TreatmentVoucher(data)
-    const medicineSaleResult = await newMedicineSale.save()
-    //Transaction
-    const fTransaction = new Transaction({
-        "amount": data.payAmount,
-        "date": Date.now(),
-        "remark": req.body.remark,
-        "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines),
-        "relatedMedicineSale": medicineSaleResult._id,
-        "type": "Credit",
-        "createdBy": createdBy
-    })
-    const fTransResult = await fTransaction.save()
-    var amountUpdate = await Accounting.findOneAndUpdate(
-        { _id: "646739c059a9bc811d97fa8b" },
-        { $inc: { amount: data.msPaidAmount } }
-    )
-    //sec transaction
-    const secTransaction = new Transaction(
-        {
-            "amount": data.msPaidAmount,
+        const medicineSaleResult = await TreatmentVoucher.create(data)
+        console.log(medicineSaleResult._id)
+        //Transaction
+        const fTransaction = new Transaction({
+            "amount": data.payAmount,
             "date": Date.now(),
             "remark": req.body.remark,
-            "relatedBank": req.body.relatedBank,
-            "relatedCash": req.body.relatedCash,
-            "type": "Debit",
-            "relatedTransaction": fTransResult._id,
+            "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines),
+            "relatedMedicineSale": medicineSaleResult._id,
+            "type": "Credit",
             "createdBy": createdBy
-        }
-    )
-    const secTransResult = await secTransaction.save();
-    var fTransUpdate = await Transaction.findOneAndUpdate(
-        { _id: fTransResult._id },
-        {
-            relatedTransaction: secTransResult._id
-        },
-        { new: true }
-    )
-    if (req.body.relatedBankAccount) {
-        var amountUpdate = await Accounting.findOneAndUpdate(
-            { _id: req.body.relatedBankAccount },
-            { $inc: { amount: data.msPaidAmount } }
-        )
-    } else if (req.body.relatedCash) {
-        var amountUpdate = await Accounting.findOneAndUpdate(
-            { _id: req.body.relatedCash },
-            { $inc: { amount: data.msPaidAmount } }
-        )
-    }
-
-    if (req.body.relatedBank) objID = req.body.relatedBank
-    if (req.body.relatedCash) objID = req.body.relatedCash
-    //transaction
-    const acc = await Accounting.find({ _id: objID })
-    const accResult = await Accounting.findOneAndUpdate(
-        { _id: objID },
-        { amount: parseInt(req.body.msPaidAmount) + parseInt(acc[0].amount) },
-        { new: true },
-    )
-    const updateMedSale = TreatmentVoucher.findOneAndUpdate({ _id: medicineSaleResult._id }, { relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.body.relatedBranch }, { new: true })
-    if (req.body.balance) {
-        const debtCreate = await Debt.create({
-            "balance": req.body.balance,
-            "relatedPatient": data.relatedPatient,
-            "relatedTreatmentVoucher": medicineSaleResult._id
         })
+        const fTransResult = await fTransaction.save()
+        
+        var amountUpdate = await Accounting.findOneAndUpdate(
+            { _id: "646739c059a9bc811d97fa8b" },
+            { $inc: { amount: data.msPaidAmount } }
+        )
+        console.log('here')
+        //sec transaction
+        const secTransaction = new Transaction(
+            {
+                "amount": data.msPaidAmount,
+                "date": Date.now(),
+                "remark": req.body.remark,
+                "relatedBank": req.body.relatedBank,
+                "relatedCash": req.body.relatedCash,
+                "type": "Debit",
+                "relatedTransaction": fTransResult._id,
+                "createdBy": createdBy
+            }
+        )
+        const secTransResult = await secTransaction.save();
+        
+        var fTransUpdate = await Transaction.findOneAndUpdate(
+            { _id: fTransResult._id },
+            {
+                relatedTransaction: secTransResult._id
+            },
+            { new: true }
+        )
+        
+        if (req.body.relatedBank) {
+            var amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: req.body.relatedBankAccount },
+                { $inc: { amount: data.msPaidAmount } }
+            )
+        } else if (req.body.relatedCash) {
+            var amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: req.body.relatedCash },
+                { $inc: { amount: data.msPaidAmount } }
+            )
+        }
+
+        if (req.body.relatedBank) objID = req.body.relatedBank
+        if (req.body.relatedCash) objID = req.body.relatedCash
+        //transaction
+        
+        const acc = await Accounting.find({ _id: objID })
+        
+        const accResult = await Accounting.findOneAndUpdate(
+            { _id: objID },
+            { amount: parseInt(req.body.msPaidAmount) + parseInt(acc[0].amount) },
+            { new: true },
+        )
+        
+        const updateMedSale = await TreatmentVoucher.findOneAndUpdate({ _id: medicineSaleResult._id }, { relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.body.relatedBranch }, { new: true })
+        if (req.body.balance) {
+            const debtCreate = await Debt.create({
+                "balance": req.body.balance,
+                "relatedPatient": data.relatedPatient,
+                "relatedTreatmentVoucher": medicineSaleResult._id
+            })
+        }
+        return res.status(200).send({
+            message: 'MedicineSale Transaction success',
+            success: true,
+            data: updateMedSale
+        });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send({
+            error: true,
+            message: error.message
+        });
     }
-
-    res.status(200).send({
-        message: 'MedicineSale Transaction success',
-        success: true,
-        data: updateMedSale
-    });
-
 }
 
 exports.getCodeMS = async (req, res) => {
