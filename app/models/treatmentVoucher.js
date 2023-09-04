@@ -89,8 +89,11 @@ let TreatmentVoucherSchema = new Schema({
         type: Number,
         default: 0
     },
+    balance: {
+        type: Number
+    },
     totalPaidAmount: {
-        type: Number, 
+        type: Number,
         default: 0
     },
     payment: {
@@ -127,7 +130,7 @@ let TreatmentVoucherSchema = new Schema({
     msGrandTotal: {
         type: Number
     },
-    msBalance : {
+    msBalance: {
         type: Number
     },
     multiTreatment: [{
@@ -169,9 +172,9 @@ let TreatmentVoucherSchema = new Schema({
     deposit: {
         type: Number
     },
-    payment:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Attachments'
+    payment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Attachments'
     }
 });
 

@@ -213,7 +213,7 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
                 "relatedAppointment": relatedAppointment,
                 "relatedPatient": relatedPatient,
                 "paymentMethod": "Advanced", //enum: ['by Appointment','Lapsum','Total','Advanced']
-                "totalPaidAmount": paidAmount,
+                "paidAmount": paidAmount,
                 "relatedBank": relatedBank,
                 "bankType": bankType,//must be bank acc from accounting accs
                 "paymentType": paymentType, //enum: ['Bank','Cash']
@@ -269,8 +269,6 @@ exports.createTreatmentSelection = async (req, res, next) => {
     let files = req.files
     // if (flag === true) patient advance update(-totalAmount)
     try {
-
-
 
         if (req.body.originalDate === undefined) return res.status(500).send({ error: true, message: 'Original Date is required' })
         const appointmentConfig = {
@@ -529,7 +527,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedAppointment": req.body.relatedAppointment,
                 "relatedPatient": req.body.relatedPatient,
                 "paymentMethod": "pAdvance", //enum: ['by Appointment','Lapsum','Total','Advanced']
-                "amount": req.body.totalAmount,
+
                 "relatedBank": req.body.relatedBank,
                 "bankType": req.body.bankType,//must be bank acc from accounting accs
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
@@ -539,7 +537,10 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "remark": req.body.remark,
                 "payment": attachID,
                 "relatedDiscount": req.body.relatedDiscount,
-                "relatedDoctor": req.body.relatedDoctor
+                "relatedDoctor": req.body.relatedDoctor,
+                "amount": req.body.totalAmount,
+                "paidAmount": req.body.paidAmount,
+                "balance": req.body.balance
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -587,7 +588,9 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedAppointment": req.body.relatedAppointment,
                 "relatedPatient": req.body.relatedPatient,
                 "paymentMethod": "Advanced", //enum: ['by Appointment','Lapsum','Total','Advanced']
-                "amount": req.body.paidAmount,
+                "amount": req.body.totalAmount,
+                "paidAmount": req.body.paidAmount,
+                "balance": req.body.balance,
                 "relatedBank": req.body.relatedBank,
                 "bankType": req.body.bankType,//must be bank acc from accounting accs
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
