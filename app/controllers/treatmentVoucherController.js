@@ -282,7 +282,7 @@ exports.createSingleMedicineSale = async (req, res) => {
             "createdBy": createdBy
         })
         const fTransResult = await fTransaction.save()
-        
+
         var amountUpdate = await Accounting.findOneAndUpdate(
             { _id: "646739c059a9bc811d97fa8b" },
             { $inc: { amount: data.msPaidAmount } }
@@ -302,7 +302,7 @@ exports.createSingleMedicineSale = async (req, res) => {
             }
         )
         const secTransResult = await secTransaction.save();
-        
+
         var fTransUpdate = await Transaction.findOneAndUpdate(
             { _id: fTransResult._id },
             {
@@ -310,7 +310,7 @@ exports.createSingleMedicineSale = async (req, res) => {
             },
             { new: true }
         )
-        
+
         if (req.body.relatedBank) {
             var amountUpdate = await Accounting.findOneAndUpdate(
                 { _id: req.body.relatedBankAccount },
@@ -326,15 +326,15 @@ exports.createSingleMedicineSale = async (req, res) => {
         if (req.body.relatedBank) objID = req.body.relatedBank
         if (req.body.relatedCash) objID = req.body.relatedCash
         //transaction
-        
+
         const acc = await Accounting.find({ _id: objID })
-        
+
         const accResult = await Accounting.findOneAndUpdate(
             { _id: objID },
             { amount: parseInt(req.body.msPaidAmount) + parseInt(acc[0].amount) },
             { new: true },
         )
-        
+
         const updateMedSale = await TreatmentVoucher.findOneAndUpdate({ _id: medicineSaleResult._id }, { relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.body.relatedBranch }, { new: true })
         if (req.body.balance) {
             const debtCreate = await Debt.create({
@@ -645,7 +645,7 @@ exports.TreatmentVoucherFilter = async (req, res) => {
                 return result;
             }, {});
 
-            const CashTotal = cashResult.reduce((total, sale) => total + sale.paidAmount || 0 + sale.msPaidAmount || 0 + sale.totalPaidAmount || 0, 0);
+            const CashTotal = cashResult.reduce((total, sale) => total + (sale.paidAmount || 0) + (sale.msPaidAmount || 0) + (sale.totalPaidAmount || 0), 0);
             response.data = { ...response.data, CashList: cashResult, CashNames: CashNames, CashTotal: CashTotal }
         }
         //filter solid beauty
@@ -656,7 +656,7 @@ exports.TreatmentVoucherFilter = async (req, res) => {
             } return result;
 
         }, {});
-        const BankTotal = bankResult.reduce((total, sale) => total + sale.paidAmount || 0 + sale.msPaidAmount || 0 + sale.totalPaidAmount || 0, 0);
+        const BankTotal = bankResult.reduce((total, sale) => total + (sale.paidAmount || 0) + (sale.msPaidAmount || 0) + (sale.totalPaidAmount || 0), 0);
         response.data = { ...response.data, BankList: bankResult, BankNames: BankNames, BankTotal: BankTotal }
 
         return res.status(200).send(response);
