@@ -141,6 +141,15 @@ let TreatmentVoucherSchema = new Schema({
     msBalance: {
         type: Number
     },
+    psGrandTotal: {
+        type: Number
+    },
+    psBalance: {
+        type: Number
+    },
+    psPaidAmount: {
+        type: Number
+    },
     multiTreatment: [{
         item_id: {
             type: mongoose.Schema.Types.ObjectId,
