@@ -100,6 +100,14 @@ let TreatmentVoucherSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Attachments'
     },
+    relatedPackageSelection: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PackageSelections'
+    },
+    relatedPackage: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Packages'
+    },
     relatedDiscount: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Discounts'
