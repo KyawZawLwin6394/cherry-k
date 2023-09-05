@@ -166,7 +166,7 @@ exports.createPackageSelection = async (req, res, next) => {
         //first transaction 
         if (req.body.paymentMethod === 'Cash Down') {
             var fTransResult = await Transaction.create({
-                "amount": req.body.paidAmount,
+                "amount": req.body.psPaidAmount,
                 "date": Date.now(),
                 "remark": null,
                 "relatedAccounting": "64a3f2e39f17ad46313dc882", //Sales (Package)
@@ -175,11 +175,11 @@ exports.createPackageSelection = async (req, res, next) => {
             })
             var amountUpdate = await Accounting.findOneAndUpdate(
                 { _id: "64a3f2e39f17ad46313dc882" },
-                { $inc: { amount: req.body.paidAmount } }
+                { $inc: { amount: req.body.psPaidAmount } }
             )
             //sec transaction
             var secTransResult = await Transaction.create({
-                "amount": req.body.paidAmount,
+                "amount": req.body.psPaidAmount,
                 "date": Date.now(),
                 "remark": null,
                 "relatedBank": req.body.relatedBank,
@@ -198,12 +198,12 @@ exports.createPackageSelection = async (req, res, next) => {
             if (req.body.relatedBank) {
                 var amountUpdate = await Accounting.findOneAndUpdate(
                     { _id: req.body.relatedBank },
-                    { $inc: { amount: req.body.paidAmount } }
+                    { $inc: { amount: req.body.psPaidAmount } }
                 )
             } else if (req.body.relatedCash) {
                 var amountUpdate = await Accounting.findOneAndUpdate(
                     { _id: req.body.relatedCash },
-                    { $inc: { amount: req.body.paidAmount } }
+                    { $inc: { amount: req.body.psPaidAmount } }
                 )
             }
             tvcCreate = true;
@@ -417,7 +417,11 @@ exports.createPackageSelection = async (req, res, next) => {
                 "remark": req.body.remark,
                 "payment": attachID,
                 "relatedDiscount": req.body.relatedDiscount,
-                "relatedDoctor": req.body.relatedDoctor
+                "relatedDoctor": req.body.relatedDoctor,
+                "tsType": 'PS',
+                "psGrandTotal": req.body.psGrandTotal,
+                "psBalance": req.body.psBalance,
+                "psPaidAmount": req.body.psPaidAmount
             }
             let today = new Date().toISOString()
             const latestDocument = await TreatmentVoucher.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -436,7 +440,7 @@ exports.createPackageSelection = async (req, res, next) => {
                 "relatedAppointment": req.body.relatedAppointment,
                 "relatedPatient": req.body.relatedPatient,
                 "paymentMethod": "Advanced", //enum: ['by Appointment','Lapsum','Total','Advanced']
-                "amount": req.body.paidAmount,
+                "amount": req.body.psPaidAmount,
                 "relatedBank": req.body.relatedBank,
                 "bankType": req.body.bankType,//must be bank acc from accounting accs
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
@@ -475,7 +479,7 @@ exports.createPackageSelection = async (req, res, next) => {
             { new: true }
         )
         var freqfTransResult = await Transaction.create({
-            "amount": req.body.paidAmount,
+            "amount": req.body.psPaidAmount,
             "date": Date.now(),
             "remark": null,
             "relatedAccounting": "64a3f2e39f17ad46313dc882", //Sales Package
@@ -484,11 +488,11 @@ exports.createPackageSelection = async (req, res, next) => {
         })
         var freqamountUpdate = await Accounting.findOneAndUpdate(
             { _id: "64a3f2e39f17ad46313dc882" },
-            { $inc: { amount: -req.body.paidAmount } }
+            { $inc: { amount: -req.body.psPaidAmount } }
         )
         //sec transaction
         var freqSecTransResult = await Transaction.create({
-            "amount": req.body.paidAmount,
+            "amount": req.body.psPaidAmount,
             "date": Date.now(),
             "remark": null,
             "relatedBank": req.body.relatedBank,
@@ -507,12 +511,12 @@ exports.createPackageSelection = async (req, res, next) => {
         if (req.body.relatedBank) {
             var freqSecamountUpdate = await Accounting.findOneAndUpdate(
                 { _id: req.body.relatedBank },
-                { $inc: { amount: req.body.paidAmount } }
+                { $inc: { amount: req.body.psPaidAmount } }
             )
         } else if (req.body.relatedCash) {
             var freqSecamountUpdate = await Accounting.findOneAndUpdate(
                 { _id: req.body.relatedCash },
-                { $inc: { amount: req.body.paidAmount } }
+                { $inc: { amount: req.body.psPaidAmount } }
             )
         }
         //Freq Update end
