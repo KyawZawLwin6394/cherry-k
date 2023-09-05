@@ -465,7 +465,7 @@ exports.createPackageSelection = async (req, res, next) => {
             }
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
-        let advanceQuery = { $inc: { amount: -req.body.totalAmount } }
+        let advanceQuery = { $inc: { amount: -req.body.psGrandTotal } }
         if (req.body.recievedPatient) advanceQuery.recievedPatient = req.body.recievedPatient
         //freq Update Start
         const advanceResult = await AdvanceRecords.findOneAndUpdate(
@@ -475,7 +475,7 @@ exports.createPackageSelection = async (req, res, next) => {
         )
         const freqUpdate = await Patient.findOneAndUpdate(
             { _id: req.body.relatedPatient },
-            { $inc: { treatmentPackageQty: 1, totalAmount: req.body.totalAmount } },
+            { $inc: { treatmentPackageQty: 1, totalAmount: req.body.psGrandTotal } },
             { new: true }
         )
         var freqfTransResult = await Transaction.create({
