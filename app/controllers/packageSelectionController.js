@@ -156,7 +156,7 @@ exports.createPackageSelection = async (req, res, next) => {
 
         const patientUpdate = await Patient.findOneAndUpdate(
             { _id: req.body.relatedPatient },
-            { $inc: { conditionAmount: req.body.totalAmount, conditionPurchaseFreq: 1, conditionPackageQty: 1 } },
+            { $inc: { conditionAmount: req.body.psPaidAmount, conditionPurchaseFreq: 1, conditionPackageQty: 1 } },
             { new: true }
         )
 
