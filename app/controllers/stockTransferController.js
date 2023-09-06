@@ -103,7 +103,9 @@ exports.createStockTransfer = async (req, res, next) => {
   let procedureMedicineFinished = []
   let medicineListsFinished = []
   let procedureAccessoryFinished = []
-  const { pMed, pAcc, med } = [[], [], []]
+  const pAcc = procedureAccessory.reduce((total, sale) => total + sale.totalPrice, 0)
+  const med = medicineLists.reduce((total, sale) => total + sale.totalPrice, 0)
+  const pMed = procedureMedicine.reduce((total, sale) => total + sale.totalPrice, 0)
   const procedureMedicineRes = procedureMedicine.reduce(
     (total, sale) => total + sale.purchasePrice,
     0
@@ -293,7 +295,10 @@ exports.createStockTransfer = async (req, res, next) => {
         }
       })
     }
-    newBody = { ...newBody, totalPrice: (pAcc || 0) + (pMed || 0) + (med || 0) }
+    const totalPrice = pAcc + pMed + med
+    console.log(pMed, pAcc, med, totalPrice, 'here it is')
+    newBody = { ...newBody, totalPrice: totalPrice }
+    console.log(newBody)
     const newStockTransfer = new StockTransfer(newBody)
     const result = await newStockTransfer.save()
     const stockRequestUpdate = await StockRequest.findOneAndUpdate(
