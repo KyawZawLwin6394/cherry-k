@@ -103,6 +103,7 @@ exports.createStockTransfer = async (req, res, next) => {
   let procedureMedicineFinished = []
   let medicineListsFinished = []
   let procedureAccessoryFinished = []
+  const { pMed, pAcc, med } = [[], [], []]
   const procedureMedicineRes = procedureMedicine.reduce(
     (total, sale) => total + sale.purchasePrice,
     0
@@ -211,6 +212,7 @@ exports.createStockTransfer = async (req, res, next) => {
               relatedBranch: relatedBranch,
               createdBy: createdBy
             })
+            pMed = pMed + parseInt(e.totalPrice)
           } catch (error) {
             procedureMedicineError.push(e)
           }
@@ -246,6 +248,7 @@ exports.createStockTransfer = async (req, res, next) => {
               relatedBranch: relatedBranch,
               createdBy: createdBy
             })
+            med = med + parseInt(e.totalPrice)
           } catch (error) {
             medicineListsError.push(e)
           }
@@ -282,7 +285,7 @@ exports.createStockTransfer = async (req, res, next) => {
               createdBy: createdBy
             })
             // const log = await Log.create({
-
+            pAcc = pAcc + parseInt(e.totalPrice)
             // })
           } catch (error) {
             procedureAccessoryError.push(e)
@@ -290,6 +293,7 @@ exports.createStockTransfer = async (req, res, next) => {
         }
       })
     }
+    newBody = { ...newBody, totalPrice: (pAcc || 0) + (pMed || 0) + (med || 0) }
     const newStockTransfer = new StockTransfer(newBody)
     const result = await newStockTransfer.save()
     const stockRequestUpdate = await StockRequest.findOneAndUpdate(
