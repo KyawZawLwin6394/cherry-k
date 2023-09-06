@@ -166,7 +166,7 @@ exports.searchCommission = async (req, res) => {
 
 exports.collectComission = async (req, res) => {
     try {
-        let { update, startDate, endDate, collectAmount, remark, relatedDoctor } = req.body
+        let { update, startDate, endDate, collectAmount, remark, relatedDoctor, collectDate } = req.body
         // Convert string IDs to MongoDB ObjectIds
         const objectIds = update.map((id) => ObjectId(id));
 
@@ -182,7 +182,8 @@ exports.collectComission = async (req, res) => {
             collectAmount: collectAmount,
             remark: remark,
             relatedDoctor: relatedDoctor,
-            relatedCommissions: objectIds
+            relatedCommissions: objectIds,
+            collectDate: collectDate
         })
         return res.status(200).send({ success: true, updateResult: updateResult, comissionPayResult: cPayResult })
     } catch (e) {
