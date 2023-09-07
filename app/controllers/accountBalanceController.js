@@ -4,6 +4,7 @@ const MedicineSale = require('../models/medicineSale');
 const Expense = require('../models/expense');
 const Income = require('../models/income');
 const TreatmentVoucher = require('../models/treatmentVoucher');
+const AccountingList = require('../models/accountingList');
 
 exports.listAllAccountBalances = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -52,6 +53,7 @@ exports.getAccountBalance = async (req, res) => {
 exports.createAccountBalance = async (req, res, next) => {
     let newBody = req.body;
     try {
+        const { amount } = req.body;
         const newAccountBalance = new AccountBalance(newBody);
         const result = await newAccountBalance.save();
         res.status(200).send({
@@ -64,6 +66,37 @@ exports.createAccountBalance = async (req, res, next) => {
         return res.status(500).send({ "error": true, message: error.message })
     }
 };
+
+
+exports.accountBalanceTransfer = async (req, res) => {
+    try {
+        const { transferAmount, closingAmount, closingAcc, transferAcc, relatedBranch, remark } = req.body;
+        const transfered = await AccountingList.findOneAndUpdate({ _id: transferAcc }, { $inc: { amount: transferAmount } }, { new: true })
+        if (closingAmount) {
+            const closing = await AccountBalance.create({
+                type: 'Closing',
+                amount: closingAmount,
+                relatedBranch: relatedBranch,
+                remark: remark,
+                relatedAccounting: closingAcc,
+                date: Date.now()
+            })
+            return res.status(200).send({
+                success: true, data: {
+                    transferResult: transfered,
+                    closingResult: closing
+                }
+            })
+        }
+        return res.status(200).send({
+            success: true, data: {
+                transferResult: transfered
+            }
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 exports.updateAccountBalance = async (req, res, next) => {
     try {
