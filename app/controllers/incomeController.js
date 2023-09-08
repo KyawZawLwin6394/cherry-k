@@ -8,6 +8,47 @@ const Expense = require('../models/expense');
 const mergeAndSum = require('../lib/userUtil').mergeAndSum;
 const Currency = require('../models/currency');
 
+exports.incomeBankCashFilter = async (req, res) => {
+  let query = { relatedBankAccount: { $exists: true }, isDeleted: false }
+  let response = {
+    success: true,
+    data: {}
+  }
+  try {
+    const { startDate, endDate, relatedBranch } = req.query
+    if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate }
+    if (relatedBranch) query.relatedBranch = relatedBranch
+    let bankResult = await Income.find(query).populate('relatedBankAccount relatedCashAccount relatedAccounting relatedBranch')
+
+    const { relatedBankAccount, ...query2 } = query;
+    query2.relatedCashAccount = { $exists: true };
+    let cashResult = await Income.find(query2).populate('relatedBankAccount relatedCashAccount relatedAccounting relatedBranch')
+    const CashNames = cashResult.reduce((result, { relatedCashAccount, finalAmount }) => {
+      if (relatedCashAccount) {
+        const { name } = relatedCashAccount;
+        result[name] = (result[name] || 0) + (finalAmount || 0);
+      }
+      return result;
+    }, {});
+
+    const CashTotal = cashResult.reduce((total, sale) => total + (sale.finalAmount || 0), 0);
+    response.data = { ...response.data, CashList: cashResult, CashNames: CashNames, CashTotal: CashTotal }
+
+    const BankNames = bankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
+      if (relatedBankAccount) {
+        const { name } = relatedBankAccount;
+        result[name] = (result[name] || 0) + (finalAmount || 0);
+      } return result;
+
+    }, {});
+    const BankTotal = bankResult.reduce((total, sale) => total + (sale.finalAmount || 0), 0);
+    response.data = { ...response.data, BankList: bankResult, BankNames: BankNames, BankTotal: BankTotal }
+
+    return res.status(200).send(response);
+  } catch (error) {
+    return res.status(500).send({ error: true, message: error.message })
+  }
+}
 
 exports.listAllIncomes = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
@@ -56,16 +97,16 @@ exports.getIncome = async (req, res) => {
 exports.getCode = async (req, res) => {
   let data = {}
   try {
-      let today = new Date().toISOString()
-      const latestDocument = await Income.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
-      if (latestDocument.length === 0) data = { ...data, seq: 1, code: "INC-" + "-1" } // if seq is undefined set initial patientID and seq
-      if (latestDocument.length > 0) {
-          const increment = latestDocument[0].seq + 1
-          data = { ...data, code: "INC" + "-" + increment, seq: increment }
-      }
-      return res.status(200).send({ success: true, data: data })
+    let today = new Date().toISOString()
+    const latestDocument = await Income.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
+    if (latestDocument.length === 0) data = { ...data, seq: 1, code: "INC-" + "-1" } // if seq is undefined set initial patientID and seq
+    if (latestDocument.length > 0) {
+      const increment = latestDocument[0].seq + 1
+      data = { ...data, code: "INC" + "-" + increment, seq: increment }
+    }
+    return res.status(200).send({ success: true, data: data })
   } catch (error) {
-      return res.status(500).send({ "error": true, message: error.message })
+    return res.status(500).send({ "error": true, message: error.message })
   }
 }
 

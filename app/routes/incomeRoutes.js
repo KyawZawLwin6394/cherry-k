@@ -19,6 +19,7 @@ module.exports = (app) => {
     app.route('/api/incomes/get-date').get(verifyToken, catchError(income.getwithExactDate))
     app.route('/api/incomes/filter').get(verifyToken, catchError(income.incomeFilter))
     app.route('/api/incomes/code').get(verifyToken, catchError(income.getCode))
+    app.route('/api/incomes/bank-cash-filter').get(verifyToken, catchError(income.incomeBankCashFilter))
 
     app.route('/api/incomes/total-income').get(verifyToken, catchError(income.totalIncome))
     app.route('/api/incomes-filter')
