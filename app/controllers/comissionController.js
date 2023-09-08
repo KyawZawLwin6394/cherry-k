@@ -4,6 +4,8 @@ const Appointment = require('../models/appointment');
 const Doctor = require('../models/doctor');
 const ComissionPay = require('../models/commissionPay');
 const { ObjectId } = require('mongodb');
+const Nurse = require('../models/nurse');
+const Therapist = require('../models/therapist');
 
 exports.listAllComissiones = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -48,14 +50,22 @@ exports.getComission = async (req, res) => {
 };
 
 exports.createComission = async (req, res, next) => {
+    const { doctorID, appointmentID, nurseID, therapistID } = req.body;
     let percent = 0.02
-    let appointmentResult = await Appointment.find({ _id: req.body.appointmentID })
+    let appointmentResult = await Appointment.find({ _id: appointmentID })
     if (appointmentResult[0].isCommissioned === true) return res.status(500).send({ error: true, message: 'Alread Commissioned!' })
     let comission = (req.body.totalAmount / req.body.treatmentTimes) * percent
-    let doctorUpdate = await Doctor.findOneAndUpdate(
-        { _id: req.body.doctorID },
-        { commissionAmount: comission }
-    )
+    if (doctorID) {
+        const doctorUpdate = await Doctor.findOneAndUpdate(
+            { _id: doctorID },
+            { commissionAmount: comission }
+        )
+    } else if (nurseID) {
+        const nurseUpdate = await Nurse.findOneAndUpdate({ _id: nurseID }, { commissionAmount: comission })
+    } else if (therapistID) {
+        const therapistUpdate = await Therapist.findOneAndUpdate({ _id: therapistID }, { commissionAmount: comission })
+    }
+
     let appointmentUpdate = await Appointment.findOneAndUpdate(
         { _id: req.body.appointmentID },
         { isCommissioned: true }
@@ -70,7 +80,9 @@ exports.createComission = async (req, res, next) => {
             relatedDoctor: req.body.doctorID,
             percent: percent,
             relatedBranch: req.body.relatedBranch,
-            relatedTreatmentSelection: req.body.relatedTreatmentSelection
+            relatedTreatmentSelection: req.body.relatedTreatmentSelection,
+            relatedNurse: nurseID,
+            relatedTherapist: therapistID
         });
         res.status(200).send({
             message: 'Comission create success',
@@ -127,15 +139,13 @@ exports.activateComission = async (req, res, next) => {
 exports.searchCommission = async (req, res) => {
     let total = 0
     try {
-        const { month, doctor } = req.query;
+        const { month, doctor, nurse, therapist } = req.query;
         if (month) {
             let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-
             //Check if the provided month value is valid
             if (!months.includes(month)) {
                 return res.status(400).json({ error: 'Invalid month' });
             }
-
             // Get the start and end dates for the specified month
             var startDate = new Date(Date.UTC(new Date().getFullYear(), months.indexOf(month), 1));
             var endDate = new Date(Date.UTC(new Date().getFullYear(), months.indexOf(month) + 1, 1));
@@ -146,7 +156,9 @@ exports.searchCommission = async (req, res) => {
         let query = { status: 'Unclaimed' }
         if (month) query.date = { $gte: startDate, $lte: endDate }
         if (doctor) query.relatedDoctor = doctor
-        const result = await Comission.find(query).populate('relatedDoctor relatedAppointment relatedBranch').populate({
+        if (nurse) query.nurse = nurse
+        if (therapist) query.therapist = therapist
+        const result = await Comission.find(query).populate('relatedDoctor relatedTherapist relatedNurse relatedAppointment relatedBranch').populate({
             path: 'relatedTreatmentSelection',
             model: 'TreatmentSelections',
             populate: {
@@ -166,7 +178,7 @@ exports.searchCommission = async (req, res) => {
 
 exports.collectComission = async (req, res) => {
     try {
-        let { update, startDate, endDate, collectAmount, remark, relatedDoctor, collectDate } = req.body
+        let { update, startDate, endDate, collectAmount, remark, relatedDoctor, relatedNurse, relatedTherapist, collectDate } = req.body
         // Convert string IDs to MongoDB ObjectIds
         const objectIds = update.map((id) => ObjectId(id));
 
@@ -182,6 +194,8 @@ exports.collectComission = async (req, res) => {
             collectAmount: collectAmount,
             remark: remark,
             relatedDoctor: relatedDoctor,
+            relatedNurse: relatedNurse,
+            relatedTherapist: relatedTherapist,
             relatedCommissions: objectIds,
             collectDate: collectDate
         })

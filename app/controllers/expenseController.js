@@ -48,6 +48,48 @@ exports.getExpense = async (req, res) => {
     return res.status(200).send({ success: true, data: result });
 };
 
+exports.expenseBankCashFilter = async (req, res) => {
+    let query = { relatedBankAccount: { $exists: true }, isDeleted: false }
+    let response = {
+        success: true,
+        data: {}
+    }
+    try {
+        const { startDate, endDate, relatedBranch } = req.query
+        if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate }
+        if (relatedBranch) query.relatedBranch = relatedBranch
+        let bankResult = await Expense.find(query).populate('relatedBankAccount relatedCashAccount relatedAccounting relatedBranch')
+
+        const { relatedBankAccount, ...query2 } = query;
+        query2.relatedCashAccount = { $exists: true };
+        let cashResult = await Expense.find(query2).populate('relatedBankAccount relatedCashAccount relatedAccounting relatedBranch')
+        const CashNames = cashResult.reduce((result, { relatedCashAccount, finalAmount }) => {
+            if (relatedCashAccount) {
+                const { name } = relatedCashAccount;
+                result[name] = (result[name] || 0) + (finalAmount || 0);
+            }
+            return result;
+        }, {});
+
+        const CashTotal = cashResult.reduce((total, sale) => total + (sale.finalAmount || 0), 0);
+        response.data = { ...response.data, CashList: cashResult, CashNames: CashNames, CashTotal: CashTotal }
+
+        const BankNames = bankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
+            if (relatedBankAccount) {
+                const { name } = relatedBankAccount;
+                result[name] = (result[name] || 0) + (finalAmount || 0);
+            } return result;
+
+        }, {});
+        const BankTotal = bankResult.reduce((total, sale) => total + (sale.finalAmount || 0));
+        response.data = { ...response.data, BankList: bankResult, BankNames: BankNames, BankTotal: BankTotal }
+
+        return res.status(200).send(response);
+    } catch (error) {
+        return res.status(500).send({ error: true, message: error.message })
+    }
+}
+
 exports.getCode = async (req, res) => {
     let data = {}
     try {

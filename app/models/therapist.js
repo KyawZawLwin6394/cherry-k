@@ -22,6 +22,9 @@ let TherapistSchema = new Schema({
   commission: {
     type: Number,
   },
+  commissionAmount: {
+    type: Number
+  },
   createdAt: {
     type: Date,
     default: Date.now,

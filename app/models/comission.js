@@ -43,6 +43,14 @@ let ComissionSchema = new Schema({
     relatedTreatmentSelection: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'TreatmentSelections'
+    },
+    relatedNurse:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Nurses'
+    },
+    relatedTherapist:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Therapists'
     }
 });
 
