@@ -81,7 +81,7 @@ exports.expenseBankCashFilter = async (req, res) => {
             } return result;
 
         }, {});
-        const BankTotal = bankResult.reduce((total, sale) => total + (sale.finalAmount || 0));
+        const BankTotal = bankResult.reduce((total, sale) => total + (sale.finalAmount || 0), 0);
         response.data = { ...response.data, BankList: bankResult, BankNames: BankNames, BankTotal: BankTotal }
 
         return res.status(200).send(response);
