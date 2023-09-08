@@ -16,10 +16,10 @@ exports.incomeBankCashFilter = async (req, res) => {
   }
   try {
     const { startDate, endDate, relatedBranch } = req.query
-    if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate }
-    if (relatedBranch) query.relatedBranch = relatedBranch
+    if (startDate && endDate) query.date = { $gte: startDate, $lte: endDate }
+    if (relatedBranch) { query.relatedBranch = relatedBranch } else query.relatedBranch = { $exists: false }
     let bankResult = await Income.find(query).populate('relatedBankAccount relatedCashAccount relatedAccounting relatedBranch')
-
+    console.log(query)
     const { relatedBankAccount, ...query2 } = query;
     query2.relatedCashAccount = { $exists: true };
     let cashResult = await Income.find(query2).populate('relatedBankAccount relatedCashAccount relatedAccounting relatedBranch')

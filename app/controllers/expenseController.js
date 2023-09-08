@@ -56,8 +56,8 @@ exports.expenseBankCashFilter = async (req, res) => {
     }
     try {
         const { startDate, endDate, relatedBranch } = req.query
-        if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate }
-        if (relatedBranch) query.relatedBranch = relatedBranch
+        if (startDate && endDate) query.date = { $gte: startDate, $lte: endDate }
+        if (relatedBranch) { query.relatedBranch = relatedBranch } else query.relatedBranch = { $exists: false }
         let bankResult = await Expense.find(query).populate('relatedBankAccount relatedCashAccount relatedAccounting relatedBranch')
 
         const { relatedBankAccount, ...query2 } = query;
