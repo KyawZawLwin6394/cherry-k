@@ -65,7 +65,12 @@ exports.getComissionHistory = async (req, res, next) => {
             var { startDate, endDate } = req.query;
         }
         console.log(startDate, endDate)
-        const history = await Comission.find({ date: { $gte: startDate, $lte: endDate }, status: 'Claimed', relatedDoctor: doctor, relatedNurse: nurse, relatedTherapist: therapist }).populate('relatedDoctor relatedTherapist relatedNurse relatedAppointment relatedBranch').populate({
+        const query = { status: 'Claimed' }
+        if (startDate & endDate) query.date = { $gte: startDate, $lte: endDate }
+        if (doctor) query.relatedDoctor = doctor
+        if (nurse) query.relatedNurse = nurse
+        if (therapist) query.relatedTherapist = therapist
+        const history = await Comission.find(query).populate('relatedDoctor relatedTherapist relatedNurse relatedAppointment relatedBranch').populate({
             path: 'relatedTreatmentSelection',
             model: 'TreatmentSelections',
             populate: {
