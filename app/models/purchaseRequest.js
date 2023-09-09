@@ -15,14 +15,20 @@ let PurchaseRequestSchema = new Schema({
     purchaseDate: {
         type: Date,
     },
-    reason:{
-        type:String
+    reason: {
+        type: String
     },
-    requiredDate:{
-        type:Date
-    },    
+    requiredDate: {
+        type: Date
+    },
     remark: {
         type: String,
+    },
+    supplierName: {
+        type: String
+    },
+    supplierVoucher: {
+        type: String
     },
     medicineItems: [{
         item_id: {
@@ -32,7 +38,7 @@ let PurchaseRequestSchema = new Schema({
         stockQty: Number,
         requestedQty: Number,
         purchasePrice: Number,
-        subTotal:Number,
+        subTotal: Number,
         recievedQty: {
             type: Number
         },
@@ -46,7 +52,7 @@ let PurchaseRequestSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ProcedureItems'
         },
-        subTotal:Number,
+        subTotal: Number,
         stockQty: Number,
         requestedQty: Number,
         purchasePrice: Number,
@@ -63,7 +69,7 @@ let PurchaseRequestSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'AccessoryItems'
         },
-        subTotal:Number,
+        subTotal: Number,
         stockQty: Number,
         requestedQty: Number,
         purchasePrice: Number,

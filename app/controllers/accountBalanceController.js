@@ -150,24 +150,26 @@ exports.getOpeningAndClosingWithExactDate = async (req, res) => {
         const latestDocument = await AccountBalance.findOne(query, null, { sort });
         console.log(latestDocument)
         let openingTotal = latestDocument ? latestDocument.amount : 0
-
-        const medicineTotal = await TreatmentVoucher.find({ createdAt: { $gte: startDate, $lt: endDate }, tsType:'MS', relatedBranch: relatedBranch, relatedCash: relatedCash, relatedBank: relatedBank }).then(msResult => {
+        console.log(startDate, endDate)
+        const medicineTotal = await TreatmentVoucher.find({ createdAt: { $gte: startDate, $lt: endDate }, tsType:'MS', relatedBranch: relatedBranch }).then(msResult => {
+            console.log(msResult)
             const msTotal = msResult.reduce((accumulator, currentValue) => { return accumulator + currentValue.msPaidAmount }, 0)
+            console.log(msTotal)
             return msTotal
         }
         )
-        const expenseTotal = await Expense.find({ date: { $gte: startDate, $lt: endDate }, relatedBranch: relatedBranch, relatedCashAccount: relatedCash, relatedBankAccount: relatedBank }).then(result => {
+        const expenseTotal = await Expense.find({ date: { $gte: startDate, $lt: endDate }, relatedBranch: relatedBranch}).then(result => {
             const total = result.reduce((accumulator, currentValue) => { return accumulator + currentValue.finalAmount }, 0)
             return total
         }
         )
-        const TVTotal = await TreatmentVoucher.find({ createdAt: { $gte: startDate, $lt: endDate }, tsType:'TS', relatedBranch: relatedBranch, relatedCash: relatedCash, relatedBank: relatedBank }).then(result => {
+        const TVTotal = await TreatmentVoucher.find({ createdAt: { $gte: startDate, $lt: endDate }, tsType:'TS', relatedBranch: relatedBranch }).then(result => {
             const total = result.reduce((accumulator, currentValue) => { return accumulator + currentValue.totalPaidAmount }, 0)
             return total
         }
         )
 
-        const incomeTotal = await Income.find({ date: { $gte: startDate, $lt: endDate }, relatedBranch: relatedBranch, relatedCashAccount: relatedCash, relatedBankAccount: relatedBank }).then(result => {
+        const incomeTotal = await Income.find({ date: { $gte: startDate, $lt: endDate }, relatedBranch: relatedBranch }).then(result => {
             const total = result.reduce((accumulator, currentValue) => { return accumulator + currentValue.finalAmount }, 0)
             return total
         }
