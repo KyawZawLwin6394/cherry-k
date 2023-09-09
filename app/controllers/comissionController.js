@@ -49,6 +49,44 @@ exports.getComission = async (req, res) => {
     return res.status(200).send({ success: true, data: result });
 };
 
+exports.getComissionHistory = async (req, res, next) => {
+    try {
+        const { month, doctor, nurse, therapist } = req.query;
+        if (month) {
+            let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+            //Check if the provided month value is valid
+            if (!months.includes(month)) {
+                return res.status(400).json({ error: 'Invalid month' });
+            }
+            // Get the start and end dates for the specified month
+            var startDate = new Date(Date.UTC(new Date().getFullYear(), months.indexOf(month), 1));
+            var endDate = new Date(Date.UTC(new Date().getFullYear(), months.indexOf(month) + 1, 1));
+        } else {
+            var { startDate, endDate } = req.query;
+        }
+        console.log(startDate, endDate)
+        const history = await Comission.find({ date: { $gte: startDate, $lte: endDate }, status: 'Claimed', relatedDoctor: doctor, relatedNurse: nurse, relatedTherapist: therapist }).populate('relatedDoctor relatedTherapist relatedNurse relatedAppointment relatedBranch').populate({
+            path: 'relatedTreatmentSelection',
+            model: 'TreatmentSelections',
+            populate: {
+                path: 'relatedTreatment',
+                model: 'Treatments'
+            }
+        })
+        const previousAmount = history.reduce((accumulator, item) => accumulator + item.commissionAmount, 0)
+        return res.status(200).send({
+            success: true, data: {
+                previousAmount: previousAmount,
+                history: history
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            error: true, message: error.message
+        })
+    }
+}
+
 exports.createComission = async (req, res, next) => {
     const { doctorID, appointmentID, nurseID, therapistID } = req.body;
     let percent = 0.02

@@ -18,4 +18,5 @@ module.exports = (app) => {
     app.route('/api/comissions').get(verifyToken, catchError(comission.listAllComissiones))
     app.route('/api/comissions/search').get(verifyToken, catchError(comission.searchCommission))
     app.route('/api/comissions/collect').post(verifyToken, catchError(comission.collectComission))
+    app.route('/api/comissions/history').get(verifyToken, catchError(comission.getComissionHistory))
 };
