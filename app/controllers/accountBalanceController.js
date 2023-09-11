@@ -151,19 +151,18 @@ exports.getOpeningAndClosingWithExactDate = async (req, res) => {
         console.log(latestDocument)
         let openingTotal = latestDocument ? latestDocument.amount : 0
         console.log(startDate, endDate)
-        const medicineTotal = await TreatmentVoucher.find({ createdAt: { $gte: startDate, $lt: endDate }, tsType:'MS', relatedBranch: relatedBranch }).then(msResult => {
-            console.log(msResult)
+        const medicineTotal = await TreatmentVoucher.find({ createdAt: { $gte: startDate, $lt: endDate }, tsType: 'MS', relatedBranch: relatedBranch }).then(msResult => {
             const msTotal = msResult.reduce((accumulator, currentValue) => { return accumulator + currentValue.msPaidAmount }, 0)
-            console.log(msTotal)
             return msTotal
         }
         )
-        const expenseTotal = await Expense.find({ date: { $gte: startDate, $lt: endDate }, relatedBranch: relatedBranch}).then(result => {
+        const expenseTotal = await Expense.find({ date: { $gte: startDate, $lt: endDate }, relatedBranch: relatedBranch }).then(result => {
             const total = result.reduce((accumulator, currentValue) => { return accumulator + currentValue.finalAmount }, 0)
             return total
         }
         )
-        const TVTotal = await TreatmentVoucher.find({ createdAt: { $gte: startDate, $lt: endDate }, tsType:'TS', relatedBranch: relatedBranch }).then(result => {
+        const TVTotal = await TreatmentVoucher.find({ createdAt: { $gte: startDate, $lt: endDate }, tsType: { $in: ['TS', 'TSMulti'] } }).then(result => {
+            console.log(result)
             const total = result.reduce((accumulator, currentValue) => { return accumulator + currentValue.totalPaidAmount }, 0)
             return total
         }
