@@ -208,6 +208,7 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             let dataTVC = {
                 "relatedTreatmentSelection": TSArray,
                 "deposit": req.body.deposit,
+                "relatedBranch": req.body.relatedBranch,
                 "purchaseType": req.body.purchaseType,
                 "relatedDoctor": req.body.relatedDoctor,
                 "relatedAppointment": relatedAppointment,
