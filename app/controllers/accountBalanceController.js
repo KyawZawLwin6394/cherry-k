@@ -5,6 +5,7 @@ const Expense = require('../models/expense');
 const Income = require('../models/income');
 const TreatmentVoucher = require('../models/treatmentVoucher');
 const AccountingList = require('../models/accountingList');
+const Transfer = require('../models/transfer');
 
 exports.listAllAccountBalances = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -72,6 +73,13 @@ exports.accountBalanceTransfer = async (req, res) => {
     try {
         const { transferAmount, closingAmount, closingAcc, transferAcc, relatedBranch, remark } = req.body;
         const transfered = await AccountingList.findOneAndUpdate({ _id: transferAcc }, { $inc: { amount: transferAmount } }, { new: true })
+        const transferList = await Transfer.create({
+            remark: remark,
+            amount: transferAmount,
+            fromAcc: closingAcc,
+            toAcc: transferAcc,
+            date: Date.now()
+        })
         if (closingAmount) {
             const closing = await AccountBalance.create({
                 type: 'Closing',
@@ -84,13 +92,15 @@ exports.accountBalanceTransfer = async (req, res) => {
             return res.status(200).send({
                 success: true, data: {
                     transferResult: transfered,
-                    closingResult: closing
+                    closingResult: closing,
+                    transferList: transferList
                 }
             })
         }
         return res.status(200).send({
             success: true, data: {
-                transferResult: transfered
+                transferResult: transfered,
+                transferList: transferList
             }
         })
     } catch (error) {
