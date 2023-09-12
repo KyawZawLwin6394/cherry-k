@@ -162,9 +162,9 @@ exports.getTotalWithDateFilter = async (req, res) => {
         if (req.query.relatedBranch) cogsquery.relatedBranch = req.query.relatedBranch
         const COGS = await AccountingList.find(cogsquery).populate('relatedType relatedHeader relatedTreatment relatedBank relatedBranch')
         const COGSTotal = COGS.reduce((total, sale) => total + sale.amount, 0);
-        filterQuery2 = {...filterQuery2, tsType:'MS'}
+        filterQuery2.tsType = { $in: ['MS', 'Combined'] }
         const msFilterBankResult = await TreatmentVoucher.find(filterQuery2).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
-        filterQuery2 = {...filterQuery2, tsType:'TS'}
+        filterQuery2.tsType = { $in: ['TS', 'TSMulti'] }
         const tvFilterBankResult = await TreatmentVoucher.find(filterQuery2).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
         const incomeFilterBankResult = await Income.find(filterQuery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
         const expenseFilterBankResult = await Expense.find(filterQuery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
@@ -174,40 +174,40 @@ exports.getTotalWithDateFilter = async (req, res) => {
 
         const { relatedBank, ...filterQuery3 } = filterQuery2;
         filterQuery3.relatedCash = { $exists: true };
-        filterQuery3.tsType = 'MS'
+        filterQuery3.tsType = { $in: ['MS', 'Combined'] }
         const msFilterCashResult = await TreatmentVoucher.find(filterQuery3).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
-        filterQuery3.tsType = 'TS'
+        filterQuery3.tsType = { $in: ['TS', 'TSMulti'] }
         const tvFilterCashResult = await TreatmentVoucher.find(filterQuery3).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
         const incomeFilterCashResult = await Income.find(filterQuerys).populate('relatedAccounting relatedBankAccount relatedCashAccount')
         const expenseFilterCashResult = await Expense.find(filterQuerys).populate('relatedAccounting relatedBankAccount relatedCashAccount')
 
         //      Medicine Sale
-        const msBankNames = msFilterBankResult.reduce((result, { relatedBank, totalAmount }) => {
+        const msBankNames = msFilterBankResult.reduce((result, { relatedBank, msPaidAmount }) => {
             const { name } = relatedBank;
-            result[name] = (result[name] || 0) + totalAmount;
+            result[name] = (result[name] || 0) + msPaidAmount;
             return result;
         }, {});
-        const msCashNames = msFilterCashResult.reduce((result, { relatedCash, totalAmount }) => {
+        const msCashNames = msFilterCashResult.reduce((result, { relatedCash, msPaidAmount }) => {
             const { name } = relatedCash;
-            result[name] = (result[name] || 0) + totalAmount;
+            result[name] = (result[name] || 0) + msPaidAmount;
             return result;
         }, {});
-        const msBankTotal = msFilterBankResult.reduce((total, sale) => total + sale.totalAmount, 0);
-        const msCashTotal = msFilterCashResult.reduce((total, sale) => total + sale.totalAmount, 0);
+        const msBankTotal = msFilterBankResult.reduce((total, sale) => total + sale.msPaidAmount, 0);
+        const msCashTotal = msFilterCashResult.reduce((total, sale) => total + sale.msPaidAmount, 0);
 
         //TreatmentVoucher
-        const tvBankNames = tvFilterBankResult.reduce((result, { relatedBank, amount }) => {
+        const tvBankNames = tvFilterBankResult.reduce((result, { relatedBank, paidAmount, totalPaidAmount }) => {
             const { name } = relatedBank;
-            result[name] = (result[name] || 0) + amount;
+            result[name] = (result[name] || 0) + (paidAmount || 0) + (totalPaidAmount || 0);
             return result;
         }, {});
-        const tvCashNames = tvFilterCashResult.reduce((result, { relatedCash, amount }) => {
+        const tvCashNames = tvFilterCashResult.reduce((result, { relatedCash, paidAmount, totalPaidAmount }) => {
             const { name } = relatedCash;
-            result[name] = (result[name] || 0) + amount;
+            result[name] = (result[name] || 0) + (paidAmount || 0) + (totalPaidAmount || 0);
             return result;
         }, {});
-        const tvBankTotal = tvFilterBankResult.reduce((total, sale) => total + sale.amount, 0);
-        const tvCashTotal = tvFilterCashResult.reduce((total, sale) => total + sale.amount, 0);
+        const tvBankTotal = tvFilterBankResult.reduce((total, sale) => total + (sale.paidAmount || 0) + (sale.totalPaidAmount || 0), 0);
+        const tvCashTotal = tvFilterCashResult.reduce((total, sale) => total + (sale.totalPaidAmount || 0) + (sale.paidAmount || 0), 0);
 
         //Income
         const incomeBankNames = incomeFilterBankResult.reduce((result, { relatedBankAccount, finalAmount }) => {
@@ -237,25 +237,13 @@ exports.getTotalWithDateFilter = async (req, res) => {
         const expenseBankTotal = expenseFilterBankResult.reduce((total, sale) => total + sale.finalAmount, 0);
         const expenseCashTotal = expenseFilterCashResult.reduce((total, sale) => total + sale.finalAmount, 0);
 
-        const MedicineSaleResult = await MedicineSale.find(query).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment').populate({
-            path: 'relatedTransaction',
-            populate: [{
-                path: 'relatedAccounting',
-                model: 'AccountingLists'
-            }, {
-                path: 'relatedBank',
-                model: 'AccountingLists'
-            }, {
-                path: 'relatedCash',
-                model: 'AccountingLists'
-            }]
-        });
+        const MedicineSaleResult = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
         const TreatmentVoucherResult = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
         const ExpenseResult = await Expense.find(exquery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
         const IncomeResult = await Income.find(exquery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
 
-        const msTotalAmount = MedicineSaleResult.reduce((total, sale) => total + sale.grandTotal, 0);
-        const tvTotalAmount = TreatmentVoucherResult.reduce((total, sale) => total + sale.amount, 0);
+        const msTotalAmount = MedicineSaleResult.reduce((total, sale) => total + (sale.msPaidAmount || 0), 0);
+        const tvTotalAmount = TreatmentVoucherResult.reduce((total, sale) => total + (sale.paidAmount || 0) + (sale.totalPaidAmount || 0), 0);
         const exTotalAmount = ExpenseResult.reduce((total, sale) => {
             let current = currencyList.filter(currency => currency.code === sale.finalCurrency)[0].exchangeRate
             let ans = current * sale.finalAmount
@@ -267,13 +255,13 @@ exports.getTotalWithDateFilter = async (req, res) => {
             return total + ans
         }, 0);
 
-        const tvPaymentMethod = TreatmentVoucherResult.reduce((result, { paymentMethod, amount }) => {
-            result[paymentMethod] = (result[paymentMethod] || 0) + amount;
+        const tvPaymentMethod = TreatmentVoucherResult.reduce((result, { paymentMethod, paidAmount }) => {
+            result[paymentMethod] = (result[paymentMethod] || 0) + paidAmount;
             return result;
         }, {});
 
-        const msPaymentMethod = MedicineSaleResult.reduce((result, { paymentMethod, totalAmount }) => {
-            result[paymentMethod] = (result[paymentMethod] || 0) + totalAmount;
+        const msPaymentMethod = MedicineSaleResult.reduce((result, { paymentMethod, msPaidAmount }) => {
+            result[paymentMethod] = (result[paymentMethod] || 0) + msPaidAmount;
             return result;
         }, {});
 
