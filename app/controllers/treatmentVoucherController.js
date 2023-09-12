@@ -81,8 +81,8 @@ exports.combineMedicineSale = async (req, res) => {
     )
     if (medicineItems !== undefined) {
         for (const e of medicineItems) {
-            if (e.stock < e.quantity) return res.status(500).send({ error: true, message: 'RequestedQty Cannot Be Greater Than StockQty!' })
-            let totalUnit = e.stock - e.quantity
+            if (e.stock < e.qty) return res.status(500).send({ error: true, message: 'RequestedQty Cannot Be Greater Than StockQty!' })
+            let totalUnit = e.stock - e.qty
             const result = await Stock.find({ relatedMedicineItems: e.item_id, relatedBranch: req.body.relatedBranch })
             if (result.length <= 0) return res.status(500).send({ error: true, message: 'Medicine Item Not Found!' })
             const from = result[0].fromUnit
@@ -239,8 +239,8 @@ exports.createSingleMedicineSale = async (req, res) => {
         let createdBy = req.credentials.id;
         if (medicineItems !== undefined) {
             for (const e of medicineItems) {
-                if (e.stock < e.quantity) return res.status(500).send({ error: true, message: 'RequestedQty Cannot Be Greater Than StockQty!' })
-                let totalUnit = e.stock - e.quantity
+                if (e.stock < e.qty) return res.status(500).send({ error: true, message: 'RequestedQty Cannot Be Greater Than StockQty!' })
+                let totalUnit = e.stock - e.qty
                 const result = await Stock.find({ relatedMedicineItems: e.item_id, relatedBranch: req.body.relatedBranch })
                 if (result.length <= 0) return res.status(500).send({ error: true, message: 'Medicine Item Not Found!' })
                 const from = result[0].fromUnit
