@@ -158,24 +158,13 @@ exports.getTotalWithDateFilter = async (req, res) => {
             filterQuery2.createdBy = createdBy
             filterQuery.createdBy = createdBy
         }
-        let cogsquery = { code: { $gte: '6006', $lte: '6010' }}
+        let cogsquery = { code: { $gte: '6006', $lte: '6010' } }
         if (req.query.relatedBranch) cogsquery.relatedBranch = req.query.relatedBranch
         const COGS = await AccountingList.find(cogsquery).populate('relatedType relatedHeader relatedTreatment relatedBank relatedBranch')
         const COGSTotal = COGS.reduce((total, sale) => total + sale.amount, 0);
-
-        const msFilterBankResult = await MedicineSale.find(filterQuery2).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment relatedBank relatedCash').populate({
-            path: 'relatedTransaction',
-            populate: [{
-                path: 'relatedAccounting',
-                model: 'AccountingLists'
-            }, {
-                path: 'relatedBank',
-                model: 'AccountingLists'
-            }, {
-                path: 'relatedCash',
-                model: 'AccountingLists'
-            }]
-        });
+        filterQuery2 = {...filterQuery2, tsType:'MS'}
+        const msFilterBankResult = await TreatmentVoucher.find(filterQuery2).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
+        filterQuery2 = {...filterQuery2, tsType:'TS'}
         const tvFilterBankResult = await TreatmentVoucher.find(filterQuery2).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
         const incomeFilterBankResult = await Income.find(filterQuery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
         const expenseFilterBankResult = await Expense.find(filterQuery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
@@ -185,20 +174,9 @@ exports.getTotalWithDateFilter = async (req, res) => {
 
         const { relatedBank, ...filterQuery3 } = filterQuery2;
         filterQuery3.relatedCash = { $exists: true };
-
-        const msFilterCashResult = await MedicineSale.find(filterQuery3).populate('relatedPatient relatedAppointment medicineItems.item_id relatedTreatment relatedBank relatedCash').populate({
-            path: 'relatedTransaction',
-            populate: [{
-                path: 'relatedAccounting',
-                model: 'AccountingLists'
-            }, {
-                path: 'relatedBank',
-                model: 'AccountingLists'
-            }, {
-                path: 'relatedCash',
-                model: 'AccountingLists'
-            }]
-        });
+        filterQuery3.tsType = 'MS'
+        const msFilterCashResult = await TreatmentVoucher.find(filterQuery3).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
+        filterQuery3.tsType = 'TS'
         const tvFilterCashResult = await TreatmentVoucher.find(filterQuery3).populate('relatedTreatment relatedAppointment relatedPatient relatedBank relatedCash')
         const incomeFilterCashResult = await Income.find(filterQuerys).populate('relatedAccounting relatedBankAccount relatedCashAccount')
         const expenseFilterCashResult = await Expense.find(filterQuerys).populate('relatedAccounting relatedBankAccount relatedCashAccount')
