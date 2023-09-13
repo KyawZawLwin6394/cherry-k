@@ -32,6 +32,10 @@ let AccountBalance = new Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    transferAmount: {
+        type: Number,
+        default: 0
     }
 });
 

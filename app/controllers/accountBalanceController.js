@@ -87,7 +87,8 @@ exports.accountBalanceTransfer = async (req, res) => {
                 relatedBranch: relatedBranch,
                 remark: remark,
                 relatedAccounting: closingAcc,
-                date: Date.now()
+                date: Date.now(),
+                transferAmount: transferAmount
             })
             return res.status(200).send({
                 success: true, data: {
