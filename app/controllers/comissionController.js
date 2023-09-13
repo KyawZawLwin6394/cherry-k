@@ -130,8 +130,7 @@ exports.createComission = async (req, res, next) => {
         res.status(200).send({
             message: 'Comission create success',
             success: true,
-            data: result,
-            doctorResult: doctorUpdate
+            data: result
         });
     } catch (error) {
         // console.log(error )

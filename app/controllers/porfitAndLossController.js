@@ -236,8 +236,11 @@ exports.getTotalWithDateFilter = async (req, res) => {
         }, {});
         const expenseBankTotal = expenseFilterBankResult.reduce((total, sale) => total + sale.finalAmount, 0);
         const expenseCashTotal = expenseFilterCashResult.reduce((total, sale) => total + sale.finalAmount, 0);
+        console.log(query)
+        query.tsType = { $in: ['MS', 'Combined'] }
 
         const MedicineSaleResult = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
+        query.tsType = { $in: ['TS', 'TSMulti'] }
         const TreatmentVoucherResult = await TreatmentVoucher.find(query).populate('relatedTreatment relatedAppointment relatedPatient')
         const ExpenseResult = await Expense.find(exquery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
         const IncomeResult = await Income.find(exquery).populate('relatedAccounting relatedBankAccount relatedCashAccount')
