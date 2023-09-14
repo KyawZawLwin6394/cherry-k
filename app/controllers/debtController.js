@@ -19,7 +19,7 @@ exports.listAllDebts = async (req, res) => {
 };
 
 exports.getDebt = async (req, res) => {
-    const result = await Debt.find({ relatedPatient: req.params.id, isDeleted: false });
+    const result = await Debt.find({ relatedPatient: req.params.id, isDeleted: false }).populate('relatedPatient relatedTreatmentVoucher relatedMedicineSale');
     if (!result)
         return res.status(500).json({ error: true, message: 'No Record Found' });
     return res.status(200).send({ success: true, data: result });
