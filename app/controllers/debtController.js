@@ -1,5 +1,6 @@
 'use strict';
 const Debt = require('../models/debt');
+const TreatmentVoucher = require('../models/treatmentVoucher');
 
 exports.listAllDebts = async (req, res) => {
     try {
@@ -41,11 +42,13 @@ exports.createDebt = async (req, res, next) => {
 
 exports.updateDebt = async (req, res, next) => {
     try {
+        const { relatedTreatmentVoucher } = req.body
         const result = await Debt.findOneAndUpdate(
             { _id: req.body.id },
             req.body,
             { new: true },
         );
+        const update = await TreatmentVoucher.findOneAndUpdate({ _id: relatedTreatmentVoucher }, { paymentMethod: 'Paid' }, { new: true })
         return res.status(200).send({ success: true, data: result });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
