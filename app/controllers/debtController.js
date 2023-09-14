@@ -1,6 +1,8 @@
 'use strict';
 const Debt = require('../models/debt');
 const TreatmentVoucher = require('../models/treatmentVoucher');
+const AccountingList = require('../models/accountingList');
+const Transaction = require('../models/transaction');
 
 exports.listAllDebts = async (req, res) => {
     try {
@@ -42,7 +44,31 @@ exports.createDebt = async (req, res, next) => {
 
 exports.updateDebt = async (req, res, next) => {
     try {
-        const { relatedTreatmentVoucher } = req.body
+        const { relatedTreatmentVoucher, relatedBank, relatedCash, paidAmount, relatedBranch, date, remark } = req.body
+        if (relatedBank) {
+            const transaction = await Transaction.create({
+                "amount": paidAmount,
+                "date": date,
+                "remark": remark,
+                "type": "Debit",
+                "relatedBank": relatedBank,
+                "relatedCash": relatedCash,
+                "relatedBranch": relatedBranch
+            })
+            const update = await AccountingList.findOneAndUpdate({ _id: relatedBank }, { amount: paidAmount }, { new: true })
+        }
+        if (relatedCash) {
+            const transaction = await Transaction.create({
+                "amount": paidAmount,
+                "date": date,
+                "remark": remark,
+                "type": "Debit",
+                "relatedBank": relatedBank,
+                "relatedCash": relatedCash,
+                "relatedBranch": relatedBranch
+            })
+            const update = await AccountingList.findOneAndUpdate({ _id: relatedCash }, { amount: paidAmount }, { new: true })
+        }
         const result = await Debt.findOneAndUpdate(
             { _id: req.body.id },
             req.body,
