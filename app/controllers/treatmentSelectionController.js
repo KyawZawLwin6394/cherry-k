@@ -200,6 +200,9 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             data.relatedTreatment = i.item_id
             data.totalAmount = i.price
             data.discount = i.discountAmount
+            data.relatedCash = relatedCash
+            data.relatedBank = relatedBank
+            data.bankType = bankType
             let result = await TreatmentSelection.create(data)
             TSArray.push(result._id)
         }

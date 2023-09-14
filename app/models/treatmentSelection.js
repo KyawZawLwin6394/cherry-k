@@ -11,7 +11,7 @@ let TreatmentSelectionSchema = new Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['Paid','Partial']
+    enum: ['Paid', 'Partial']
   },
   paidAmount: {
     type: Number,
@@ -33,6 +33,18 @@ let TreatmentSelectionSchema = new Schema({
     type: Boolean,
     required: true,
     default: false
+  },
+  relatedBank: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AccountingLists'
+  },
+  relatedCash: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AccountingLists'
+  },
+  bankType: {
+    type: String,
+    enum: ['Normal', 'POS', 'Pay']
   },
   multiTreatment: [{
     item_id: {
@@ -126,9 +138,9 @@ let TreatmentSelectionSchema = new Schema({
     discountAmount: Number,
     price: Number,
     qty: Number,
-    treatmentVoucher:{
-      type:mongoose.Schema.Types.ObjectId,
-      ref:'TreatmentVouchers'
+    treatmentVoucher: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'TreatmentVouchers'
     }
   }],
 
