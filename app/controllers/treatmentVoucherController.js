@@ -30,19 +30,19 @@ exports.combineMedicineSale = async (req, res) => {
     //     { $inc: { amount: -data.payAmount } }
     // )
     // //sec transaction
-    // const secTransaction = new Transaction(
-    //     {
-    //         "amount": data.payAmount,
-    //         "date": Date.now(),
-    //         "remark": req.body.remark,
-    //         "relatedBank": req.body.relatedBank,
-    //         "relatedCash": req.body.relatedCash,
-    //         "type": "Debit",
-    //         "relatedTransaction": fTransResult._id,
-    //         "createdBy": createdBy
-    //     }
-    // )
-    // const secTransResult = await secTransaction.save();
+    const secTransaction = new Transaction(
+        {
+            "amount": req.body.msPaidAmount,
+            "date": Date.now(),
+            "remark": req.body.remark,
+            "relatedBank": req.body.relatedBank,
+            "relatedCash": req.body.relatedCash,
+            "type": "Debit",
+            // "relatedTransaction": fTransResult._id,
+            "createdBy": createdBy
+        }
+    )
+    const secTransResult = await secTransaction.save();
     // var fTransUpdate = await Transaction.findOneAndUpdate(
     //     { _id: fTransResult._id },
     //     {
@@ -50,17 +50,17 @@ exports.combineMedicineSale = async (req, res) => {
     //     },
     //     { new: true }
     // )
-    // if (req.body.relatedBankAccount) {
-    //     var amountUpdate = await Accounting.findOneAndUpdate(
-    //         { _id: req.body.relatedBankAccount },
-    //         { $inc: { amount: data.payAmount } }
-    //     )
-    // } else if (req.body.relatedCash) {
-    //     var amountUpdate = await Accounting.findOneAndUpdate(
-    //         { _id: req.body.relatedCash },
-    //         { $inc: { amount: data.payAmount } }
-    //     )
-    // }
+    if (req.body.relatedBank) {
+        var amountUpdate = await Accounting.findOneAndUpdate(
+            { _id: req.body.relatedBank },
+            { $inc: { amount: req.body.msPaidAmount } }
+        )
+    } else if (req.body.relatedCash) {
+        var amountUpdate = await Accounting.findOneAndUpdate(
+            { _id: req.body.relatedCash },
+            { $inc: { amount: req.body.msPaidAmount } }
+        )
+    }
 
     // if (req.body.relatedBank) objID = relatedBank
     // if (req.body.relatedCash) objID = relatedCash
