@@ -213,7 +213,7 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
                 "relatedDoctor": req.body.relatedDoctor,
                 "relatedAppointment": relatedAppointment,
                 "relatedPatient": relatedPatient,
-                "paymentMethod": "Advanced", //enum: ['by Appointment','Lapsum','Total','Advanced']
+                "paymentMethod": req.body.paymentMethod, //enum: ['by Appointment','Lapsum','Total','Advanced']
                 "paidAmount": paidAmount,
                 "relatedBank": relatedBank,
                 "bankType": bankType,//must be bank acc from accounting accs
@@ -252,7 +252,51 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             })
         }
 
-
+        // const fTransaction = new Transaction({
+        //     "amount": req.body.totalPaidAmount,
+        //     "date": Date.now(),
+        //     "remark": remark,
+        //     "relatedAccounting": "648095b57d7e4357442aa457", //Sales Medicines
+        //     "type": "Credit",
+        //     "createdBy": createdBy
+        // })
+        // const fTransResult = await fTransaction.save()
+        // var amountUpdate = await Accounting.findOneAndUpdate(
+        //     { _id: "648095b57d7e4357442aa457" },  //Sales Medicines
+        //     { $inc: { amount: req.body.totalPaidAmount } }
+        // )
+        //sec transaction
+        const secTransaction = new Transaction(
+            {
+                "amount": data.msPaidAmount,
+                "date": Date.now(),
+                "remark": remark,
+                "relatedBank": relatedBank,
+                "relatedCash": relatedCash,
+                "type": "Debit",
+                // "relatedTransaction": fTransResult._id,
+                "createdBy": createdBy
+            }
+        )
+        const secTransResult = await secTransaction.save();
+        // var fTransUpdate = await Transaction.findOneAndUpdate(
+        //     { _id: fTransResult._id },
+        //     {
+        //         relatedTransaction: secTransResult._id
+        //     },
+        //     { new: true }
+        // )
+        if (relatedBank) {
+            var amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: relatedBank },
+                { $inc: { amount: req.body.totalPaidAmount } }
+            )
+        } else if (relatedCash) {
+            var amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: relatedCash },
+                { $inc: { amount: req.body.totalPaidAmount } }
+            )
+        }
         if (populatedTV) response.treatmentVoucherResult = populatedTV
         res.status(200).send(response);
 
@@ -1126,13 +1170,13 @@ exports.TopTenFilter = async (req, res) => {
 
 
 // const TreatmentNames = TreatmentResult.reduce((result, { relatedTreatment }) => {
-        //     const { name, treatmentName } = relatedTreatment;
-        //     result[name] = (result[name] || 0) + 1; // Increment count by 1
-        //     return result;
-        // }, []);
-        // const sortedTreatmentNames = Object.entries(TreatmentNames)
-        //     .sort((a, b) => b[1] - a[1])
-        //     .reduce((sortedObj, [name, count]) => {
-        //         sortedObj[name] = count;
-        //         return sortedObj;
-        //     }, {}); //Descending
+//     const { name, treatmentName } = relatedTreatment;
+//     result[name] = (result[name] || 0) + 1; // Increment count by 1
+//     return result;
+// }, []);
+// const sortedTreatmentNames = Object.entries(TreatmentNames)
+//     .sort((a, b) => b[1] - a[1])
+//     .reduce((sortedObj, [name, count]) => {
+//         sortedObj[name] = count;
+//         return sortedObj;
+//     }, {}); //Descending
