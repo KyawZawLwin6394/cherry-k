@@ -164,7 +164,7 @@ exports.createPackageSelection = async (req, res, next) => {
 
 
         //first transaction 
-        if (req.body.paymentMethod === 'Paid') {
+        if (req.body.paymentMethod === 'Cash Down') {
             var fTransResult = await Transaction.create({
                 "amount": req.body.psPaidAmount,
                 "date": Date.now(),
