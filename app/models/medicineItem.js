@@ -57,6 +57,9 @@ let MedicineItemSchema = new Schema({
   },
   unit:{
     type:String
+  },
+  TCLSellingPrice: {
+    type: Number
   }
 });
 

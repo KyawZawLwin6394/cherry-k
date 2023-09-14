@@ -55,8 +55,11 @@ let procedureItemSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
   },
-  unit:{
-    type:String
+  unit: {
+    type: String
+  },
+  TCLSellingPrice: {
+    type: Number
   }
 });
 

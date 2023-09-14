@@ -72,6 +72,9 @@ let AccessoryItem = new Schema({
   },
   unit:{
     type:String
+  },
+  TCLSellingPrice: {
+    type: Number
   }
 });
 
