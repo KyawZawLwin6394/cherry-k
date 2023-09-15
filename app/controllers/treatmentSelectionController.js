@@ -209,14 +209,14 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             if (getAccountingAcccount.relatedAccount) {
                 const sellingPrice = getAccountingAcccount.sellingPrice
                 const transaction = await Transaction.create({
-                    "amount": req.body.msPaidAmount,
+                    "amount": req.body.totalPaidAmount,
                     "date": Date.now(),
                     "remark": remark,
                     relatedAccounting: getAccountingAcccount.relatedAccount,
                     "type": "Credit",
                     "createdBy": createdBy
                 })
-                const amtUpdate = await Accounting.findOneAndUpdate({ _id: getAccountingAcccount.relatedAccount }, { $inc: { amount: req.body.msPaidAmount } })
+                const amtUpdate = await Accounting.findOneAndUpdate({ _id: getAccountingAcccount.relatedAccount }, { $inc: { amount: req.body.totalPaidAmount } })
             }
 
             let result = await TreatmentSelection.create(data)
