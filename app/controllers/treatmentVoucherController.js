@@ -14,22 +14,22 @@ exports.combineMedicineSale = async (req, res) => {
     let { remark, relatedBank, relatedCash, msPaidAmount, bankType, medicineItems, id, relatedPatient } = req.body;
     let createdBy = req.credentials.id;
     let objID = ''
-    //first transaction 
-    // const fTransaction = new Transaction({
-    //     "amount": data.payAmount,
-    //     "date": Date.now(),
-    //     "remark": req.body.remark,
-    //     "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines),
-    //     "relatedMedicineSale": medicineSaleResult._id,
-    //     "type": "Credit",
-    //     "createdBy": createdBy
-    // })
-    // const fTransResult = await fTransaction.save()
-    // var amountUpdate = await Accounting.findOneAndUpdate(
-    //     { _id: "646739c059a9bc811d97fa8b" },
-    //     { $inc: { amount: -data.payAmount } }
-    // )
-    // //sec transaction
+
+    const fTransaction = new Transaction({
+        "amount": req.body.msPaidAmount,
+        "date": Date.now(),
+        "remark": req.body.remark,
+        "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines),
+        "relatedMedicineSale": medicineSaleResult._id,
+        "type": "Credit",
+        "createdBy": createdBy
+    })
+    const fTransResult = await fTransaction.save()
+    var amountUpdate = await Accounting.findOneAndUpdate(
+        { _id: "646739c059a9bc811d97fa8b" },
+        { $inc: { amount: req.body.msPaidAmount } }
+    )
+    //sec transaction
     const secTransaction = new Transaction(
         {
             "amount": req.body.msPaidAmount,
@@ -43,13 +43,13 @@ exports.combineMedicineSale = async (req, res) => {
         }
     )
     const secTransResult = await secTransaction.save();
-    // var fTransUpdate = await Transaction.findOneAndUpdate(
-    //     { _id: fTransResult._id },
-    //     {
-    //         relatedTransaction: secTransResult._id
-    //     },
-    //     { new: true }
-    // )
+    var fTransUpdate = await Transaction.findOneAndUpdate(
+        { _id: fTransResult._id },
+        {
+            relatedTransaction: secTransResult._id
+        },
+        { new: true }
+    )
     if (req.body.relatedBank) {
         var amountUpdate = await Accounting.findOneAndUpdate(
             { _id: req.body.relatedBank },
@@ -61,18 +61,6 @@ exports.combineMedicineSale = async (req, res) => {
             { $inc: { amount: req.body.msPaidAmount } }
         )
     }
-
-    // if (req.body.relatedBank) objID = relatedBank
-    // if (req.body.relatedCash) objID = relatedCash
-    // //transaction
-    // const acc = await Accounting.find({ _id: objID })
-    // const accResult = await Accounting.findOneAndUpdate(
-    //     { _id: objID },
-    //     { amount: parseInt(req.body.payAmount) + parseInt(acc[0].amount) },
-    //     { new: true },
-    // )
-    // data = { ...data, relatedTransaction: [fTransResult._id, secTransResult._id], createdBy: createdBy, relatedBranch: req.body.relatedBranch }
-    // console.log(data)
 
     const patientUpdate = await Patient.findOneAndUpdate(
         { _id: relatedPatient },

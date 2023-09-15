@@ -10,6 +10,7 @@ const Attachment = require('../models/attachment');
 const AdvanceRecords = require('../models/advanceRecord');
 const Package = require('../models/treatment');
 const TreatmentSelection = require('../models/treatmentSelection');
+const Debt = require('../models/debt');
 
 exports.listAllPackageSelections = async (req, res) => {
     let { keyword, role, limit, skip } = req.query;
@@ -164,7 +165,7 @@ exports.createPackageSelection = async (req, res, next) => {
 
 
         //first transaction 
-        if (req.body.paymentMethod === 'Cash Down') {
+        if (req.body.paymentMethod === 'Paid') {
             var fTransResult = await Transaction.create({
                 "amount": req.body.psPaidAmount,
                 "date": Date.now(),
@@ -400,33 +401,33 @@ exports.createPackageSelection = async (req, res, next) => {
         //     var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         // }
 
-        if (req.body.paymentMethod === 'FOC') {
-            let dataTVC = {
-                "relatedPackageSelection": result._id,
-                "relatedPackage": req.body.relatedPackage,
-                "relatedAppointment": req.body.relatedAppointment,
-                "relatedPatient": req.body.relatedPatient,
-                "paymentMethod": "FOC", //enum: ['by Appointment','Lapsum','Total','Advanced']
-                "amount": 0,
-                "relatedBank": req.body.relatedBank,
-                "bankType": req.body.bankType,//must be bank acc from accounting accs
-                "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
-                "relatedCash": req.body.relatedCash, //must be cash acc from accounting accs
-                "createdBy": createdBy,
-                "relatedBranch": req.body.relatedBranch,
-                "remark": req.body.remark,
-                "payment": attachID,
-                "relatedDiscount": req.body.relatedDiscount,
-                "relatedDoctor": req.body.relatedDoctor,
-                "tsType": 'PS',
-                "psGrandTotal": req.body.psGrandTotal,
-                "psBalance": req.body.psBalance,
-                "psPaidAmount": req.body.psPaidAmount,
-                "seq":req.body.seq,
-                "code":req.body.code
-            }
-            var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
-        }
+        // if (req.body.paymentMethod === 'FOC') {
+        //     let dataTVC = {
+        //         "relatedPackageSelection": result._id,
+        //         "relatedPackage": req.body.relatedPackage,
+        //         "relatedAppointment": req.body.relatedAppointment,
+        //         "relatedPatient": req.body.relatedPatient,
+        //         "paymentMethod": "FOC", //enum: ['by Appointment','Lapsum','Total','Advanced']
+        //         "amount": 0,
+        //         "relatedBank": req.body.relatedBank,
+        //         "bankType": req.body.bankType,//must be bank acc from accounting accs
+        //         "paymentType": req.body.paymentType, //enum: ['Bank','Cash']
+        //         "relatedCash": req.body.relatedCash, //must be cash acc from accounting accs
+        //         "createdBy": createdBy,
+        //         "relatedBranch": req.body.relatedBranch,
+        //         "remark": req.body.remark,
+        //         "payment": attachID,
+        //         "relatedDiscount": req.body.relatedDiscount,
+        //         "relatedDoctor": req.body.relatedDoctor,
+        //         "tsType": 'PS',
+        //         "psGrandTotal": req.body.psGrandTotal,
+        //         "psBalance": req.body.psBalance,
+        //         "psPaidAmount": req.body.psPaidAmount,
+        //         "seq":req.body.seq,
+        //         "code":req.body.code
+        //     }
+        //     var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
+        // }
         if (tvcCreate === true) {
             //--> treatment voucher create
             let dataTVC = {
@@ -545,6 +546,14 @@ exports.createPackageSelection = async (req, res, next) => {
         if (treatmentVoucherResult) {
             var populatedTV = await TreatmentVoucher.find({ _id: treatmentVoucherResult._id }).populate('relatedDiscount')
         }
+        if (req.body.balance) {
+            const debtCreate = await Debt.create({
+                "balance": req.body.balance,
+                "relatedPatient": data.relatedPatient,
+                "relatedTreatmentVoucher": treatmentVoucherResult._id
+            })
+        }
+
 
         let response = {
             message: 'Treatment Selection create success',
@@ -963,13 +972,13 @@ exports.TopTenFilter = async (req, res) => {
 
 
 // const TreatmentNames = TreatmentResult.reduce((result, { relatedTreatment }) => {
-        //     const { name, treatmentName } = relatedTreatment;
-        //     result[name] = (result[name] || 0) + 1; // Increment count by 1
-        //     return result;
-        // }, []);
-        // const sortedTreatmentNames = Object.entries(TreatmentNames)
-        //     .sort((a, b) => b[1] - a[1])
-        //     .reduce((sortedObj, [name, count]) => {
-        //         sortedObj[name] = count;
-        //         return sortedObj;
-        //     }, {}); //Descending
+//     const { name, treatmentName } = relatedTreatment;
+//     result[name] = (result[name] || 0) + 1; // Increment count by 1
+//     return result;
+// }, []);
+// const sortedTreatmentNames = Object.entries(TreatmentNames)
+//     .sort((a, b) => b[1] - a[1])
+//     .reduce((sortedObj, [name, count]) => {
+//         sortedObj[name] = count;
+//         return sortedObj;
+//     }, {}); //Descending
