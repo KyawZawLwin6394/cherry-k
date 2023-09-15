@@ -15,53 +15,6 @@ exports.combineMedicineSale = async (req, res) => {
     let createdBy = req.credentials.id;
     let objID = ''
 
-    const fTransaction = new Transaction({
-        "amount": req.body.msPaidAmount,
-        "date": Date.now(),
-        "remark": req.body.remark,
-        "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines),
-        "relatedMedicineSale": medicineSaleResult._id,
-        "type": "Credit",
-        "createdBy": createdBy
-    })
-    const fTransResult = await fTransaction.save()
-    var amountUpdate = await Accounting.findOneAndUpdate(
-        { _id: "646739c059a9bc811d97fa8b" },
-        { $inc: { amount: req.body.msPaidAmount } }
-    )
-    //sec transaction
-    const secTransaction = new Transaction(
-        {
-            "amount": req.body.msPaidAmount,
-            "date": Date.now(),
-            "remark": req.body.remark,
-            "relatedBank": req.body.relatedBank,
-            "relatedCash": req.body.relatedCash,
-            "type": "Debit",
-            // "relatedTransaction": fTransResult._id,
-            "createdBy": createdBy
-        }
-    )
-    const secTransResult = await secTransaction.save();
-    var fTransUpdate = await Transaction.findOneAndUpdate(
-        { _id: fTransResult._id },
-        {
-            relatedTransaction: secTransResult._id
-        },
-        { new: true }
-    )
-    if (req.body.relatedBank) {
-        var amountUpdate = await Accounting.findOneAndUpdate(
-            { _id: req.body.relatedBank },
-            { $inc: { amount: req.body.msPaidAmount } }
-        )
-    } else if (req.body.relatedCash) {
-        var amountUpdate = await Accounting.findOneAndUpdate(
-            { _id: req.body.relatedCash },
-            { $inc: { amount: req.body.msPaidAmount } }
-        )
-    }
-
     const patientUpdate = await Patient.findOneAndUpdate(
         { _id: relatedPatient },
         { $inc: { conditionAmount: req.body.msPaidAmount, conditionPurchaseFreq: 1, conditionPackageQty: 1 } },
@@ -211,6 +164,54 @@ exports.combineMedicineSale = async (req, res) => {
             "relatedTreatmentVoucher": medicineSaleResult._id
         })
     }
+    
+    const fTransaction = new Transaction({
+        "amount": req.body.msPaidAmount,
+        "date": Date.now(),
+        "remark": req.body.remark,
+        "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines),
+        "relatedMedicineSale": medicineSaleResult._id,
+        "type": "Credit",
+        "createdBy": createdBy
+    })
+    const fTransResult = await fTransaction.save()
+    var amountUpdate = await Accounting.findOneAndUpdate(
+        { _id: "646739c059a9bc811d97fa8b" },
+        { $inc: { amount: req.body.msPaidAmount } }
+    )
+    //sec transaction
+    const secTransaction = new Transaction(
+        {
+            "amount": req.body.msPaidAmount,
+            "date": Date.now(),
+            "remark": req.body.remark,
+            "relatedBank": req.body.relatedBank,
+            "relatedCash": req.body.relatedCash,
+            "type": "Debit",
+            // "relatedTransaction": fTransResult._id,
+            "createdBy": createdBy
+        }
+    )
+    const secTransResult = await secTransaction.save();
+    var fTransUpdate = await Transaction.findOneAndUpdate(
+        { _id: fTransResult._id },
+        {
+            relatedTransaction: secTransResult._id
+        },
+        { new: true }
+    )
+    if (req.body.relatedBank) {
+        var amountUpdate = await Accounting.findOneAndUpdate(
+            { _id: req.body.relatedBank },
+            { $inc: { amount: req.body.msPaidAmount } }
+        )
+    } else if (req.body.relatedCash) {
+        var amountUpdate = await Accounting.findOneAndUpdate(
+            { _id: req.body.relatedCash },
+            { $inc: { amount: req.body.msPaidAmount } }
+        )
+    }
+
     res.status(200).send({
         message: 'MedicineSale Combination success',
         success: true,
