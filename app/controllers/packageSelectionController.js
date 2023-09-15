@@ -435,7 +435,7 @@ exports.createPackageSelection = async (req, res, next) => {
                 "relatedPackage": req.body.relatedPackage,
                 "relatedAppointment": req.body.relatedAppointment,
                 "relatedPatient": req.body.relatedPatient,
-                "paymentMethod": "Advanced", //enum: ['by Appointment','Lapsum','Total','Advanced']
+                "paymentMethod": req.body.paymentMethod, //enum: ['by Appointment','Lapsum','Total','Advanced']
                 "amount": req.body.psPaidAmount,
                 "relatedBank": req.body.relatedBank,
                 "bankType": req.body.bankType,//must be bank acc from accounting accs
