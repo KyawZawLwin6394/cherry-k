@@ -203,6 +203,22 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             data.relatedCash = relatedCash
             data.relatedBank = relatedBank
             data.bankType = bankType
+
+            //related account for each treatments
+            const getAccountingAcccount = await Treatment.findOne({ _id: i.item_id })
+            if (getAccountingAcccount.relatedAccount) {
+                const sellingPrice = getAccountingAcccount.sellingPrice
+                const transaction = await Transaction.create({
+                    "amount": req.body.msPaidAmount,
+                    "date": Date.now(),
+                    "remark": remark,
+                    relatedAccounting: getAccountingAcccount.relatedAccount,
+                    "type": "Credit",
+                    "createdBy": createdBy
+                })
+                const amtUpdate = await Accounting.findOneAndUpdate({ _id: getAccountingAcccount.relatedAccount }, { $inc: { amount: req.body.msPaidAmount } })
+            }
+
             let result = await TreatmentSelection.create(data)
             TSArray.push(result._id)
         }
@@ -255,20 +271,20 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             })
         }
 
-        // const fTransaction = new Transaction({
-        //     "amount": req.body.totalPaidAmount,
-        //     "date": Date.now(),
-        //     "remark": remark,
-        //     "relatedAccounting": "648095b57d7e4357442aa457", //Sales Medicines
-        //     "type": "Credit",
-        //     "createdBy": createdBy
-        // })
-        // const fTransResult = await fTransaction.save()
-        // var amountUpdate = await Accounting.findOneAndUpdate(
-        //     { _id: "648095b57d7e4357442aa457" },  //Sales Medicines
-        //     { $inc: { amount: req.body.totalPaidAmount } }
-        // )
-        //sec transaction
+        const fTransaction = new Transaction({
+            "amount": req.body.totalAmount,
+            "date": Date.now(),
+            "remark": remark,
+            "relatedAccounting": "6492cbb6dbf11808abf6685d", //Sales Income (Treatment)
+            "type": "Credit",
+            "createdBy": createdBy
+        })
+        const fTransResult = await fTransaction.save()
+        var amountUpdate = await Accounting.findOneAndUpdate(
+            { _id: "6492cbb6dbf11808abf6685d" },  //Sales Income (Treatment)
+            { $inc: { amount: req.body.totalAmount } }
+        )
+
         const secTransaction = new Transaction(
             {
                 "amount": data.msPaidAmount,
@@ -277,18 +293,18 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
                 "relatedBank": relatedBank,
                 "relatedCash": relatedCash,
                 "type": "Debit",
-                // "relatedTransaction": fTransResult._id,
+                "relatedTransaction": fTransResult._id,
                 "createdBy": createdBy
             }
         )
         const secTransResult = await secTransaction.save();
-        // var fTransUpdate = await Transaction.findOneAndUpdate(
-        //     { _id: fTransResult._id },
-        //     {
-        //         relatedTransaction: secTransResult._id
-        //     },
-        //     { new: true }
-        // )
+        var fTransUpdate = await Transaction.findOneAndUpdate(
+            { _id: fTransResult._id },
+            {
+                relatedTransaction: secTransResult._id
+            },
+            { new: true }
+        )
         if (relatedBank) {
             var amountUpdate = await Accounting.findOneAndUpdate(
                 { _id: relatedBank },
