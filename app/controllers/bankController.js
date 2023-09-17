@@ -9,7 +9,7 @@ exports.listAllBanks = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit  
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -38,7 +38,7 @@ exports.listAllBanks = async (req, res) => {
 };
 
 exports.getBank = async (req, res) => {
-  const result = await Bank.find({ _id: req.params.id,isDeleted:false }).populate('relatedAccounting')
+  const result = await Bank.find({ _id: req.params.id, isDeleted: false }).populate('relatedAccounting')
   if (result.length === 0)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -48,29 +48,29 @@ exports.createBank = async (req, res, next) => {
   let newBody = req.body;
   try {
     const bankAccJSON = {
-      code:null,
-      relatedType:req.body.relatedType,
-      relatedHeader:req.body.relatedHeader,
-      subHeader:req.body.subHeading,
-      name:req.body.accountName,
-      relatedTreatment:null,
-      amount:req.body.balance,
-      openingBalance:req.body.balance,
-      generalFlag:null,
-      relatedCurrency:null,
-      carryForWork:null,
+      code: req.body.coaCode,
+      relatedType: req.body.relatedType,
+      relatedHeader: req.body.relatedHeader,
+      subHeader: req.body.subHeading,
+      name: req.body.accountName,
+      relatedTreatment: null,
+      amount: req.body.balance,
+      openingBalance: req.body.balance,
+      generalFlag: null,
+      relatedCurrency: null,
+      carryForWork: null,
     }
     const newBankAcc = new AccountingList(bankAccJSON)
     const bankAccResult = await newBankAcc.save();
 
-    newBody = {...newBody,relatedAccounting:bankAccResult._id }
+    newBody = { ...newBody, relatedAccounting: bankAccResult._id }
     const newBank = new Bank(newBody);
     const result = await newBank.save();
     res.status(200).send({
       message: 'Bank create success',
       success: true,
       data: result,
-      bank:bankAccResult
+      bank: bankAccResult
     });
   } catch (error) {
     // console.log(error )
@@ -80,6 +80,10 @@ exports.createBank = async (req, res, next) => {
 
 exports.updateBank = async (req, res, next) => {
   try {
+    if (req.body.coaCode) {
+      const bankResult = await Bank.findOne({ _id: req.body.id })
+      const updateResult = await AccountingList.findOneAndUpdate({ _id: bankResult.relatedAccounting }, { code: req.body.coaCode }, { new: true })
+    }
     const result = await Bank.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
