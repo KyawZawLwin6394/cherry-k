@@ -246,7 +246,8 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
                 "totalDiscount": totalDiscount,
                 "totalAmount": totalAmount,
                 "totalPaidAmount": totalPaidAmount,
-                "tsType": "TSMulti"
+                "tsType": "TSMulti",
+                "createdAt": req.body.createdAt
             }
             console.log(parsedMulti)
             dataTVC.multiTreatment = parsedMulti
@@ -591,7 +592,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 "relatedAppointment": req.body.relatedAppointment,
                 "relatedPatient": req.body.relatedPatient,
                 "paymentMethod": "pAdvance", //enum: ['by Appointment','Lapsum','Total','Advanced']
-
+                "createdAt": req.body.createdAt,
                 "relatedBank": req.body.relatedBank,
                 "bankType": req.body.bankType,//must be bank acc from accounting accs
                 "paymentType": req.body.paymentType, //enum: ['Bank','Cash']

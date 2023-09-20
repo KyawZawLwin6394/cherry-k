@@ -451,6 +451,7 @@ exports.createPackageSelection = async (req, res, next) => {
                 "tsType": 'PS',
                 "psGrandTotal": req.body.psGrandTotal,
                 "psBalance": req.body.psBalance,
+                "createdAt": req.body.createdAt,
                 "psPaidAmount": req.body.psPaidAmount
             }
             let today = new Date().toISOString()
