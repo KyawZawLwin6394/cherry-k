@@ -38,33 +38,60 @@ let TreatmentSchema = new Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'ProcedureItems'
     },
-    quantity: Number,
-    perUsageQTY: Number
+    quantity: {
+      type: Number
+    },
+    perUsageQTY: {
+      type: Number
+    },
+    unit: {
+      type: String
+    }
   }],
   medicineLists: [{
     item_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'MedicineItems'
     },
-    quantity: Number,
-    perUsageQTY: Number
+    quantity: {
+      type: Number
+    },
+    perUsageQTY: {
+      type: Number
+    },
+    unit: {
+      type: String
+    }
   }],
   procedureAccessory: [{
     item_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'AccessoryItems'
     },
-    quantity: Number,
-    perUsageQTY: Number
+    quantity: {
+      type: Number
+    },
+    perUsageQTY: {
+      type: Number
+    },
+    unit: {
+      type: String
+    }
   }],
   machine: [{
     item_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'FixedAssets'
     },
-    quantity: Number,
-    perUsageQTY: Number,
-    unit: String
+    quantity: {
+      type: Number
+    },
+    perUsageQTY: {
+      type: Number
+    },
+    unit: {
+      type: String
+    }
   }],
   estimateTotalPrice: {
     type: Number,
