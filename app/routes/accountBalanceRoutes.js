@@ -20,6 +20,8 @@ module.exports = (app) => {
     app.route('/api/account-balances/transfer-closing').post(verifyToken, catchError(accountBalance.accountBalanceTransfer))
 
     app.route('/api/account-balances').get(verifyToken, catchError(accountBalance.listAllAccountBalances))
-    app.route('/api/account-balances/closing').get(verifyToken, catchError(accountBalance.getClosing))
+    app.route('/api/account-balances/closing')
+        .get(verifyToken, catchError(accountBalance.getClosing))
+        .post(verifyToken, catchError(accountBalance.getOpeningClosingWithExactDate))
 
 };

@@ -149,6 +149,21 @@ exports.activateAccountBalance = async (req, res, next) => {
     }
 };
 
+exports.getOpeningClosingWithExactDate = async (req, res) => {
+    try {
+        const { type, acc, branch, exact } = req.body;
+        const date = new Date(exact);
+        const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()); // Set start date to the beginning of the day
+        const endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+        let query = { relatedAccounting: acc, type: type, date: { $gte: startDate, $lte: endDate } }
+        if (branch) query.relatedBranch = branch
+        const result = await AccountBalance.find(query).populate('relatedAccounting')
+        return res.status(200).send({ success: true, data: result })
+    } catch (error) {
+        return res.status(500).send({ error: true, message: error.message })
+    }
+}
+
 exports.getOpeningAndClosingWithExactDate = async (req, res) => {
     let { exact, relatedBranch, relatedCash, type, relatedAccounting, relatedBank } = req.query;
     const query = { relatedAccounting: relatedAccounting, type: type };
