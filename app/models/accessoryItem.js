@@ -10,68 +10,68 @@ let AccessoryItem = new Schema({
   code: {
     type: String
   },
-  accessoryItemName:{
-    type:String,
+  accessoryItemName: {
+    type: String,
   },
   name: {
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'ProcedureAccessories'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ProcedureAccessories'
   },
   currentQuantity: {
-    type:Number
+    type: mongoose.Schema.Types.Decimal128
   },
   reOrderQuantity: {
-    type:Number,
+    type: Number,
   },
   purchasePrice: {
-    type:Number
+    type: Number
   },
   sellingPrice: {
-    type:Number
+    type: Number
   },
   description: {
-    type:String,
+    type: String,
   },
   fromUnit: {
-    type:Number,
+    type: Number,
   },
   toUnit: {
-    type:Number
+    type: Number
   },
   totalUnit: {
-    type:Number
+    type: Number
   },
   updatedAt: {
     type: Date
   },
   isDeleted: {
-    type:Boolean,
-    default:false
+    type: Boolean,
+    default: false
   },
-  totalUnit:{
-    type:Number
+  totalUnit: {
+    type: Number
   },
   relatedCategory: {
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'Categories'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Categories'
   },
-  perUnitQuantity:{
-    type:Number
+  perUnitQuantity: {
+    type: Number
   },
   relatedBrand: {
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'Brands'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Brands'
   },
   relatedSubCategory: {
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'SubCategories'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'SubCategories'
   },
   relatedBranch: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Branches'
   },
-  unit:{
-    type:String
+  unit: {
+    type: String
   },
   TCLSellingPrice: {
     type: Number

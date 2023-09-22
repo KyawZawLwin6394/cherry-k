@@ -8,7 +8,7 @@ exports.listAllProcedureAccessorys = async (req, res) => {
   try {
     limit = +limit <= 100 ? +limit : 10; //limit
     skip = +skip || 0;
-    let query = {isDeleted:false},
+    let query = { isDeleted: false },
       regexKeyword;
     role ? (query['role'] = role.toUpperCase()) : '';
     keyword && /\w/.test(keyword)
@@ -37,7 +37,7 @@ exports.listAllProcedureAccessorys = async (req, res) => {
 };
 
 exports.getProcedureAccessory = async (req, res) => {
-  const result = await ProcedureAccessory.find({ _id: req.params.id,isDeleted:false }).populate('relatedCategory relatedBrand relatedSubCategory');
+  const result = await ProcedureAccessory.find({ _id: req.params.id, isDeleted: false }).populate('relatedCategory relatedBrand relatedSubCategory');
   if (!result)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -102,9 +102,17 @@ exports.activateProcedureAccessory = async (req, res, next) => {
 exports.searchProcedureAccessories = async (req, res, next) => {
   try {
     const result = await ProcedureAccessory.find({ $text: { $search: req.body.search } }).populate('relatedCategory relatedBrand relatedSubCategory');
-    if (result.length===0) return res.status(404).send({error:true, message:'No Record Found!'})
+    if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
     return res.status(200).send({ success: true, data: result })
   } catch (err) {
     return res.status(500).send({ error: true, message: err.message })
   }
 }
+
+// exports.issueToClinic = async (req, res) => {
+//   const { procedureItems } = req.body
+//   if (procedureItems.length === 0) return res.status(404).send({ error: true, message: 'Not Found!' })
+//   for (const item of procedureItems) {
+//     item.item_id
+//   }
+// }

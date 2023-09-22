@@ -18,7 +18,7 @@ let procedureItemSchema = new Schema({
     ref: 'ProcedureMedicines'
   },
   currentQuantity: {
-    type: Number
+    type: mongoose.Schema.Types.Decimal128
   },
   reOrderQuantity: {
     type: Number,
