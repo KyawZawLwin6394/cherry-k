@@ -15,6 +15,8 @@ module.exports = (app) => {
         .delete(verifyToken, catchError(accessoryItem.deleteAccessoryItem))
         .post(verifyToken, catchError(accessoryItem.activateAccessoryItem))
 
+    app.route('/api/accessory-items/issue-to-clinic').post(verifyToken, catchError(accessoryItem.issueToClinic))
+
     app.route('/api/accessory-items').get(verifyToken, catchError(accessoryItem.listAllAccessoryItems))
     app.route('/api/accessory-items/:id').get(verifyToken, catchError(accessoryItem.getRelatedAccessoryItem))
     app.route('/api/accessory-items-search').post(verifyToken, catchError(accessoryItem.searchAccessoryItems))

@@ -3,6 +3,8 @@ const AccessoryItem = require('../models/accessoryItem');
 const Branch = require('../models/branch');
 const Stock = require('../models/stock');
 const Log = require('../models/log')
+const AccessoryItemRecord = require('../models/accessoryItemRecord')
+
 exports.listAllAccessoryItems = async (req, res) => {
   let { keyword, role, limit, skip } = req.query;
   let count = 0;
@@ -86,6 +88,74 @@ exports.createAccessoryItem = async (req, res, next) => {
     return res.status(500).send({ "error": true, message: error.message })
   }
 };
+
+exports.issueToClinic = async (req, res) => {
+  try {
+    const { accessoryItems, relatedBranch, reason, date } = req.body;
+    if (accessoryItems.length === 0) return res.status(404).send({ error: true, message: 'Not Found!' })
+    if (relatedBranch === undefined) {
+      for (const e of accessoryItems) {
+        const result = await AccessoryItem.find({ _id: e.item_id })
+        let totalUnit = result[0].totalUnit - e.qty
+        const from = result[0].fromUnit
+        const to = result[0].toUnit
+        const currentQty = (from * totalUnit) / to
+        try {
+          const result = await AccessoryItem.findOneAndUpdate(
+            { _id: e.item_id },
+            { totalUnit: totalUnit, currentQty: currentQty },
+            { new: true },
+          )
+        } catch (error) {
+          return res.status(500).send({ error: true, message: error.message })
+        }
+        const logResult = await Log.create({
+          "relatedAccessoryItems": e.item_id,
+          "currentQty": e.stock,
+          "actualQty": e.actual,
+          "finalQty": totalUnit,
+          "type": "Issue To Clinic",
+          "createdBy": createdBy
+        })
+      }
+    } else if (relatedBranch) {
+      for (const e of accessoryItems) {
+        const result = await Stock.find({ relatedAccessoryItems: e.item_id, relatedBranch: relatedBranch })
+        let totalUnit = result[0].totalUnit - e.qty
+        const from = result[0].fromUnit
+        const to = result[0].toUnit
+        const currentQty = (from * totalUnit) / to
+        try {
+          const result = await AccessoryItem.findOneAndUpdate(
+            { relatedAccessoryItems: e.item_id, relatedBranch: relatedBranch },
+            { totalUnit: totalUnit, currentQty: currentQty },
+            { new: true },
+          )
+        } catch (error) {
+          return res.status(500).send({ error: true, message: error.message })
+        }
+        const logResult = await Log.create({
+          "relatedAccessoryItems": e.item_id,
+          "currentQty": e.stock,
+          "actualQty": e.actual,
+          "finalQty": totalUnit,
+          "type": "Issue To Clinic",
+          "createdBy": createdBy
+        })
+      }
+    }
+    const result = await AccessoryItemRecord.create({
+      accessoryItems: accessoryItems,
+      reason: reason,
+      createdAt: date,
+      relatedBranch: relatedBranch
+
+    })
+    return res.status(200).send({ success: true, data: result })
+  } catch (error) {
+    return res.status(500).send({ error: true, message: error.message })
+  }
+}
 
 exports.updateAccessoryItem = async (req, res, next) => {
   try {
