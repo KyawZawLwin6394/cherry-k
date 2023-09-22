@@ -18,7 +18,7 @@ let MedicineItemSchema = new Schema({
     ref: 'MedicineLists'
   },
   currentQuantity: {
-    type: mongoose.Schema.Types.Decimal128
+    type: Number
   },
   purchasePrice: {
     type: Number

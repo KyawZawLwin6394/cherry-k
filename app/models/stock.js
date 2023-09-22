@@ -35,7 +35,7 @@ let StockSchema = new Schema({
     ref: 'FixedAssets'
   },
   currentQty: {
-    type: mongoose.Schema.Types.Decimal128
+    type: Number
   },
   fromUnit: {
     type: Number
