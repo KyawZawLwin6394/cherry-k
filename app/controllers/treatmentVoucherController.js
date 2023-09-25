@@ -51,7 +51,23 @@ exports.combineMedicineSale = async (req, res) => {
             })
         }
     }
+    if (req.body.secondAmount) {
+        var fTransResult = await Transaction.create({
+            "amount": req.body.secondAmount,
+            "relatedBranch": req.body.relatedBranch,
+            "date": Date.now(),
+            "remark": null,
+            "relatedAccounting": req.body.secondAccount,
+            "type": "Credit",
+            "createdBy": createdBy,
+            "relatedBranch": req.mongoQuery.relatedBranch
+        })
+        const amountUpdates = await Accounting.findOneAndUpdate(
+            { _id: req.body.secondAccount },
+            { $inc: { amount: req.body.secondAmount } }
+        )
 
+    }
     //_________COGS___________
     // const medicineResult = await MedicineItems.find({ _id: { $in: medicineItems.map(item => item.item_id) } })
     // const purchaseTotal = medicineResult.reduce((accumulator, currentValue) => accumulator + currentValue.purchasePrice, 0)
@@ -164,7 +180,7 @@ exports.combineMedicineSale = async (req, res) => {
             "relatedTreatmentVoucher": medicineSaleResult._id
         })
     }
-    
+
     const fTransaction = new Transaction({
         "amount": req.body.msPaidAmount,
         "date": Date.now(),
@@ -257,7 +273,23 @@ exports.createSingleMedicineSale = async (req, res) => {
                 })
             }
         }
+        if (req.body.secondAmount) {
+            var fTransResult = await Transaction.create({
+                "amount": req.body.secondAmount,
+                "relatedBranch": req.body.relatedBranch,
+                "date": Date.now(),
+                "remark": null,
+                "relatedAccounting": req.body.secondAccount,
+                "type": "Credit",
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
+            })
+            const amountUpdates = await Accounting.findOneAndUpdate(
+                { _id: req.body.secondAccount },
+                { $inc: { amount: req.body.secondAmount } }
+            )
 
+        }
         const medicineSaleResult = await TreatmentVoucher.create(data)
         console.log(medicineSaleResult._id)
         //Transaction

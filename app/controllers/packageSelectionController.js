@@ -429,7 +429,25 @@ exports.createPackageSelection = async (req, res, next) => {
         //     var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         // }
         if (req.body.paymentMethod === 'Partial') tvcCreate = true
+        if (req.body.secondAmount) {
+            var fTransResult = await Transaction.create({
+                "amount": req.body.secondAmount,
+                "relatedBranch": req.body.relatedBranch,
+                "date": Date.now(),
+                "remark": null,
+                "relatedAccounting": req.body.secondAccount,
+                "type": "Credit",
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
+            })
+            const amountUpdates = await Accounting.findOneAndUpdate(
+                { _id: req.body.secondAccount },
+                { $inc: { amount: req.body.secondAmount } }
+            )
+
+        }
         if (tvcCreate === true) {
+
             //--> treatment voucher create
             let dataTVC = {
                 "secondAmount": req.body.secondAmount,

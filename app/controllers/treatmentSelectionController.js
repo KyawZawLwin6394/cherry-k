@@ -222,6 +222,57 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             let result = await TreatmentSelection.create(data)
             TSArray.push(result._id)
         }
+        if (req.body.secondAmount) {
+            var fTransResult = await Transaction.create({
+                "amount": req.body.secondAmount,
+                "relatedBranch": req.body.relatedBranch,
+                "date": Date.now(),
+                "remark": null,
+                "relatedAccounting": req.body.secondAccount,
+                "type": "Credit",
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
+            })
+            const amountUpdates = await Accounting.findOneAndUpdate(
+                { _id: req.body.secondAccount },
+                { $inc: { amount: req.body.secondAmount } }
+            )
+
+        }
+        if (req.body.secondAmount) {
+            var fTransResult = await Transaction.create({
+                "amount": req.body.secondAmount,
+                "relatedBranch": req.body.relatedBranch,
+                "date": Date.now(),
+                "remark": null,
+                "relatedAccounting": req.body.secondAccount,
+                "type": "Credit",
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
+            })
+            const amountUpdates = await Accounting.findOneAndUpdate(
+                { _id: req.body.secondAccount },
+                { $inc: { amount: req.body.secondAmount } }
+            )
+
+        }
+        if (req.body.secondAmount) {
+            var fTransResult = await Transaction.create({
+                "amount": req.body.secondAmount,
+                "relatedBranch": req.body.relatedBranch,
+                "date": Date.now(),
+                "remark": null,
+                "relatedAccounting": req.body.secondAccount,
+                "type": "Credit",
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
+            })
+            const amountUpdates = await Accounting.findOneAndUpdate(
+                { _id: req.body.secondAccount },
+                { $inc: { amount: req.body.secondAmount } }
+            )
+
+        }
         if (tvcCreate === true) {
             //--> treatment voucher create
             let dataTVC = {
@@ -637,6 +688,23 @@ exports.createTreatmentSelection = async (req, res, next) => {
                     { new: true }
                 )
             }
+            if (req.body.secondAmount) {
+                var fTransResult = await Transaction.create({
+                    "amount": req.body.secondAmount,
+                    "relatedBranch": req.body.relatedBranch,
+                    "date": Date.now(),
+                    "remark": null,
+                    "relatedAccounting": req.body.secondAccount,
+                    "type": "Credit",
+                    "createdBy": createdBy,
+                    "relatedBranch": req.mongoQuery.relatedBranch
+                })
+                const amountUpdates = await Accounting.findOneAndUpdate(
+                    { _id: req.body.secondAccount },
+                    { $inc: { amount: req.body.secondAmount } }
+                )
+    
+            }
             let dataTVC = {
                 "secondAmount": req.body.secondAmount,
                 "secondAccount": req.body.secondAccount,
@@ -670,6 +738,23 @@ exports.createTreatmentSelection = async (req, res, next) => {
             }
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
         }
+        if (req.body.secondAmount) {
+            var fTransResult = await Transaction.create({
+                "amount": req.body.secondAmount,
+                "relatedBranch": req.body.relatedBranch,
+                "date": Date.now(),
+                "remark": null,
+                "relatedAccounting": req.body.secondAccount,
+                "type": "Credit",
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
+            })
+            const amountUpdates = await Accounting.findOneAndUpdate(
+                { _id: req.body.secondAccount },
+                { $inc: { amount: req.body.secondAmount } }
+            )
+
+        }
 
         if (req.body.paymentMethod === 'FOC') {
             let dataTVC = {
@@ -701,6 +786,23 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 dataTVC = { ...dataTVC, code: "TVC-" + today.split('T')[0].replace(/-/g, '') + "-" + increment, seq: increment }
             }
             var treatmentVoucherResult = await TreatmentVoucher.create(dataTVC)
+        }
+        if (req.body.secondAmount) {
+            var fTransResult = await Transaction.create({
+                "amount": req.body.secondAmount,
+                "relatedBranch": req.body.relatedBranch,
+                "date": Date.now(),
+                "remark": null,
+                "relatedAccounting": req.body.secondAccount,
+                "type": "Credit",
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
+            })
+            const amountUpdates = await Accounting.findOneAndUpdate(
+                { _id: req.body.secondAccount },
+                { $inc: { amount: req.body.secondAmount } }
+            )
+
         }
         if (tvcCreate === true) {
             //--> treatment voucher create
@@ -892,6 +994,23 @@ exports.treatmentPayment = async (req, res, next) => {
                 const attachResult = await Attachment.create(attachData);
                 var attachID = attachResult._id.toString()
             }
+        }
+        if (req.body.secondAmount) {
+            var fTransResult = await Transaction.create({
+                "amount": req.body.secondAmount,
+                "relatedBranch": req.body.relatedBranch,
+                "date": Date.now(),
+                "remark": null,
+                "relatedAccounting": req.body.secondAccount,
+                "type": "Credit",
+                "createdBy": createdBy,
+                "relatedBranch": req.mongoQuery.relatedBranch
+            })
+            const amountUpdates = await Accounting.findOneAndUpdate(
+                { _id: req.body.secondAccount },
+                { $inc: { amount: req.body.secondAmount } }
+            )
+
         }
         if (result.paymentMethod === 'Credit') { //
             let dataTVC = {
