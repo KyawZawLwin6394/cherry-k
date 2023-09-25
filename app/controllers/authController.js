@@ -3,6 +3,22 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const CONFIG = require('../../config/db');
+exports.verifyToken = (req, res) => {
+  const authorization = req.headers['authorization'];
+  if (!authorization) {
+    return res.status(401).send({ auth: false, message: 'No token provided.' });
+  }
+  const token = req.headers['authorization'].replace('Bearer ', '');
+
+  jwt.verify(token, CONFIG.jwtSecret, function (err, decoded) {
+    if (err) {
+      return res
+        .status(500)
+        .send({ auth: false, message: 'Failed to authenticate token.' });
+    }
+  });
+  return res.status(200).send({ success: true, isVerified: true })
+}
 
 exports.login = (req, res) => {
   try {
