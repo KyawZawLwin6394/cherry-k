@@ -165,15 +165,14 @@ exports.getOpeningClosingWithExactDate = async (req, res) => {
 }
 
 exports.getOpeningAndClosingWithExactDate = async (req, res) => {
-    let { exact, relatedBranch, relatedCash, type, relatedAccounting, relatedBank } = req.query;
-    const query = { relatedAccounting: relatedAccounting, type: type };
-    const sort = { _id: -1 }; // Sort by descending _id to get the latest document
+    let { exact, relatedBranch, type, relatedAccounting } = req.query;
+    const query = { relatedAccounting: relatedAccounting, type: type, date: { $gte: startDate, $lte: endDate } };
     try {
         const date = new Date(exact);
         const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()); // Set start date to the beginning of the day
         const endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1); // Set end date to the beginning of the next day
 
-        const latestDocument = await AccountBalance.findOne(query, null, { sort });
+        const latestDocument = await AccountBalance.findOne(query);
         console.log(latestDocument)
         let openingTotal = latestDocument ? latestDocument.amount : 0
         console.log(startDate, endDate)
