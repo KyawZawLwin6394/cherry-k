@@ -225,6 +225,9 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
         if (tvcCreate === true) {
             //--> treatment voucher create
             let dataTVC = {
+                "secondAmount": req.body.secondAmount,
+                "secondAccount": req.body.secondAccount,
+                "isDouble": req.body.isDouble,
                 "relatedTreatmentSelection": TSArray,
                 "deposit": req.body.deposit,
                 "relatedBranch": req.body.relatedBranch,
@@ -380,6 +383,54 @@ exports.createTreatmentSelection = async (req, res, next) => {
         data = { ...data, relatedAppointments: relatedAppointments, remainingAppointments: relatedAppointments, createdBy: createdBy, relatedBranch: req.mongoQuery.relatedBranch, tsType: 'TS' }
         console.log(data, 'data1') //adding TS
 
+        // if (req.body.secondAccount) {
+        //     const fTransaction = new Transaction({
+        //         "amount": req.body.msPaidAmount,
+        //         "date": Date.now(),
+        //         "remark": req.body.remark,
+        //         "relatedAccounting": "646739c059a9bc811d97fa8b", //Sales (Medicines),
+        //         "relatedMedicineSale": medicineSaleResult._id,
+        //         "type": "Credit",
+        //         "createdBy": createdBy
+        //     })
+        //     const fTransResult = await fTransaction.save()
+        //     var amountUpdate = await Accounting.findOneAndUpdate(
+        //         { _id: "646739c059a9bc811d97fa8b" },
+        //         { $inc: { amount: req.body.msPaidAmount } }
+        //     )
+        //     //sec transaction
+        //     const secTransaction = new Transaction(
+        //         {
+        //             "amount": req.body.msPaidAmount,
+        //             "date": Date.now(),
+        //             "remark": req.body.remark,
+        //             "relatedBank": req.body.relatedBank,
+        //             "relatedCash": req.body.relatedCash,
+        //             "type": "Debit",
+        //             // "relatedTransaction": fTransResult._id,
+        //             "createdBy": createdBy
+        //         }
+        //     )
+        //     const secTransResult = await secTransaction.save();
+        //     var fTransUpdate = await Transaction.findOneAndUpdate(
+        //         { _id: fTransResult._id },
+        //         {
+        //             relatedTransaction: secTransResult._id
+        //         },
+        //         { new: true }
+        //     )
+        //     if (req.body.relatedBank) {
+        //         var amountUpdate = await Accounting.findOneAndUpdate(
+        //             { _id: req.body.relatedBank },
+        //             { $inc: { amount: req.body.msPaidAmount } }
+        //         )
+        //     } else if (req.body.relatedCash) {
+        //         var amountUpdate = await Accounting.findOneAndUpdate(
+        //             { _id: req.body.relatedCash },
+        //             { $inc: { amount: req.body.msPaidAmount } }
+        //         )
+        //     }
+        // }
 
         //first transaction 
         if (req.body.paymentMethod === 'Cash Down') {
@@ -587,6 +638,9 @@ exports.createTreatmentSelection = async (req, res, next) => {
                 )
             }
             let dataTVC = {
+                "secondAmount": req.body.secondAmount,
+                "secondAccount": req.body.secondAccount,
+                "isDouble": req.body.isDouble,
                 "relatedTreatmentSelection": result._id,
                 "relatedTreatment": req.body.relatedTreatment,
                 "relatedAppointment": req.body.relatedAppointment,
@@ -619,6 +673,9 @@ exports.createTreatmentSelection = async (req, res, next) => {
 
         if (req.body.paymentMethod === 'FOC') {
             let dataTVC = {
+                "secondAmount": req.body.secondAmount,
+                "secondAccount": req.body.secondAccount,
+                "isDouble": req.body.isDouble,
                 "relatedTreatmentSelection": result._id,
                 "relatedTreatment": req.body.relatedTreatment,
                 "relatedAppointment": req.body.relatedAppointment,
@@ -648,6 +705,9 @@ exports.createTreatmentSelection = async (req, res, next) => {
         if (tvcCreate === true) {
             //--> treatment voucher create
             let dataTVC = {
+                "secondAmount": req.body.secondAmount,
+                "secondAccount": req.body.secondAccount,
+                "isDouble": req.body.isDouble,
                 "relatedTreatmentSelection": result._id,
                 "relatedTreatment": req.body.relatedTreatment,
                 "relatedAppointment": req.body.relatedAppointment,
@@ -835,6 +895,9 @@ exports.treatmentPayment = async (req, res, next) => {
         }
         if (result.paymentMethod === 'Credit') { //
             let dataTVC = {
+                "secondAmount": req.body.secondAmount,
+                "secondAccount": req.body.secondAccount,
+                "isDouble": req.body.isDouble,
                 "relatedTreatmentSelection": result._id,
                 "relatedTreatment": req.body.relatedTreatment,
                 "relatedAppointment": req.body.relatedAppointment,

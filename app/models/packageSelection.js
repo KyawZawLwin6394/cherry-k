@@ -16,6 +16,17 @@ let PackageSelectionSchema = new Schema({
   paidAmount: {
     type: Number,
   },
+  secondAccount: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AccountingLists'
+  },
+  secondAmount: {
+    type: Number,
+    default: 0
+  },
+  isDouble: {
+    type: Boolean
+  },
   leftOverAmount: {
     type: Number,
   },

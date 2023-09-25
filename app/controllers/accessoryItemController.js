@@ -111,8 +111,8 @@ exports.issueToClinic = async (req, res) => {
         }
         const logResult = await Log.create({
           "relatedAccessoryItems": e.item_id,
-          "currentQty": e.stock,
-          "actualQty": e.actual,
+          "currentQty": e.qty,
+          "actualQty": e.qty + totalUnit,
           "finalQty": totalUnit,
           "type": "Issue To Clinic",
           "createdBy": createdBy

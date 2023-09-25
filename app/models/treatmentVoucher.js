@@ -19,6 +19,17 @@ let TreatmentVoucherSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Treatments'
     },
+    secondAccount: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AccountingLists'
+    },
+    secondAmount: {
+        type: Number,
+        default: 0
+    },
+    isDouble: {
+        type: Boolean
+    },
     relatedAppointment: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Appointments'
@@ -29,7 +40,7 @@ let TreatmentVoucherSchema = new Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['Paid', 'Partial','FOC']
+        enum: ['Paid', 'Partial', 'FOC']
     },
     code: {
         type: String

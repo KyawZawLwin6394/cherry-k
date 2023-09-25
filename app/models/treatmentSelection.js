@@ -42,6 +42,17 @@ let TreatmentSelectionSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'AccountingLists'
   },
+  secondAccount: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AccountingLists'
+  },
+  secondAmount: {
+    type: Number,
+    default: 0
+  },
+  isDouble: {
+    type: Boolean
+  },
   bankType: {
     type: String,
     enum: ['Normal', 'POS', 'Pay']

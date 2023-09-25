@@ -432,6 +432,9 @@ exports.createPackageSelection = async (req, res, next) => {
         if (tvcCreate === true) {
             //--> treatment voucher create
             let dataTVC = {
+                "secondAmount": req.body.secondAmount,
+                "secondAccount": req.body.secondAccount,
+                "isDouble": req.body.isDouble,
                 "relatedPackageSelection": result._id,
                 "relatedPackage": req.body.relatedPackage,
                 "relatedAppointment": req.body.relatedAppointment,
