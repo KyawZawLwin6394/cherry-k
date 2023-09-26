@@ -585,14 +585,16 @@ exports.deleteTreatmentVoucher = async (req, res, next) => {
             { $set: { isDeleted: true } } // Update
         );
         for (const item of transactionArr) {
-            if (item.relatedBank) {
-                const updateBank = accountingList.findOneAndUpdate({ _id: item.relatedBank }, { $inc: { amount: -item.amount } }, { new: true })
+            const getItem = await TreatmentVoucher.findOne({ _id: item })
+            if (!getItem) return res.status(200).send({ success: true, message: 'Not Found!' })
+            if (getItem.relatedBank) {
+                const updateBank = accountingList.findOneAndUpdate({ _id: getItem.relatedBank }, { $inc: { amount: -getItem.amount } }, { new: true })
             }
-            if (item.relatedCash) {
-                const updateCash = accountingList.findOneAndUpdate({ _id: item.relatedCash }, { $inc: { amount: -item.amount } }, { new: true })
+            if (getItem.relatedCash) {
+                const updateCash = accountingList.findOneAndUpdate({ _id: getItem.relatedCash }, { $inc: { amount: -getItem.amount } }, { new: true })
             }
-            if (item.relatedAccounting) {
-                const updateCash = accountingList.findOneAndUpdate({ _id: item.relatedAccounting }, { $inc: { amount: -item.amount } }, { new: true })
+            if (getItem.relatedAccounting) {
+                const updateCash = accountingList.findOneAndUpdate({ _id: getItem.relatedAccounting }, { $inc: { amount: -getItem.amount } }, { new: true })
             }
         }
         return res.status(200).send({ success: true, data: { isDeleted: result.isDeleted } });
