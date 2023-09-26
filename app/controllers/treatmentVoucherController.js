@@ -8,6 +8,7 @@ const Stock = require('../models/stock');
 const Log = require('../models/log');
 const Debt = require('../models/debt');
 const treatmentVoucher = require('../models/treatmentVoucher');
+const accountingList = require('../models/accountingList');
 
 exports.combineMedicineSale = async (req, res) => {
     let data = req.body;
@@ -583,6 +584,17 @@ exports.deleteTreatmentVoucher = async (req, res, next) => {
             { _id: { $in: transactionArr }, isDeleted: false }, // Filter
             { $set: { isDeleted: true } } // Update
         );
+        for (const item of transactionArr) {
+            if (item.relatedBank) {
+                const updateBank = accountingList.findOneAndUpdate({ _id: item.relatedBank }, { $inc: { amount: -item.amount } }, { new: true })
+            }
+            if (item.relatedCash) {
+                const updateCash = accountingList.findOneAndUpdate({ _id: item.relatedCash }, { $inc: { amount: -item.amount } }, { new: true })
+            }
+            if (item.relatedAccounting) {
+                const updateCash = accountingList.findOneAndUpdate({ _id: item.relatedAccounting }, { $inc: { amount: -item.amount } }, { new: true })
+            }
+        }
         return res.status(200).send({ success: true, data: { isDeleted: result.isDeleted } });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
