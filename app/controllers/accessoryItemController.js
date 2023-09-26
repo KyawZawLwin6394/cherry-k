@@ -101,6 +101,7 @@ exports.issueToClinic = async (req, res) => {
         const from = result[0].fromUnit
         const to = result[0].toUnit
         const currentQty = (from * totalUnit) / to
+        console.log(totalUnit, currentQty, 'here')
         try {
           const result = await AccessoryItem.findOneAndUpdate(
             { _id: e.item_id },
@@ -120,21 +121,19 @@ exports.issueToClinic = async (req, res) => {
         })
       }
     } else if (relatedBranch) {
+
       for (const e of accessoryItems) {
         const result = await Stock.find({ relatedAccessoryItems: e.item_id, relatedBranch: relatedBranch })
         let totalUnit = result[0].totalUnit - e.qty
         const from = result[0].fromUnit
         const to = result[0].toUnit
         const currentQty = (from * totalUnit) / to
-        try {
-          const result = await AccessoryItem.findOneAndUpdate(
-            { relatedAccessoryItems: e.item_id, relatedBranch: relatedBranch },
-            { totalUnit: totalUnit, currentQty: currentQty },
-            { new: true },
-          )
-        } catch (error) {
-          return res.status(500).send({ error: true, message: error.message })
-        }
+        console.log(totalUnit, currentQty, 'here')
+        const result2 = await Stock.findOneAndUpdate(
+          { relatedAccessoryItems: e.item_id, relatedBranch: relatedBranch },
+          { totalUnit: totalUnit, currentQty: currentQty },
+          { new: true },
+        )
         const logResult = await Log.create({
           "relatedAccessoryItems": e.item_id,
           "currentQty": e.stock,
@@ -187,7 +186,12 @@ exports.deleteAccessoryItem = async (req, res, next) => {
       { isDeleted: true },
       { new: true },
     );
-    return res.status(200).send({ success: true, data: { isDeleted: result.isDeleted } });
+    const deleteStocks = await Stock.findOneAndUpdate(
+      { relatedAccessoryItems: req.params.id },
+      { isDeleted: true },
+      { new: true }
+    )
+    return res.status(200).send({ success: true, data: { isDeleted: result.isDeleted }, message: 'Stocks are deleted' });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
 
