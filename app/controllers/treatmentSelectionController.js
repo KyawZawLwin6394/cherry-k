@@ -318,12 +318,57 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             var populatedTV = await TreatmentVoucher.find({ _id: treatmentVoucherResult._id }).populate('relatedDiscount multiTreatment.item_id')
         }
         var updatePatient = await Patient.findOneAndUpdate({ _id: relatedPatient }, { $addToSet: { relatedTreatmentSelection: TSArray }, $inc: { conditionAmount: req.body.totalAmount, conditionPurchaseFreq: 1, conditionPackageQty: 1 } })
-        if (req.body.balance) {
+        if (req.body.balance > 0) {
             const debtCreate = await Debt.create({
                 "balance": req.body.balance,
                 "relatedPatient": data.relatedPatient,
                 "relatedTreatmentVoucher": treatmentVoucherResult._id
             })
+            const fTransaction = new Transaction({
+                "amount": req.body.balance,
+                "date": Date.now(),
+                "remark": remark,
+                "relatedAccounting": "6505692e8a572e8de464c0ea", //Account Receivable from Customer
+                "type": "Debit",
+                "createdBy": createdBy
+            })
+            const fTransResult = await fTransaction.save()
+            var amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: "6505692e8a572e8de464c0ea" },  //Account Receivable from Customer
+                { $inc: { amount: req.body.balance } }
+            )
+
+            const secTransaction = new Transaction(
+                {
+                    "amount": data.totalPaidAmount,
+                    "date": Date.now(),
+                    "remark": remark,
+                    "relatedBank": relatedBank,
+                    "relatedCash": relatedCash,
+                    "type": "Debit",
+                    "relatedTransaction": fTransResult._id,
+                    "createdBy": createdBy
+                }
+            )
+            const secTransResult = await secTransaction.save();
+            var fTransUpdate = await Transaction.findOneAndUpdate(
+                { _id: fTransResult._id },
+                {
+                    relatedTransaction: secTransResult._id
+                },
+                { new: true }
+            )
+            if (relatedBank) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: relatedBank },
+                    { $inc: { amount: req.body.totalPaidAmount } }
+                )
+            } else if (relatedCash) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: relatedCash },
+                    { $inc: { amount: req.body.totalPaidAmount } }
+                )
+            }
         }
 
         const fTransaction = new Transaction({
@@ -703,7 +748,7 @@ exports.createTreatmentSelection = async (req, res, next) => {
                     { _id: req.body.secondAccount },
                     { $inc: { amount: req.body.secondAmount } }
                 )
-    
+
             }
             let dataTVC = {
                 "secondAmount": req.body.secondAmount,
@@ -925,12 +970,57 @@ exports.createTreatmentSelection = async (req, res, next) => {
             var populatedTV = await TreatmentVoucher.find({ _id: treatmentVoucherResult._id }).populate('relatedDiscount')
         }
 
-        if (req.body.balance) {
+        if (req.body.balance > 0) {
             const debtCreate = await Debt.create({
                 "balance": req.body.balance,
                 "relatedPatient": data.relatedPatient,
                 "relatedTreatmentVoucher": treatmentVoucherResult._id
             })
+            const fTransaction = new Transaction({
+                "amount": req.body.balance,
+                "date": Date.now(),
+                "remark": remark,
+                "relatedAccounting": "6505692e8a572e8de464c0ea", //Account Receivable from Customer
+                "type": "Debit",
+                "createdBy": createdBy
+            })
+            const fTransResult = await fTransaction.save()
+            var amountUpdate = await Accounting.findOneAndUpdate(
+                { _id: "6505692e8a572e8de464c0ea" },  //Account Receivable from Customer
+                { $inc: { amount: req.body.balance } }
+            )
+
+            const secTransaction = new Transaction(
+                {
+                    "amount": data.totalPaidAmount,
+                    "date": Date.now(),
+                    "remark": remark,
+                    "relatedBank": relatedBank,
+                    "relatedCash": relatedCash,
+                    "type": "Debit",
+                    "relatedTransaction": fTransResult._id,
+                    "createdBy": createdBy
+                }
+            )
+            const secTransResult = await secTransaction.save();
+            var fTransUpdate = await Transaction.findOneAndUpdate(
+                { _id: fTransResult._id },
+                {
+                    relatedTransaction: secTransResult._id
+                },
+                { new: true }
+            )
+            if (relatedBank) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: relatedBank },
+                    { $inc: { amount: req.body.totalPaidAmount } }
+                )
+            } else if (relatedCash) {
+                var amountUpdate = await Accounting.findOneAndUpdate(
+                    { _id: relatedCash },
+                    { $inc: { amount: req.body.totalPaidAmount } }
+                )
+            }
         }
 
         let response = {
