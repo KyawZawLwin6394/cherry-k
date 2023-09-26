@@ -15,7 +15,7 @@ exports.listAllAccessoryItemRecordes = async (req, res) => {
       ? (regexKeyword = new RegExp(keyword, 'i'))
       : '';
     regexKeyword ? (query['name'] = regexKeyword) : '';
-    let result = await AccessoryItemRecord.find(query)
+    let result = await AccessoryItemRecord.find(query).populate('accessoryItems.item_id relatedBranch')
     count = await AccessoryItemRecord.find(query).count();
     const division = count / limit;
     page = Math.ceil(division);
@@ -37,7 +37,7 @@ exports.listAllAccessoryItemRecordes = async (req, res) => {
 };
 
 exports.getAccessoryItemRecord = async (req, res) => {
-  const result = await AccessoryItemRecord.find({ _id: req.params.id,isDeleted:false }).populate('procedureMedicine.item_id medicineLists.item_id procedureAccessory.item_id relatedAccessoryItemRecord')
+  const result = await AccessoryItemRecord.find({ _id: req.params.id,isDeleted:false }).populate('accessoryItems.item_id relatedBranch')
   if (result.length === 0)
     return res.status(500).json({ error: true, message: 'No Record Found' });
   return res.status(200).send({ success: true, data: result });
@@ -65,7 +65,7 @@ exports.updateAccessoryItemRecord = async (req, res, next) => {
       { _id: req.body.id },
       req.body,
       { new: true },
-    ).populate('procedureMedicine.item_id medicineLists.item_id procedureAccessory.item_id relatedAccessoryItemRecord')
+    ).populate('accessoryItems.item_id relatedBranch')
     return res.status(200).send({ success: true, data: result });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
