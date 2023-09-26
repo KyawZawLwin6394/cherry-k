@@ -69,6 +69,14 @@ exports.updateDebt = async (req, res, next) => {
             })
             const update = await AccountingList.findOneAndUpdate({ _id: relatedCash }, { amount: paidAmount }, { new: true })
         }
+        const fDebt = await Transaction.create({
+            "amount": req.body.paidAmount,
+            "relatedAccounting": "6505692e8a572e8de464c0ea", //Account Receivable from Customer
+            "type": "Credit",
+            "relatedBranch": relatedBranch,
+            "date": date
+        })
+        const updateDebt = await AccountingList.findOneAndUpdate({ _id: "6505692e8a572e8de464c0ea" }, { $inc: { amount: -paidAmount } }, { new: true })
         const result = await Debt.findOneAndUpdate(
             { _id: req.body.id },
             req.body,
