@@ -622,7 +622,6 @@ exports.createPackageSelection = async (req, res, next) => {
             }
         }
 
-
         let response = {
             message: 'Treatment Selection create success',
             success: true,
