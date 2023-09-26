@@ -7,7 +7,6 @@ const Patient = require('../models/patient');
 const Stock = require('../models/stock');
 const Log = require('../models/log');
 const Debt = require('../models/debt');
-const Transaction = require('../models/transaction');
 const treatmentVoucher = require('../models/treatmentVoucher');
 
 exports.combineMedicineSale = async (req, res) => {
@@ -182,7 +181,7 @@ exports.combineMedicineSale = async (req, res) => {
         })
     }
 
-    const fTransaction = new Transaction({
+    const fAmtTransaction = new Transaction({
         "amount": req.body.msPaidAmount,
         "date": Date.now(),
         "remark": req.body.remark,
@@ -191,13 +190,13 @@ exports.combineMedicineSale = async (req, res) => {
         "type": "Credit",
         "createdBy": createdBy
     })
-    const fTransResult = await fTransaction.save()
+    const fsecAmtTransResult = await fTransaction.save()
     var amountUpdate = await Accounting.findOneAndUpdate(
         { _id: "646739c059a9bc811d97fa8b" },
         { $inc: { amount: req.body.msPaidAmount } }
     )
     //sec transaction
-    const secTransaction = new Transaction(
+    const secAmtTransaction = new Transaction(
         {
             "amount": req.body.msPaidAmount,
             "date": Date.now(),
@@ -209,7 +208,7 @@ exports.combineMedicineSale = async (req, res) => {
             "createdBy": createdBy
         }
     )
-    const secTransResult = await secTransaction.save();
+    const secAmtTransResult = await secAmtTransaction.save();
     var fTransUpdate = await Transaction.findOneAndUpdate(
         { _id: fTransResult._id },
         {
@@ -275,7 +274,7 @@ exports.createSingleMedicineSale = async (req, res) => {
             }
         }
         if (req.body.secondAmount) {
-            var fTransResult = await Transaction.create({
+            var fAmtTransResult = await Transaction.create({
                 "amount": req.body.secondAmount,
                 "relatedBranch": req.body.relatedBranch,
                 "date": Date.now(),

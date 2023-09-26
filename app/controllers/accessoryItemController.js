@@ -92,6 +92,7 @@ exports.createAccessoryItem = async (req, res, next) => {
 exports.issueToClinic = async (req, res) => {
   try {
     const { accessoryItems, relatedBranch, reason, date } = req.body;
+    const createdBy = req.credentials.id
     if (accessoryItems.length === 0) return res.status(404).send({ error: true, message: 'Not Found!' })
     if (relatedBranch === undefined) {
       for (const e of accessoryItems) {

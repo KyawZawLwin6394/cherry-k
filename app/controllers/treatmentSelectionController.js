@@ -223,41 +223,7 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
             TSArray.push(result._id)
         }
         if (req.body.secondAmount) {
-            var fTransResult = await Transaction.create({
-                "amount": req.body.secondAmount,
-                "relatedBranch": req.body.relatedBranch,
-                "date": Date.now(),
-                "remark": null,
-                "relatedAccounting": req.body.secondAccount,
-                "type": "Credit",
-                "createdBy": createdBy,
-                "relatedBranch": req.mongoQuery.relatedBranch
-            })
-            const amountUpdates = await Accounting.findOneAndUpdate(
-                { _id: req.body.secondAccount },
-                { $inc: { amount: req.body.secondAmount } }
-            )
-
-        }
-        if (req.body.secondAmount) {
-            var fTransResult = await Transaction.create({
-                "amount": req.body.secondAmount,
-                "relatedBranch": req.body.relatedBranch,
-                "date": Date.now(),
-                "remark": null,
-                "relatedAccounting": req.body.secondAccount,
-                "type": "Credit",
-                "createdBy": createdBy,
-                "relatedBranch": req.mongoQuery.relatedBranch
-            })
-            const amountUpdates = await Accounting.findOneAndUpdate(
-                { _id: req.body.secondAccount },
-                { $inc: { amount: req.body.secondAmount } }
-            )
-
-        }
-        if (req.body.secondAmount) {
-            var fTransResult = await Transaction.create({
+            var fsecAmtTransResult = await Transaction.create({
                 "amount": req.body.secondAmount,
                 "relatedBranch": req.body.relatedBranch,
                 "date": Date.now(),
