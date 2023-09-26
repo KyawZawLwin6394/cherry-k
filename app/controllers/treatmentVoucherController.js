@@ -7,6 +7,7 @@ const Patient = require('../models/patient');
 const Stock = require('../models/stock');
 const Log = require('../models/log');
 const Debt = require('../models/debt');
+const Transaction = require('../models/transaction');
 const treatmentVoucher = require('../models/treatmentVoucher');
 
 exports.combineMedicineSale = async (req, res) => {
@@ -577,6 +578,11 @@ exports.deleteTreatmentVoucher = async (req, res, next) => {
             { _id: req.params.id },
             { isDeleted: true },
             { new: true },
+        );
+        const transactionArr = result.relatedTransaction
+        const deletedTransactions = await Transaction.updateMany(
+            { _id: { $in: transactionArr }, isDeleted: false }, // Filter
+            { $set: { isDeleted: true } } // Update
         );
         return res.status(200).send({ success: true, data: { isDeleted: result.isDeleted } });
     } catch (error) {
