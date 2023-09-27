@@ -1389,11 +1389,13 @@ exports.searchTreatmentSelections = async (req, res, next) => {
 exports.TopTenFilter = async (req, res) => {
     try {
         let query = req.mongoQuery;
-        let { start, end } = req.query;
+        let { start, end, purchaseType } = req.query;
         if (start, end) query.createdAt = { $gte: start, $lte: end };
+        if (purchaseType) query.purchaseType = purchaseType;
 
         const TreatmentResult = await TreatmentSelection.find(query)
             .populate('relatedTreatment')
+            .populate('multiTreatment.item_id')
             .populate({
                 path: 'relatedTreatment',
                 populate: {
@@ -1402,18 +1404,32 @@ exports.TopTenFilter = async (req, res) => {
                 }
             });
 
-        const treatmentNameMap = TreatmentResult.reduce((result, { relatedTreatment }) => {
-            const { name, treatmentName } = relatedTreatment;
-            const treatmentUnit = name;
-            const treatment = treatmentName.name;
+        const treatmentNameMap = TreatmentResult.reduce((result, { relatedTreatment, multiTreatment, purchaseType }) => {
+            if (relatedTreatment) {
+                const { name, treatmentName, sellingPrice } = relatedTreatment;
+                const treatmentUnit = name;
+                const treatment = treatmentName.name;
 
-            if (result.hasOwnProperty(treatmentUnit)) {
-                result[treatmentUnit].qty++;
-            } else {
-                result[treatmentUnit] = { treatmentUnit, treatment, qty: 1 };
+                if (result.hasOwnProperty(treatmentUnit)) {
+                    result[treatmentUnit].qty++;
+                } else {
+                    result[treatmentUnit] = { treatmentUnit, treatment, qty: 1, purchaseType: purchaseType, sellingPrice: sellingPrice };
+                }
+            } else if (multiTreatment) {
+                for (const item of multiTreatment) {
+                    const { name, treatmentName, sellingPrice } = item;
+                    const treatmentUnit = name;
+                    const treatment = treatmentName.name;
+
+                    if (result.hasOwnProperty(treatmentUnit)) {
+                        result[treatmentUnit].qty++;
+                    } else {
+                        result[treatmentUnit] = { treatmentUnit, treatment, qty: 1, purchaseType: purchaseType, sellingPrice: sellingPrice };
+                    }
+                }
             }
 
-            return result;
+            return result; // Moved the return statement outside the if/else block
         }, {});
 
         const reducedTreatmentNames = Object.values(treatmentNameMap);
