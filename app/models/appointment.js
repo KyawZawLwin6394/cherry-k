@@ -91,6 +91,10 @@ let AppointmentSchema = new Schema({
   relatedTreatment: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Treatments'
+  },
+  isGeneral: {
+    type: Boolean,
+    default: false
   }
 });
 

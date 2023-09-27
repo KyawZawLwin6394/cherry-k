@@ -121,6 +121,7 @@ exports.getAppointment = async (req, res) => {
 
 exports.createAppointment = async (req, res, next) => {
   let data = req.body
+  data = { ...data, isGeneral: true } // general filter
   try {
     if (req.body.pstatus == 'New') {
       const latestDocument = await Patient.find({}, { seq: 1 }).sort({ _id: -1 }).limit(1).exec();
@@ -154,7 +155,7 @@ exports.createAppointment = async (req, res, next) => {
 exports.updateAppointment = async (req, res, next) => {
   try {
     let { relatedPatient } = req.body;
-    console.log(req.body,'here')
+    console.log(req.body, 'here')
     const result = await Appointment.findOneAndUpdate(
       { _id: req.body.id },
       req.body,
@@ -202,7 +203,8 @@ exports.activateAppointment = async (req, res, next) => {
 exports.filterAppointments = async (req, res, next) => {
   try {
     let query = req.mongoQuery
-    const { start, end, token, phone } = req.query
+    const { start, end, token, phone, isGeneral } = req.query
+    if (isGeneral) query.isGeneral = isGeneral
     if (start && end) query.originalDate = { $gte: start, $lte: end }
     if (token) query.token = token
     if (phone) query.phone = phone
