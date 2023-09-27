@@ -171,7 +171,12 @@ exports.deleteProcedureHistory = async (req, res, next) => {
       { isDeleted: true },
       { new: true },
     );
-    return res.status(200).send({ success: true, data: { isDeleted: result.isDeleted } });
+    const deleteStocks = await Stock.findOneAndUpdate(
+      { relatedProcedureItems: req.params.id },
+      { isDeleted: true },
+      { new: true }
+    )
+    return res.status(200).send({ success: true, data: { isDeleted: result.isDeleted }, message: 'Stocks are deleted' });
   } catch (error) {
     return res.status(500).send({ "error": true, "message": error.message })
 
