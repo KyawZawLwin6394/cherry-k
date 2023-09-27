@@ -1,14 +1,14 @@
 'use strict';
 const TreatmentVoucher = require('../models/treatmentVoucher');
-const MedicineItems = require('../models/medicineItem');
 const Transaction = require('../models/transaction');
 const Accounting = require('../models/accountingList');
 const Patient = require('../models/patient');
 const Stock = require('../models/stock');
 const Log = require('../models/log');
 const Debt = require('../models/debt');
-const treatmentVoucher = require('../models/treatmentVoucher');
 const accountingList = require('../models/accountingList');
+const TreatmentSelection = require('../models/treatmentSelection');
+const Appointment = require('../models/appointment');
 
 exports.combineMedicineSale = async (req, res) => {
     let data = req.body;
@@ -580,23 +580,41 @@ exports.deleteTreatmentVoucher = async (req, res, next) => {
             { new: true },
         );
         const transactionArr = result.relatedTransaction
+        const treatmentSelect = result.relatedTreatmentSelection
+        const appointment = result.relatedAppointment
+
         const deletedTransactions = await Transaction.updateMany(
             { _id: { $in: transactionArr }, isDeleted: false }, // Filter
             { $set: { isDeleted: true } } // Update
         );
-        for (const item of transactionArr) {
-            const getItem = await TreatmentVoucher.findOne({ _id: item })
-            if (!getItem) return res.status(200).send({ success: true, message: 'Not Found!' })
-            if (getItem.relatedBank) {
-                const updateBank = accountingList.findOneAndUpdate({ _id: getItem.relatedBank }, { $inc: { amount: -getItem.amount } }, { new: true })
-            }
-            if (getItem.relatedCash) {
-                const updateCash = accountingList.findOneAndUpdate({ _id: getItem.relatedCash }, { $inc: { amount: -getItem.amount } }, { new: true })
-            }
-            if (getItem.relatedAccounting) {
-                const updateCash = accountingList.findOneAndUpdate({ _id: getItem.relatedAccounting }, { $inc: { amount: -getItem.amount } }, { new: true })
+
+        if (transactionArr) {
+            for (const item of transactionArr) {
+                const getItem = await TreatmentVoucher.findOne({ _id: item })
+                if (!getItem) return res.status(200).send({ success: true, message: 'Not Found!' })
+                if (getItem.relatedBank) {
+                    const updateBank = accountingList.findOneAndUpdate({ _id: getItem.relatedBank }, { $inc: { amount: -getItem.amount } }, { new: true })
+                }
+                if (getItem.relatedCash) {
+                    const updateCash = accountingList.findOneAndUpdate({ _id: getItem.relatedCash }, { $inc: { amount: -getItem.amount } }, { new: true })
+                }
+                if (getItem.relatedAccounting) {
+                    const updateCash = accountingList.findOneAndUpdate({ _id: getItem.relatedAccounting }, { $inc: { amount: -getItem.amount } }, { new: true })
+                }
             }
         }
+
+        if (treatmentSelect) {
+            for (const item of treatmentSelect) {
+                const getItem = await TreatmentSelection.findOneAndUpdate({ _id: item }, { isDeleted: true })
+                if (!getItem) return res.status(200).send({ success: true, message: 'Not Found!' })
+            }
+        }
+
+        if (appointment) {
+            const updateResult = await Appointment.findOneAndUpdate({ _id: appointment }, { isDeleted: true })
+        }
+
         return res.status(200).send({ success: true, data: { isDeleted: result.isDeleted } });
     } catch (error) {
         return res.status(500).send({ "error": true, "message": error.message })
