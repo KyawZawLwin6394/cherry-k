@@ -186,7 +186,7 @@ exports.deleteAccessoryItem = async (req, res, next) => {
       { isDeleted: true },
       { new: true },
     );
-    const deleteStocks = await Stock.findOneAndUpdate(
+    const deleteStocks = await Stock.updateMany(
       { relatedAccessoryItems: req.params.id },
       { isDeleted: true },
       { new: true }

@@ -114,7 +114,7 @@ exports.updateProcedureItem = async (req, res, next) => {
 
 exports.deleteProcedureItem = async (req, res, next) => {
   try {
-    const result = await ProcedureItem.findOneAndUpdate(
+    const result = await ProcedureItem.updateMany(
       { _id: req.params.id },
       { isDeleted: true },
       { new: true },
