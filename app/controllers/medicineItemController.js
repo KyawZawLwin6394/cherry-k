@@ -124,7 +124,7 @@ exports.deleteMedicineItem = async (req, res, next) => {
       { isDeleted: true },
       { new: true },
     );
-    const deleteStocks = await Stock.findOneAndUpdate(
+    const deleteStocks = await Stock.updateMany(
       { relatedMedicineItems: req.params.id },
       { isDeleted: true },
       { new: true }
