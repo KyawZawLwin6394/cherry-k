@@ -606,13 +606,15 @@ exports.deleteTreatmentVoucher = async (req, res, next) => {
 
         if (treatmentSelect) {
             for (const item of treatmentSelect) {
-                const getItem = await TreatmentSelection.findOneAndUpdate({ _id: item }, { isDeleted: true })
+
+                const getItem = await TreatmentSelection.deleteMany({ _id: item })
+                console.log(getItem)
                 if (!getItem) return res.status(200).send({ success: true, message: 'Not Found!' })
             }
         }
 
         if (appointment) {
-            const updateResult = await Appointment.findOneAndUpdate({ _id: appointment }, { isDeleted: true })
+            const updateResult = await Appointment.deleteMany({ _id: appointment })
         }
 
         return res.status(200).send({ success: true, data: { isDeleted: result.isDeleted } });

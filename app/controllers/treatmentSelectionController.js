@@ -194,7 +194,7 @@ exports.createMultiTreatmentSelection = async (req, res, next) => {
         //Adding TSMulti type
         tvcCreate = true;
         let parsedMulti = JSON.parse(multiTreatment)
-        if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
+        // if (treatmentVoucherResult) { data = { ...data, relatedTreatmentVoucher: treatmentVoucherResult._id } }
         for (const i of parsedMulti) {
             data.multiTreatment = parsedMulti
             data.relatedTreatment = i.item_id
