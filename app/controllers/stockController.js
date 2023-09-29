@@ -254,67 +254,46 @@ exports.copyStock = async (req, res) => {
         const medicineItems = await MedicineItems.find({ isDeleted: false })
         const branches = await Branch.find({})
         for (let i = 0; i < procedureItems.length; i++) {
-            console.log('here')
-            for (let b = 0; b < branches.length; b++) {
-                console.log('here2')
-                var stockResult = await Stock.create(
-                    {
-                        "relatedBranch": branches[b]._id,
-                        "relatedProcedureItems": procedureItems[i]._id,
-                        // "currentQty": procedureItems[i].currentQuantity,
-                        "currentQty": 0,
-
-                        "fromUnit": procedureItems[i].fromUnit,
-                        "toUnit": procedureItems[i].toUnit,
-                        "reOrderQuantity": procedureItems[i].reOrderQuantity,
-                        "totalUnit": 0
-                        // "totalUnit": (procedureItems[i].currentQuantity * procedureItems[i].toUnit) / procedureItems[i].fromUnit
-                    }
-                )
-                console.log(stockResult)
-            }
+            const stockResult = await Stock.create({
+                relatedProcedureItems: procedureItems[i]._id,
+                relatedBranch: '651647a617c8dbb264085bcf',//taungyi branch,
+                currentQty: 0,
+                totalUnit: 0,
+                fromUnit: 1,
+                toUnit: 1,
+                reOrderQuantity: 0
+            })
+            console.log(stockResult)
         }
 
         for (let i = 0; i < medicineItems.length; i++) {
             console.log('here')
-            for (let b = 0; b < branches.length; b++) {
-                console.log('here2')
-                var stockResult = await Stock.create(
-                    {
-                        "relatedBranch": branches[b]._id,
-                        "relatedMedicineItems": medicineItems[i]._id,
-                        // "currentQty": medicineItems[i].currentQuantity,
-                        "currentQty": 0,
-                        "fromUnit": medicineItems[i].fromUnit,
-                        "toUnit": medicineItems[i].toUnit,
-                        "reOrderQuantity": medicineItems[i].reOrderQuantity,
-                        "totalUnit": 0
-                        // "totalUnit": (medicineItems[i].currentQuantity * medicineItems[i].toUnit) / medicineItems[i].fromUnit
-                    }
-                )
-                console.log(stockResult)
-            }
+            const stockResult = await Stock.create({
+                "relatedBranch": '651647a617c8dbb264085bcf',//tgyBranch,
+                relatedMedicineItems: medicineItems[i]._id,
+                currentQty: 0,
+                totalUnit: 0,
+                fromUnit: 1,
+                toUnit: 1,
+                reOrderQuantity: 0
+            })
         }
 
         for (let i = 0; i < accessoryItems.length; i++) {
             console.log('here')
-            for (let b = 0; b < branches.length; b++) {
-                console.log('here2')
-                var stockResult = await Stock.create(
-                    {
-                        "relatedBranch": branches[b]._id,
-                        "relatedAccessoryItems": accessoryItems[i]._id,
-                        "currentQty": 0,
-                        // "currentQty": accessoryItems[i].currentQuantity,
-                        "fromUnit": accessoryItems[i].fromUnit,
-                        "toUnit": accessoryItems[i].toUnit,
-                        // "totalUnit": (accessoryItems[i].currentQuantity * accessoryItems[i].toUnit) / accessoryItems[i].fromUnit,
-                        "totalUnit": 0,
-                        "reOrderQuantity": accessoryItems[i].reOrderQuantity
-                    }
-                )
-                console.log(stockResult)
-            }
+            var stockResult = await Stock.create(
+                {
+                    "relatedBranch": '651647a617c8dbb264085bcf',//tgyBranch,
+                    "relatedAccessoryItems": accessoryItems[i]._id,
+                    "currentQty": 0,
+                    // "currentQty": accessoryItems[i].currentQuantity,
+                    "fromUnit": 1,
+                    "toUnit": 1,
+                    // "totalUnit": (accessoryItems[i].currentQuantity * accessoryItems[i].toUnit) / accessoryItems[i].fromUnit,
+                    "totalUnit": 0,
+                    "reOrderQuantity": 0
+                }
+            )
         }
 
         return res.status(200).send({ success: true, data: 'data' })
