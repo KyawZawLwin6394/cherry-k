@@ -22,7 +22,7 @@ exports.verifyToken = (req, res) => {
 
 exports.login = (req, res) => {
   try {
-
+    console.log(req.body.email)
     User.findOne({ email: req.body.email }, function (err, user) {
       if (err) {
         return res.status(500).send(
@@ -32,7 +32,7 @@ exports.login = (req, res) => {
           })
 
       }
-
+      console.log(user)
       if (!user) {
         return res.status(404).send(
           {
@@ -90,6 +90,7 @@ exports.login = (req, res) => {
 
         // otherwise we can determine why we failed
         var reasons = User.failedLogin;
+        console.log(reasons)
         switch (reason) {
           case reasons.NOT_FOUND:
             return res.status(404).send(
