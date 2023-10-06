@@ -256,7 +256,7 @@ exports.copyStock = async (req, res) => {
         for (let i = 0; i < procedureItems.length; i++) {
             const stockResult = await Stock.create({
                 relatedProcedureItems: procedureItems[i]._id,
-                relatedBranch: '651647a617c8dbb264085bcf',//taungyi branch,
+                relatedBranch: '651f84c519683c5a91239741',//k-max
                 currentQty: 0,
                 totalUnit: 0,
                 fromUnit: 1,
@@ -269,7 +269,7 @@ exports.copyStock = async (req, res) => {
         for (let i = 0; i < medicineItems.length; i++) {
             console.log('here')
             const stockResult = await Stock.create({
-                "relatedBranch": '651647a617c8dbb264085bcf',//tgyBranch,
+                "relatedBranch": '651f84c519683c5a91239741',//k-max,
                 relatedMedicineItems: medicineItems[i]._id,
                 currentQty: 0,
                 totalUnit: 0,
@@ -283,7 +283,7 @@ exports.copyStock = async (req, res) => {
             console.log('here')
             var stockResult = await Stock.create(
                 {
-                    "relatedBranch": '651647a617c8dbb264085bcf',//tgyBranch,
+                    "relatedBranch": '651f84c519683c5a91239741',//k-max,
                     "relatedAccessoryItems": accessoryItems[i]._id,
                     "currentQty": 0,
                     // "currentQty": accessoryItems[i].currentQuantity,
