@@ -370,7 +370,7 @@ exports.updateKmaxVoucher = async (req, res, next) => {
             { _id: req.body.id },
             req.body,
             { new: true },
-        ).populate('relatedPatient relatedTransaction').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy');
+        ).populate('relatedDoctor relatedTreatment secondAccount relatedAppointment relatedPatient relatedBank relatedCash paymentType relatedBranch createdBy relatedAccounting payment medicineSale.item_id procedureSale.item_id accessorySale.item_id')
         if (!result) return res.status(500).send({ error: true, message: 'Query Error!' })
         if (result === 0) return res.status(500).send({ error: true, message: 'No Records!' })
         return res.status(200).send({ success: true, data: result });
@@ -432,7 +432,7 @@ exports.filterKmaxVouchers = async (req, res, next) => {
         const { start, end } = req.query
         if (start && end) query.createdAt = { $gte: start, $lte: end }
         if (Object.keys(query).length === 0) return res.status(404).send({ error: true, message: 'Please Specify A Query To Use This Function' })
-        const result = await KmaxVoucher.find(query).populate('relatedPatient relatedTransaction relatedBranch').populate('relatedAppointment').populate('medicineItems.item_id').populate('relatedTreatment').populate('createdBy', 'givenName');
+        const result = await KmaxVoucher.find(query).populate('relatedDoctor relatedTreatment secondAccount relatedAppointment relatedPatient relatedBank relatedCash paymentType relatedBranch createdBy relatedAccounting payment medicineSale.item_id procedureSale.item_id accessorySale.item_id')
         if (result.length === 0) return res.status(404).send({ error: true, message: "No Record Found!" })
         res.status(200).send({ success: true, data: result })
     } catch (err) {
@@ -461,7 +461,7 @@ exports.searchKmaxVoucher = async (req, res, next) => {
         let query = req.mongoQuery
         let { search } = req.body
         if (search) query.$text = { $search: search }
-        const result = await KmaxVoucher.find(query).populate('relatedPatient medicineItems.item_id')
+        const result = await KmaxVoucher.find(query).populate('relatedDoctor relatedTreatment secondAccount relatedAppointment relatedPatient relatedBank relatedCash paymentType relatedBranch createdBy relatedAccounting payment medicineSale.item_id procedureSale.item_id accessorySale.item_id')
         if (result.length === 0) return res.status(404).send({ error: true, message: 'No Record Found!' })
         return res.status(200).send({ success: true, data: result })
     } catch (err) {
@@ -476,10 +476,10 @@ exports.KmaxVoucherFilter = async (req, res) => {
         if (start && end) query.createdAt = { $gte: start, $lt: end }
         if (relatedBranch) query.relatedBranch = relatedBranch
         if (createdBy) query.createdBy = createdBy
-        const bankResult = await KmaxVoucher.find(query).populate('relatedBank relatedTreatment relatedPatient relatedAppointment medicineItems.item_id relatedCash relatedAccount relatedTransaction relatedBranch').populate('createdBy', 'givenName')
+        const bankResult = await KmaxVoucher.find(query).populate('relatedDoctor relatedTreatment secondAccount relatedAppointment relatedPatient relatedBank relatedCash paymentType relatedBranch createdBy relatedAccounting payment medicineSale.item_id procedureSale.item_id accessorySale.item_id')
         const { relatedBank, ...query2 } = query;
         query2.relatedCash = { $exists: true };
-        const cashResult = await KmaxVoucher.find(query2).populate('relatedBank relatedTreatment relatedPatient relatedAppointment medicineItems.item_id relatedCash relatedAccount relatedTransaction relatedBranch').populate('createdBy', 'givenName')
+        const cashResult = await KmaxVoucher.find(query2).populate('relatedDoctor relatedTreatment secondAccount relatedAppointment relatedPatient relatedBank relatedCash paymentType relatedBranch createdBy relatedAccounting payment medicineSale.item_id procedureSale.item_id accessorySale.item_id')
         const BankNames = bankResult.reduce((result, { relatedBank, totalAmount }) => {
             const { name } = relatedBank;
             result[name] = (result[name] || 0) + totalAmount;
