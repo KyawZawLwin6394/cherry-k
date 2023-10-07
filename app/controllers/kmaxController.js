@@ -512,26 +512,26 @@ exports.KmaxVoucherFilter = async (req, res) => {
                     }
                 }
             })
-            const CashNames = cashResult.reduce((result, { relatedCash, paidAmount, msPaidAmount, totalPaidAmount, psPaidAmount }) => {
+            const CashNames = cashResult.reduce((result, { relatedCash, paidAmount }) => {
                 if (relatedCash) {
                     const { name } = relatedCash;
-                    result[name] = (result[name] || 0) + (paidAmount || 0 + msPaidAmount || 0 + totalPaidAmount || 0 + psPaidAmount || 0);
+                    result[name] = (result[name] || 0) + (paidAmount || 0);
                 }
                 return result;
             }, {});
 
-            const CashTotal = cashResult.reduce((total, sale) => total + (sale.paidAmount || 0) + (sale.msPaidAmount || 0) + (sale.totalPaidAmount || 0) + (sale.psPaidAmount || 0), 0);
+            const CashTotal = cashResult.reduce((total, sale) => total + (sale.paidAmount || 0), 0);
             response.data = { ...response.data, CashList: cashResult, CashNames: CashNames, CashTotal: CashTotal }
         }
         //filter solid beauty
-        const BankNames = bankResult.reduce((result, { relatedBank, paidAmount, msPaidAmount, totalPaidAmount, psPaidAmount }) => {
+        const BankNames = bankResult.reduce((result, { relatedBank, paidAmount }) => {
             if (relatedBank) {
                 const { name } = relatedBank;
-                result[name] = (result[name] || 0) + (paidAmount || 0 + msPaidAmount || 0 + totalPaidAmount || 0 + psPaidAmount || 0);
+                result[name] = (result[name] || 0) + (paidAmount || 0);
             } return result;
 
         }, {});
-        const BankTotal = bankResult.reduce((total, sale) => total + (sale.paidAmount || 0) + (sale.msPaidAmount || 0) + (sale.totalPaidAmount || 0) + (sale.psPaidAmount || 0), 0);
+        const BankTotal = bankResult.reduce((total, sale) => total + (sale.paidAmount || 0) , 0);
         response.data = { ...response.data, BankList: bankResult, BankNames: BankNames, BankTotal: BankTotal }
 
         return res.status(200).send(response);
