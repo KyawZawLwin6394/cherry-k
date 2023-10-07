@@ -471,39 +471,70 @@ exports.searchKmaxVoucher = async (req, res, next) => {
 
 exports.KmaxVoucherFilter = async (req, res) => {
     let query = { relatedBank: { $exists: true }, isDeleted: false }
+    let response = {
+        success: true,
+        data: {}
+    }
     try {
-        const { start, end, relatedBranch, createdBy } = req.query
-        if (start && end) query.createdAt = { $gte: start, $lt: end }
-        if (relatedBranch) query.relatedBranch = relatedBranch
+        const { startDate, endDate, createdBy, purchaseType, relatedDoctor, bankType, tsType, relatedPatient, bankID, relatedBranch } = req.query
+        if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate }
+        if (relatedPatient) query.relatedPatient = relatedPatient
+        if (bankType) query.bankType = bankType
         if (createdBy) query.createdBy = createdBy
-        const bankResult = await KmaxVoucher.find(query).populate('relatedDoctor relatedTreatment secondAccount relatedAppointment relatedPatient relatedBank relatedCash paymentType relatedBranch createdBy relatedAccounting payment medicineSale.item_id procedureSale.item_id accessorySale.item_id')
-        const { relatedBank, ...query2 } = query;
-        query2.relatedCash = { $exists: true };
-        const cashResult = await KmaxVoucher.find(query2).populate('relatedDoctor relatedTreatment secondAccount relatedAppointment relatedPatient relatedBank relatedCash paymentType relatedBranch createdBy relatedAccounting payment medicineSale.item_id procedureSale.item_id accessorySale.item_id')
-        const BankNames = bankResult.reduce((result, { relatedBank, totalAmount }) => {
-            const { name } = relatedBank;
-            result[name] = (result[name] || 0) + totalAmount;
-            return result;
-        }, {});
-        const CashNames = cashResult.reduce((result, { relatedCash, totalAmount }) => {
-            const { name } = relatedCash;
-            result[name] = (result[name] || 0) + totalAmount;
-            return result;
-        }, {});
-        const BankTotal = bankResult.reduce((total, sale) => total + sale.totalAmount, 0);
-        const CashTotal = cashResult.reduce((total, sale) => total + sale.totalAmount, 0);
-
-        return res.status(200).send({
-            success: true,
-            data: {
-                BankList: bankResult,
-                CashList: cashResult,
-                BankNames: BankNames,
-                CashNames: CashNames,
-                BankTotal: BankTotal,
-                CashTotal: CashTotal
+        if (bankID) query.relatedBank = bankID
+        if (purchaseType) query.purchaseType = purchaseType
+        if (relatedDoctor) query.relatedDoctor = relatedDoctor
+        if (relatedBranch) query.relatedBranch = relatedBranch
+        let bankResult = await KmaxVoucher.find(query).populate('medicineItems.item_id multiTreatment.item_id relatedTreatment secondAccount relatedBranch relatedDoctor relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedAccounting payment createdBy').populate({
+            path: 'relatedTreatmentSelection',
+            model: 'TreatmentSelections',
+            populate: {
+                path: 'relatedAppointments',
+                model: 'Appointments',
+                populate: {
+                    path: 'relatedDoctor',
+                    model: 'Doctors'
+                }
             }
-        });
+        })
+        if (!bankID) {
+            const { relatedBank, ...query2 } = query;
+            query2.relatedCash = { $exists: true };
+            let cashResult = await KmaxVoucher.find(query2).populate('medicineItems.item_id multiTreatment.item_id relatedTreatment secondAccount relatedBranch relatedDoctor relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedAccounting payment createdBy').populate({
+                path: 'relatedTreatmentSelection',
+                model: 'TreatmentSelections',
+                populate: {
+                    path: 'relatedAppointments',
+                    model: 'Appointments',
+                    populate: {
+                        path: 'relatedDoctor',
+                        model: 'Doctors'
+                    }
+                }
+            })
+            const CashNames = cashResult.reduce((result, { relatedCash, paidAmount, msPaidAmount, totalPaidAmount, psPaidAmount }) => {
+                if (relatedCash) {
+                    const { name } = relatedCash;
+                    result[name] = (result[name] || 0) + (paidAmount || 0 + msPaidAmount || 0 + totalPaidAmount || 0 + psPaidAmount || 0);
+                }
+                return result;
+            }, {});
+
+            const CashTotal = cashResult.reduce((total, sale) => total + (sale.paidAmount || 0) + (sale.msPaidAmount || 0) + (sale.totalPaidAmount || 0) + (sale.psPaidAmount || 0), 0);
+            response.data = { ...response.data, CashList: cashResult, CashNames: CashNames, CashTotal: CashTotal }
+        }
+        //filter solid beauty
+        const BankNames = bankResult.reduce((result, { relatedBank, paidAmount, msPaidAmount, totalPaidAmount, psPaidAmount }) => {
+            if (relatedBank) {
+                const { name } = relatedBank;
+                result[name] = (result[name] || 0) + (paidAmount || 0 + msPaidAmount || 0 + totalPaidAmount || 0 + psPaidAmount || 0);
+            } return result;
+
+        }, {});
+        const BankTotal = bankResult.reduce((total, sale) => total + (sale.paidAmount || 0) + (sale.msPaidAmount || 0) + (sale.totalPaidAmount || 0) + (sale.psPaidAmount || 0), 0);
+        response.data = { ...response.data, BankList: bankResult, BankNames: BankNames, BankTotal: BankTotal }
+
+        return res.status(200).send(response);
     } catch (error) {
         return res.status(500).send({ error: true, message: error.message })
     }

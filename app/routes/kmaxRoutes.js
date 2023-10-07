@@ -22,7 +22,7 @@ module.exports = (app) => {
     app.route('/api/kmax-vouchers/transaction').post(verifyToken, catchError(kmaxVoucher.createKmaxVoucherTransaction))
     app.route('/api/kmax-vouchers/filter').get(verifyToken, catchError(kmaxVoucher.filterKmaxVouchers))
     app.route('/api/kmax-vouchers/search').post(verifyToken, catchError(kmaxVoucher.searchKmaxVoucher))
-    app.route('/api/kmax-vouchers/ms-filter').get(verifyToken, catchError(kmaxVoucher.KmaxVoucherFilter))
+    app.route('/api/kmax-vouchers/km-filter').get(verifyToken, catchError(kmaxVoucher.KmaxVoucherFilter))
     app.route('/api/kmax-vouchers/get-date').get(verifyToken, catchError(kmaxVoucher.getwithExactDate))
 
 };
