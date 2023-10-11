@@ -567,22 +567,21 @@ exports.KmaxVoucherFilter = async (req, res) => {
     if (purchaseType) query.purchaseType = purchaseType
     if (relatedDoctor) query.relatedDoctor = relatedDoctor
     if (relatedBranch) query.relatedBranch = relatedBranch
-    let bankResult = await KmaxVoucher.find(query)
-      .populate(
-        'relatedTreatment secondAccount relatedBranch relatedDoctor relatedBank relatedCash relatedPatient  relatedAccounting payment createdBy medicineSale.item_id procedureSale.item_id accessorySale.item_id'
-      )
-      .populate({
-        path: 'relatedTreatmentSelection',
-        model: 'TreatmentSelections',
-        populate: {
-          path: 'relatedAppointments',
-          model: 'Appointments',
-          populate: {
-            path: 'relatedDoctor',
-            model: 'Doctors'
-          }
-        }
-      })
+    let bankResult = await KmaxVoucher.find(query).populate(
+      'relatedTreatment secondAccount relatedBranch relatedDoctor relatedBank relatedCash relatedPatient relatedAccounting payment createdBy medicineSale.item_id procedureSale.item_id accessorySale.item_id'
+    )
+    // .populate({
+    //   path: 'relatedTreatmentSelection',
+    //   model: 'TreatmentSelections',
+    //   populate: {
+    //     path: 'relatedAppointments',
+    //     model: 'Appointments',
+    //     populate: {
+    //       path: 'relatedDoctor',
+    //       model: 'Doctors'
+    //     }
+    //   }
+    // })
     if (!bankID) {
       const { relatedBank, ...query2 } = query
       query2.relatedCash = { $exists: true }
