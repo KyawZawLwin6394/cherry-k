@@ -87,6 +87,8 @@ exports.createKmaxVoucher = async (req, res, next) => {
     )
 
     let objID = ''
+    let totalUnit = 0
+
     const newKmaxVoucher = new KmaxVoucher(data)
 
     const medicineSaleResult = await newKmaxVoucher.save()
@@ -132,24 +134,25 @@ exports.createKmaxVoucher = async (req, res, next) => {
 
     if (medicineSale !== undefined) {
       for (const e of medicineSale) {
-        if (e.stock === undefined && e.quantity === undefined) {
-          let totalUnit = 0
-        } else {
-          let totalUnit = e.stock - e.quantity
-        }
+        console.log(e.stock, 'st')
+        console.log(e.qty, 'qt')
 
-        console.log(parseInt(totalUnit), 'total')
+        // const totalUnit =
+        // console.log(totalUnit, 'total')
+
         const result = await Stock.find({
           relatedMedicineItems: e.item_id,
           relatedBranch: relatedBranch
         })
         const from = result[0].fromUnit
         const to = result[0].toUnit
-        const currentQty = (from * totalUnit) / to
+
+        const currentQty = (from * (e.stock - e.qty)) / to
+
         try {
           const result = await Stock.findOneAndUpdate(
             { relatedMedicineItems: e.item_id, relatedBranch: relatedBranch },
-            { totalUnit: totalUnit, currentQty: currentQty },
+            { totalUnit: e.stock - e.qty, currentQty: currentQty },
             { new: true }
           )
         } catch (error) {
@@ -161,7 +164,7 @@ exports.createKmaxVoucher = async (req, res, next) => {
           relatedMedicineItems: e.item_id,
           currentQty: e.stock,
           actualQty: e.actual,
-          finalQty: totalUnit,
+          finalQty: e.stock - e.qty,
           type: 'K-Mart Sale',
           relatedBranch: relatedBranch,
           createdBy: createdBy
@@ -178,11 +181,11 @@ exports.createKmaxVoucher = async (req, res, next) => {
         })
         const from = result[0].fromUnit
         const to = result[0].toUnit
-        const currentQty = (from * totalUnit) / to
+        const currentQty = (from * (e.stock - e.qty)) / to
         try {
           const result = await Stock.findOneAndUpdate(
             { relatedProcedureItems: e.item_id, relatedBranch: relatedBranch },
-            { totalUnit: totalUnit, currentQty: currentQty },
+            { totalUnit: e.stock - e.qty, currentQty: currentQty },
             { new: true }
           )
         } catch (error) {
@@ -194,7 +197,7 @@ exports.createKmaxVoucher = async (req, res, next) => {
           relatedProcedureItems: e.item_id,
           currentQty: e.stock,
           actualQty: e.actual,
-          finalQty: totalUnit,
+          finalQty: e.stock - e.qty,
           type: 'K-Mart Sale',
           relatedBranch: relatedBranch,
           createdBy: createdBy
@@ -204,18 +207,18 @@ exports.createKmaxVoucher = async (req, res, next) => {
 
     if (accessorySale !== undefined) {
       for (const e of accessorySale) {
-        let totalUnit = e.stock - e.quantity
+        let totalUnit = e.stock - e.qty
         const result = await Stock.find({
           relatedAccessoryItems: e.item_id,
           relatedBranch: relatedBranch
         })
         const from = result[0].fromUnit
         const to = result[0].toUnit
-        const currentQty = (from * totalUnit) / to
+        const currentQty = (from * (e.stock - e.qty)) / to
         try {
           const result = await Stock.findOneAndUpdate(
             { relatedAccessoryItems: e.item_id, relatedBranch: relatedBranch },
-            { totalUnit: totalUnit, currentQty: currentQty },
+            { totalUnit: e.stock - e.qty, currentQty: currentQty },
             { new: true }
           )
         } catch (error) {
@@ -227,7 +230,7 @@ exports.createKmaxVoucher = async (req, res, next) => {
           relatedAccessoryItems: e.item_id,
           currentQty: e.stock,
           actualQty: e.actual,
-          finalQty: totalUnit,
+          finalQty: e.stock - e.qty,
           type: 'K-Mart Sale',
           relatedBranch: relatedBranch,
           createdBy: createdBy
