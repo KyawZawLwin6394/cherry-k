@@ -569,7 +569,7 @@ exports.KmaxVoucherFilter = async (req, res) => {
     if (relatedBranch) query.relatedBranch = relatedBranch
     let bankResult = await KmaxVoucher.find(query)
       .populate(
-        'medicineItems.item_id multiTreatment.item_id relatedTreatment secondAccount relatedBranch relatedDoctor relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedAccounting payment createdBy'
+        'relatedTreatment secondAccount relatedBranch relatedDoctor relatedBank relatedCash relatedPatient  relatedAccounting payment createdBy medicineSale.item_id procedureSale.item_id accessorySale.item_id'
       )
       .populate({
         path: 'relatedTreatmentSelection',
@@ -586,22 +586,21 @@ exports.KmaxVoucherFilter = async (req, res) => {
     if (!bankID) {
       const { relatedBank, ...query2 } = query
       query2.relatedCash = { $exists: true }
-      let cashResult = await KmaxVoucher.find(query2)
-        .populate(
-          'medicineItems.item_id multiTreatment.item_id relatedTreatment secondAccount relatedBranch relatedDoctor relatedBank relatedCash relatedPatient relatedTreatmentSelection relatedAccounting payment createdBy'
-        )
-        .populate({
-          path: 'relatedTreatmentSelection',
-          model: 'TreatmentSelections',
-          populate: {
-            path: 'relatedAppointments',
-            model: 'Appointments',
-            populate: {
-              path: 'relatedDoctor',
-              model: 'Doctors'
-            }
-          }
-        })
+      let cashResult = await KmaxVoucher.find(query2).populate(
+        'relatedTreatment secondAccount relatedBranch relatedDoctor relatedBank relatedCash relatedPatient relatedAccounting payment createdBy medicineSale.item_id procedureSale.item_id accessorySale.item_id'
+      )
+      // .populate({
+      //   path: 'relatedTreatmentSelection',
+      //   model: 'TreatmentSelections',
+      //   populate: {
+      //     path: 'relatedAppointments',
+      //     model: 'Appointments',
+      //     populate: {
+      //       path: 'relatedDoctor',
+      //       model: 'Doctors'
+      //     }
+      //   }
+      // })
       const CashNames = cashResult.reduce(
         (result, { relatedCash, paidAmount }) => {
           if (relatedCash) {
