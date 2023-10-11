@@ -92,7 +92,7 @@ let KmaxVoucherSchema = new Schema({
   },
   medicineSale: [
     {
-      medicineSale: {
+      item_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MedicineItems'
       },
