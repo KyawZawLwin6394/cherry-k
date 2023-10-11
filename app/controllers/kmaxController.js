@@ -134,8 +134,8 @@ exports.createKmaxVoucher = async (req, res, next) => {
 
     if (medicineSale !== undefined) {
       for (const e of medicineSale) {
-        console.log(e.stock, 'st')
-        console.log(e.qty, 'qt')
+        // console.log(e.stock, 'st')
+        // console.log(e.qty, 'qt')
 
         // const totalUnit =
         // console.log(totalUnit, 'total')
