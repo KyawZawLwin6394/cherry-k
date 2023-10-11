@@ -59,6 +59,7 @@ exports.getKmaxVoucher = async (req, res) => {
 exports.createKmaxVoucher = async (req, res, next) => {
   let data = req.body
   let createdBy = req.credentials.id
+  let totalUnit = 0
   try {
     let { medicineSale, procedureSale, accessorySale, relatedBranch } = data
     //prepare CUS-ID
@@ -86,6 +87,32 @@ exports.createKmaxVoucher = async (req, res, next) => {
     )
 
     let objID = ''
+    const newKmaxVoucher = new KmaxVoucher(data)
+
+    const medicineSaleResult = await newKmaxVoucher.save()
+
+    const fTransaction = new Transaction({
+      amount: data.payAmount,
+      date: Date.now(),
+      remark: req.body.remark,
+      relatedAccounting: '646739c059a9bc811d97fa8b', //Sales (Medicines),
+      relatedKmaxVoucher: medicineSaleResult._id,
+      type: 'Credit',
+      createdBy: createdBy
+    })
+    const fTransResult = await fTransaction.save()
+    const secTransaction = new Transaction({
+      amount: data.payAmount,
+      date: Date.now(),
+      remark: req.body.remark,
+      relatedBank: req.body.relatedBank,
+      relatedCash: req.body.relatedCash,
+      type: 'Debit',
+      relatedTransaction: fTransResult._id,
+      createdBy: createdBy
+    })
+    const secTransResult = await secTransaction.save()
+
     if (req.body.relatedBank) objID = req.body.relatedBank
     if (req.body.relatedCash) objID = req.body.relatedCash
     //transaction
@@ -105,7 +132,13 @@ exports.createKmaxVoucher = async (req, res, next) => {
 
     if (medicineSale !== undefined) {
       for (const e of medicineSale) {
-        let totalUnit = e.stock - e.quantity
+        if (e.stock === undefined && e.quantity === undefined) {
+          let totalUnit = 0
+        } else {
+          let totalUnit = e.stock - e.quantity
+        }
+
+        console.log(parseInt(totalUnit), 'total')
         const result = await Stock.find({
           relatedMedicineItems: e.item_id,
           relatedBranch: relatedBranch
@@ -201,36 +234,15 @@ exports.createKmaxVoucher = async (req, res, next) => {
         })
       }
     }
-    const newKmaxVoucher = new KmaxVoucher(data)
-    const medicineSaleResult = await newKmaxVoucher.save()
 
     //first transaction
-    const fTransaction = new Transaction({
-      amount: data.payAmount,
-      date: Date.now(),
-      remark: req.body.remark,
-      relatedAccounting: '646739c059a9bc811d97fa8b', //Sales (Medicines),
-      relatedKmaxVoucher: medicineSaleResult._id,
-      type: 'Credit',
-      createdBy: createdBy
-    })
-    const fTransResult = await fTransaction.save()
+
     var amountUpdate = await Accounting.findOneAndUpdate(
       { _id: '646739c059a9bc811d97fa8b' },
       { $inc: { amount: -data.payAmount } }
     )
     //sec transaction
-    const secTransaction = new Transaction({
-      amount: data.payAmount,
-      date: Date.now(),
-      remark: req.body.remark,
-      relatedBank: req.body.relatedBank,
-      relatedCash: req.body.relatedCash,
-      type: 'Debit',
-      relatedTransaction: fTransResult._id,
-      createdBy: createdBy
-    })
-    const secTransResult = await secTransaction.save()
+
     var fTransUpdate = await Transaction.findOneAndUpdate(
       { _id: fTransResult._id },
       {
@@ -463,12 +475,10 @@ exports.filterKmaxVouchers = async (req, res, next) => {
     const { start, end } = req.query
     if (start && end) query.createdAt = { $gte: start, $lte: end }
     if (Object.keys(query).length === 0)
-      return res
-        .status(404)
-        .send({
-          error: true,
-          message: 'Please Specify A Query To Use This Function'
-        })
+      return res.status(404).send({
+        error: true,
+        message: 'Please Specify A Query To Use This Function'
+      })
     const result = await KmaxVoucher.find(query).populate(
       'relatedDoctor relatedTreatment secondAccount relatedAppointment relatedPatient relatedBank relatedCash paymentType relatedBranch createdBy relatedAccounting payment medicineSale.item_id procedureSale.item_id accessorySale.item_id'
     )
