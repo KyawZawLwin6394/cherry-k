@@ -348,12 +348,17 @@ exports.createSingleMedicineSale = async (req, res) => {
       amount: data.msPaidAmount,
       date: Date.now(),
       remark: null,
-      relatedBank: req.body.relatedBank,
-      relatedCash: req.body.relatedCash,
+      //   relatedBank: req.body.relatedBank,
+      //   relatedCash: req.body.relatedCash,
       type: 'Debit',
       relatedTransaction: fTransResult._id,
       createdBy: createdBy
     })
+    if (req.body.relatedBank) {
+      secTransaction.relatedBank = req.body.relatedBank
+    } else {
+      secTransaction.relatedCash = req.body.relatedCash
+    }
     const secTransResult = await secTransaction.save()
 
     var fTransUpdate = await Transaction.findOneAndUpdate(
