@@ -200,6 +200,7 @@ exports.createKmaxVoucher = async (req, res, next) => {
 
     if (procedureSale !== undefined) {
       for (const e of procedureSale) {
+        console.log(e, 'pro e')
         let totalUnit = e.stock - e.quantity
         const result = await Stock.find({
           relatedProcedureItems: e.item_id,

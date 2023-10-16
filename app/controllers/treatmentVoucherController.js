@@ -269,6 +269,8 @@ exports.createSingleMedicineSale = async (req, res) => {
     let createdBy = req.credentials.id
     if (medicineItems !== undefined) {
       for (const e of medicineItems) {
+        console.log(e, 'res')
+
         if (e.stock < e.qty)
           return res.status(500).send({
             error: true,
@@ -279,6 +281,7 @@ exports.createSingleMedicineSale = async (req, res) => {
           relatedMedicineItems: e.item_id,
           relatedBranch: req.body.relatedBranch
         })
+        console.log(result, 'res')
         if (result.length <= 0)
           return res
             .status(500)
@@ -292,6 +295,7 @@ exports.createSingleMedicineSale = async (req, res) => {
             { totalUnit: totalUnit, currentQty: currentQty },
             { new: true }
           )
+          console.log(result, 'fir res')
         } catch (error) {
           return res.status(500).send({ error: true, message: error.message })
         }
