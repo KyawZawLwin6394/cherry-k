@@ -348,8 +348,8 @@ exports.createSingleMedicineSale = async (req, res) => {
       amount: data.msPaidAmount,
       date: Date.now(),
       remark: null,
-      relatedBank: req.body.relatedBank ? req.body.relatedBank : '',
-      relatedCash: req.body.relatedCash ? req.body.relatedCash : '',
+      relatedBank: req.body.relatedBank,
+      relatedCash: req.body.relatedCash,
       type: 'Debit',
       relatedTransaction: fTransResult._id,
       createdBy: createdBy
@@ -366,7 +366,7 @@ exports.createSingleMedicineSale = async (req, res) => {
 
     if (req.body.relatedBank) {
       var amountUpdate = await Accounting.findOneAndUpdate(
-        { _id: req.body.relatedBankAccount },
+        { _id: req.body.relatedBank },
         { $inc: { amount: data.msPaidAmount } }
       )
     } else if (req.body.relatedCash) {
