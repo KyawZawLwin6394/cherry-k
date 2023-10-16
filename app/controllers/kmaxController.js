@@ -114,6 +114,30 @@ exports.createKmaxVoucher = async (req, res, next) => {
       createdBy: createdBy
     })
     const secTransResult = await secTransaction.save()
+    var amountUpdate = await Accounting.findOneAndUpdate(
+      { _id: '646739c059a9bc811d97fa8b' },
+      { $inc: { amount: -data.payAmount } }
+    )
+    //sec transaction
+
+    var fTransUpdate = await Transaction.findOneAndUpdate(
+      { _id: fTransResult._id },
+      {
+        relatedTransaction: secTransResult._id
+      },
+      { new: true }
+    )
+    if (req.body.relatedBankAccount) {
+      var amountUpdate = await Accounting.findOneAndUpdate(
+        { _id: req.body.relatedBankAccount },
+        { $inc: { amount: data.payAmount } }
+      )
+    } else if (req.body.relatedCash) {
+      var amountUpdate = await Accounting.findOneAndUpdate(
+        { _id: req.body.relatedCash },
+        { $inc: { amount: data.payAmount } }
+      )
+    }
 
     if (req.body.relatedBank) objID = req.body.relatedBank
     if (req.body.relatedCash) objID = req.body.relatedCash
@@ -134,7 +158,7 @@ exports.createKmaxVoucher = async (req, res, next) => {
 
     if (medicineSale !== undefined) {
       for (const e of medicineSale) {
-        // console.log(e.stock, 'st')
+        console.log(e, 'st')
         // console.log(e.qty, 'qt')
 
         // const totalUnit =
@@ -146,15 +170,17 @@ exports.createKmaxVoucher = async (req, res, next) => {
         })
         const from = result[0].fromUnit
         const to = result[0].toUnit
-
-        const currentQty = (from * (e.stock - e.qty)) / to
+        const totalUnit = e.stock - e.qty
+        console.log(totalUnit, 'st')
+        const currentQty = (from * totalUnit) / to
 
         try {
           const result = await Stock.findOneAndUpdate(
             { relatedMedicineItems: e.item_id, relatedBranch: relatedBranch },
-            { totalUnit: e.stock - e.qty, currentQty: currentQty },
+            { totalUnit: totalUnit, currentQty: currentQty },
             { new: true }
           )
+          console.log(result, 'res')
         } catch (error) {
           return res.status(500).send({ error: true, message: error.message })
         }
@@ -164,7 +190,7 @@ exports.createKmaxVoucher = async (req, res, next) => {
           relatedMedicineItems: e.item_id,
           currentQty: e.stock,
           actualQty: e.actual,
-          finalQty: e.stock - e.qty,
+          finalQty: totalUnit,
           type: 'K-Mart Sale',
           relatedBranch: relatedBranch,
           createdBy: createdBy
@@ -240,30 +266,6 @@ exports.createKmaxVoucher = async (req, res, next) => {
 
     //first transaction
 
-    var amountUpdate = await Accounting.findOneAndUpdate(
-      { _id: '646739c059a9bc811d97fa8b' },
-      { $inc: { amount: -data.payAmount } }
-    )
-    //sec transaction
-
-    var fTransUpdate = await Transaction.findOneAndUpdate(
-      { _id: fTransResult._id },
-      {
-        relatedTransaction: secTransResult._id
-      },
-      { new: true }
-    )
-    if (req.body.relatedBankAccount) {
-      var amountUpdate = await Accounting.findOneAndUpdate(
-        { _id: req.body.relatedBankAccount },
-        { $inc: { amount: data.payAmount } }
-      )
-    } else if (req.body.relatedCash) {
-      var amountUpdate = await Accounting.findOneAndUpdate(
-        { _id: req.body.relatedCash },
-        { $inc: { amount: data.payAmount } }
-      )
-    }
     res.status(200).send({
       message: 'KmaxVoucher Transaction success',
       success: true,
