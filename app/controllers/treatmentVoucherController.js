@@ -39,12 +39,10 @@ exports.combineMedicineSale = async (req, res) => {
   if (medicineItems !== undefined) {
     for (const e of medicineItems) {
       if (e.stock < e.qty)
-        return res
-          .status(500)
-          .send({
-            error: true,
-            message: 'RequestedQty Cannot Be Greater Than StockQty!'
-          })
+        return res.status(500).send({
+          error: true,
+          message: 'RequestedQty Cannot Be Greater Than StockQty!'
+        })
       let totalUnit = e.stock - e.qty
       const result = await Stock.find({
         relatedMedicineItems: e.item_id,
@@ -272,12 +270,10 @@ exports.createSingleMedicineSale = async (req, res) => {
     if (medicineItems !== undefined) {
       for (const e of medicineItems) {
         if (e.stock < e.qty)
-          return res
-            .status(500)
-            .send({
-              error: true,
-              message: 'RequestedQty Cannot Be Greater Than StockQty!'
-            })
+          return res.status(500).send({
+            error: true,
+            message: 'RequestedQty Cannot Be Greater Than StockQty!'
+          })
         let totalUnit = e.stock - e.qty
         const result = await Stock.find({
           relatedMedicineItems: e.item_id,
@@ -334,7 +330,7 @@ exports.createSingleMedicineSale = async (req, res) => {
     const fTransaction = new Transaction({
       amount: data.payAmount,
       date: Date.now(),
-      remark: req.body.remark,
+      remark: null,
       relatedAccounting: '646739c059a9bc811d97fa8b', //Sales (Medicines),
       relatedMedicineSale: medicineSaleResult._id,
       type: 'Credit',
@@ -351,7 +347,7 @@ exports.createSingleMedicineSale = async (req, res) => {
     const secTransaction = new Transaction({
       amount: data.msPaidAmount,
       date: Date.now(),
-      remark: req.body.remark,
+      remark: null,
       relatedBank: req.body.relatedBank,
       relatedCash: req.body.relatedCash,
       type: 'Debit',
@@ -410,7 +406,7 @@ exports.createSingleMedicineSale = async (req, res) => {
       const fTransaction = new Transaction({
         amount: req.body.balance,
         date: Date.now(),
-        remark: remark,
+        remark: null,
         relatedAccounting: '6505692e8a572e8de464c0ea', //Account Receivable from Customer
         type: 'Debit',
         createdBy: createdBy
@@ -424,7 +420,7 @@ exports.createSingleMedicineSale = async (req, res) => {
       const secTransaction = new Transaction({
         amount: data.msPaidAmount,
         date: Date.now(),
-        remark: remark,
+        remark: null,
         relatedBank: relatedBank,
         relatedCash: relatedCash,
         type: 'Debit',
@@ -580,12 +576,10 @@ exports.getRelatedTreatmentVoucher = async (req, res) => {
       return res.status(404).json({ error: true, message: 'No Record Found' })
     return res.status(200).send({ success: true, data: result })
   } catch (error) {
-    return res
-      .status(500)
-      .send({
-        error: true,
-        message: 'An Error Occured While Fetching Related Treatment Vouchers'
-      })
+    return res.status(500).send({
+      error: true,
+      message: 'An Error Occured While Fetching Related Treatment Vouchers'
+    })
   }
 }
 
@@ -751,12 +745,10 @@ exports.filterTreatmentVoucher = async (req, res, next) => {
     if (relatedDoctor) query.relatedDoctor = relatedDoctor
     if (relatedPatient) query.relatedPatient = relatedPatient
     if (Object.keys(query).length === 0)
-      return res
-        .status(404)
-        .send({
-          error: true,
-          message: 'Please Specify A Query To Use This Function'
-        })
+      return res.status(404).send({
+        error: true,
+        message: 'Please Specify A Query To Use This Function'
+      })
     const result = await TreatmentVoucher.find(query).populate(
       'createdBy relatedTreatment relatedAppointment relatedPatient payment relatedTreatmentSelection relatedBranch'
     )
